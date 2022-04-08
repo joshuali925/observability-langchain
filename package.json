@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "dependencies": {
+    "moment": "^2.29.2",
+    "node-cron": "^3.0.0",
+    "node-fetch": "^3.2.3",
+    "tail": "^2.2.4"
+  }
+}
