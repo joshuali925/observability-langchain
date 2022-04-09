@@ -2,6 +2,7 @@ import { writeFile } from "fs";
 import moment from "moment";
 import cron from "node-cron";
 import { Tail } from "tail";
+import zlib from "zlib";
 import { log, randint, randomRequest } from "./utils.js";
 
 const tail = new Tail("../logs/dashboards.stdout.log", { fromBeginning: true });
@@ -17,8 +18,10 @@ const batch = () => {
   if (buffer.length === 0) return;
 
   const now = new Date();
-  const file = `./output/dashboards--${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}.txt`;
-  writeFile(file, buffer.join("\n"), (err) => {
+  const file = `./output/dashboards--${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}.txt.gz`;
+  const gz = zlib.gzipSync(buffer.join("\n"));
+
+  writeFile(file, gz, (err) => {
     if (err) {
       log("Write to file failed");
       return;
@@ -37,10 +40,15 @@ cron.schedule("* * * * *", () => {
 });
 
 tail.on("line", function (line) {
-  /* const json = JSON.parse(line);
-  const date = moment.unix(json.ts).format(SQL_DATE_FORMAT); */
+  let message = "";
+  try {
+    const json = JSON.parse(line);
+    message = `, status code: ${json.statusCode}`;
+  } catch (error) {
+    message = ", failed to parse json";
+  }
   const date = moment().format(SQL_DATE_FORMAT);
-  log("Received a new line");
+  log(`Received a new line${message}`);
 
   if (buffer.length === 0) startTime = date;
   endTime = date;

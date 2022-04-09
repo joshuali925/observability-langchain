@@ -61,12 +61,14 @@ export const randint = (min, max) =>
 export const log = (...args) =>
   console.log(`[${new Date().toISOString()}]`, ...args);
 
+let errorRate = 0.15;
+
 export const randomRequest = async (endpoint = "http://localhost:5601/") => {
   const userAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
   const random = Math.random();
-  if (random < 0.15) {
+  if (random < errorRate) {
     endpoint += randomString();
-  } else if (random > 0.2) {
+  } else if (random > errorRate + 0.05) {
     endpoint += "app/home";
   }
   log("Requesting endpoint:", endpoint);
@@ -78,5 +80,14 @@ export const randomRequest = async (endpoint = "http://localhost:5601/") => {
     });
   } catch (error) {
     log("fetch request failed");
+  }
+
+  if (random < 0.01) {
+    errorRate = 0.8;
+    log("Increased error rate to 80%");
+    setTimeout(() => {
+      errorRate = 0.15;
+      log("Decreased error rate to 15%");
+    }, randint(60000, 90000));
   }
 };
