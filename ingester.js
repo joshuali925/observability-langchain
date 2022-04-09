@@ -5,7 +5,9 @@ import { Tail } from "tail";
 import zlib from "zlib";
 import { log, randint, randomRequest } from "./utils.js";
 
-const tail = new Tail("../logs/dashboards.stdout.log", { fromBeginning: true });
+const tail = new Tail("../logs/dashboards.stdout.log", {
+  fromBeginning: false,
+});
 tail.on("error", (error) => console.error("ERROR: ", error));
 
 const SQL_DATE_FORMAT = "YYYY-MM-DD hh:mm:ss";
@@ -13,12 +15,13 @@ const SQL_DATE_FORMAT = "YYYY-MM-DD hh:mm:ss";
 let buffer = [];
 let startTime = "";
 let endTime = "";
+const metadata = { offset: [] };
 
 const batch = () => {
   if (buffer.length === 0) return;
 
   const now = new Date();
-  const file = `./output/dashboards--${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}.txt.gz`;
+  const file = `./output/${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-dashboards--${now.getHours()}-${now.getMinutes()}.txt.gz`;
   const gz = zlib.gzipSync(buffer.join("\n"));
 
   writeFile(file, gz, (err) => {
@@ -35,8 +38,13 @@ const batch = () => {
   });
 };
 
-cron.schedule("* * * * *", () => {
+cron.schedule("0 * * * *", () => {
   batch();
+});
+
+cron.schedule("*/10 * * * *", () => {
+  metadata.offset.push(buffer.length);
+  log(`Current offset: ${buffer.length}`);
 });
 
 tail.on("line", function (line) {

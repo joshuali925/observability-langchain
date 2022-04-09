@@ -82,7 +82,7 @@ export const randomRequest = async (endpoint = "http://localhost:5601/") => {
     log("fetch request failed");
   }
 
-  if (random < 0.01) {
+  if (random < 0.001) {
     errorRate = 0.8;
     log("Increased error rate to 80%");
     setTimeout(() => {
