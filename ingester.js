@@ -59,8 +59,8 @@ const batch = () => {
     putS3(BUCKET, filePath, s3Object);
 
     metadata.meta.object = s3Object;
-    metadata.startTime = startTime;
-    metadata.endTime = endTime;
+    metadata.meta.startTime = startTime;
+    metadata.meta.endTime = endTime;
     await putOpenSearch(INDEX, metadata);
 
     metadata = {
