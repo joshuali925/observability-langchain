@@ -1,6 +1,6 @@
 import { Client } from "@opensearch-project/opensearch";
-import fs from "fs";
 import AWS from "aws-sdk";
+import fs from "fs";
 import fetch from "node-fetch";
 
 const userAgents = [
@@ -102,24 +102,23 @@ export const putOpenSearch = async (index, document) => {
     body: document,
     refresh: true,
   });
+  log("Put document to opensearch");
 };
 
-export const putS3 = async (filePath, objectPath) => {
+export const putS3 = async (bucket, filePath, objectPath) => {
   const s3 = new AWS.S3();
   const fileContent = fs.readFileSync(filePath);
 
   const params = {
-    Bucket: "sql-maximus-poc-test-bucket-519072602456",
+    Bucket: bucket,
     Key: objectPath,
     Body: fileContent,
   };
 
-  s3.upload(params, function (err, data) {
+  return s3.upload(params, function (err, data) {
     if (err) {
-      throw err;
+      log("S3 object uploaded failed");
     }
-    console.log(`File uploaded successfully. ${data.Location}`);
+    log(`S3 object uploaded successfully. ${data.Location}`);
   });
 };
-
-putS3('./output/2022-3-9-dashboards--1-0.txt.gz', 'dashboards-logs/2022/3/9/dashboards-1.txt.gz')
