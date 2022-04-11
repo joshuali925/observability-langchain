@@ -12,7 +12,7 @@ tail.on("error", (error) => console.error("ERROR: ", error));
 
 const SQL_DATE_FORMAT = "YYYY-MM-DD hh:mm:ss";
 const BUCKET = "sql-maximus-poc-test-bucket-519072602456";
-const INDEX = "s3-test-js-script";
+const INDEX = "s3-dashboards-logs-hourly";
 
 let buffer = [];
 let startTime = "";
@@ -38,9 +38,9 @@ const batch = () => {
     ("0" + now.getHours()).slice(-2), //        3
     ("0" + now.getMinutes()).slice(-2), //      4
   ];
-  const filePath = `./output/${date.slice(0, 3).join("-")}-dashboards-${date
-    .slice(3)
-    .join("-")}.txt.gz`;
+  const filePath = `./output/${date.slice(0, 3).join("-")}-dashboards-${
+    date[3]
+  }.txt.gz`;
   const gz = zlib.gzipSync(buffer.join("\n"));
 
   writeFile(filePath, gz, async (err) => {
@@ -78,7 +78,7 @@ const batch = () => {
   });
 };
 
-cron.schedule("* * * * *", () => {
+cron.schedule("0 * * * *", () => {
   batch();
 });
 
