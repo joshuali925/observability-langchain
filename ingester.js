@@ -82,10 +82,10 @@ cron.schedule("0 * * * *", () => {
   batch();
 });
 
-/* cron.schedule("* * * * *", () => {
-  metadata.offset.push(buffer.length);
+cron.schedule("0 1-59 * * * *", () => {
+  metadata.meta.offset.push(buffer.length);
   log(`Current offset: ${buffer.length}`);
-}); */
+});
 
 tail.on("line", function (line) {
   let message = "";
