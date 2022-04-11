@@ -42,10 +42,10 @@ cron.schedule("0 * * * *", () => {
   batch();
 });
 
-cron.schedule("*/10 * * * *", () => {
-  metadata.offset.push(buffer.length);
-  log(`Current offset: ${buffer.length}`);
-});
+// cron.schedule("*/10 * * * *", () => {
+  // metadata.offset.push(buffer.length);
+  // log(`Current offset: ${buffer.length}`);
+// });
 
 tail.on("line", function (line) {
   let message = "";
