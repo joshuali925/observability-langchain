@@ -97,7 +97,7 @@ export const randomRequest = async (endpoint = "http://localhost:5601/") => {
 
 export const putOpenSearch = async (index, document) => {
   const client = new Client({ node: "http://localhost:9200" });
-  const response = await client.index({
+  return client.index({
     index,
     body: document,
     refresh: true,
