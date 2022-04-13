@@ -1,6 +1,6 @@
 import { Client } from "@opensearch-project/opensearch";
 import AWS from "aws-sdk";
-import fs from "fs";
+import { promises as fs } from "fs";
 import fetch from "node-fetch";
 
 const userAgents = [
@@ -97,17 +97,17 @@ export const randomRequest = async (endpoint = "http://localhost:5601/") => {
 
 export const putOpenSearch = async (index, document) => {
   const client = new Client({ node: "http://localhost:9200" });
+  log("Put OpenSearch", index);
   return client.index({
     index,
     body: document,
     refresh: true,
   });
-  log("Put document to opensearch");
 };
 
 export const putS3 = async (bucket, filePath, objectPath) => {
   const s3 = new AWS.S3();
-  const fileContent = fs.readFileSync(filePath);
+  const fileContent = await fs.readFile(filePath);
 
   const params = {
     Bucket: bucket,

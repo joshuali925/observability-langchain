@@ -1,3 +1,4 @@
+import { promises as fs } from "fs";
 import moment from "moment";
 import cron from "node-cron";
 import { Tail } from "tail";
@@ -11,6 +12,8 @@ tail.on("error", (error) => console.error("ERROR: ", error));
 
 const BUCKET = "sql-maximus-poc-test-bucket-519072602456";
 const INDEX = "s3-dashboards-logs-minutes";
+const METADATA_INDEX = INDEX + "-metadata";
+const METRICS_INDEX = INDEX + "-metrics";
 
 let buffer = [];
 let startTime = "";
@@ -22,6 +25,16 @@ let metadata = {
     type: "s3",
   },
   raw: "",
+};
+const metrics = {
+  errors: 0,
+  throughput: 0,
+  responseTime: 0,
+  contentLength: 0,
+  nonJSON: 0,
+  avgResponseTime: 0,
+  errorRate: 0,
+  avgContentLength: 0,
 };
 
 const batch = async () => {
@@ -35,12 +48,12 @@ const batch = async () => {
     ("0" + now.getHours()).slice(-2), //        3
     ("0" + now.getMinutes()).slice(-2), //      4
   ];
-  const filePath = `./output/${date.slice(0, 3).join("-")}-dashboards-${
-    date.slice(3).join('-')
-  }.txt.gz`;
+  const filePath = `./output/${date.slice(0, 3).join("-")}-dashboards-${date
+    .slice(3)
+    .join("-")}.txt.gz`;
   const gz = zlib.gzipSync(buffer.join("\n"));
 
-  await writeFile(filePath, gz, (err) => {
+  await fs.writeFile(filePath, gz, (err) => {
     if (err) {
       log("Write to file failed");
       return;
@@ -59,7 +72,7 @@ const batch = async () => {
   metadata.meta.object = s3Object;
   metadata.meta.startTime = startTime;
   metadata.meta.endTime = endTime;
-  await putOpenSearch(INDEX, metadata);
+  await putOpenSearch(METADATA_INDEX, metadata);
 
   metadata = {
     meta: {
@@ -78,6 +91,22 @@ cron.schedule("* * * * *", () => {
   batch();
 });
 
+cron.schedule("14-59/15 * * * * *", async () => {
+  const date = moment().toISOString();
+  metrics["@timestamp"] = date;
+  if (metrics.throughput > 0) {
+    metrics.errorRate =
+      Math.round((metrics.errors / metrics.throughput) * 100) / 100;
+    metrics.avgResponseTime =
+      Math.round((metrics.responseTime / metrics.throughput) * 100) / 100;
+    metrics.avgContentLength =
+      Math.round((metrics.contentLength / metrics.throughput) * 100) / 100;
+  }
+  log("metrics:", JSON.stringify(metrics));
+  await putOpenSearch(METRICS_INDEX, metrics);
+  Object.keys(metrics).forEach((key) => (metrics[key] = 0));
+});
+
 /* cron.schedule("0 1-59 * * * *", () => {
   metadata.meta.offset.push(buffer.length);
   log(`Current offset: ${buffer.length}`);
@@ -88,8 +117,15 @@ tail.on("line", function (line) {
   try {
     const json = JSON.parse(line);
     message = `, status code: ${json.statusCode}`;
+    metrics.throughput++;
+    if (json.statusCode && json.statusCode >= 400) {
+      metrics.errors++;
+    }
+    metrics.responseTime += json.res.responseTime;
+    metrics.contentLength += json.res.contentLength;
   } catch (error) {
     message = ", failed to parse json";
+    metrics.nonJSON++;
   }
   const date = moment().toISOString();
   log(`Received a new line${message}`);
