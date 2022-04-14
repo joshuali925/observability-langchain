@@ -64,9 +64,10 @@ export const randint = (min, max) =>
 export const log = (...args) =>
   console.log(`[${new Date().toISOString()}]`, ...args);
 
-let errorRate = 0.15;
+let errorRate = 0.05;
+let interval;
 
-export const randomRequest = async (endpoint = "http://localhost:5601/") => {
+export const randomRequest = async (endpoint) => {
   const userAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
   const random = Math.random();
   if (random < errorRate) {
@@ -95,9 +96,26 @@ export const randomRequest = async (endpoint = "http://localhost:5601/") => {
   }
 };
 
+export const startRandomRequest = (endpoint = "http://localhost:5601/") => {
+  interval = setInterval(() => randomRequest(endpoint), randint(1500, 3000));
+};
+
+export const stopRandomRequest = () => {
+  clearInterval(interval);
+};
+
 export const putOpenSearch = async (index, document) => {
   const client = new Client({ node: "http://localhost:9200" });
   log("Put OpenSearch", index);
+  fs.appendFile(
+    `./output/ndjson/${index}`,
+    `{"index":{}}\n` + JSON.stringify(document) + "\n",
+    (err) => {
+      if (err) {
+        log("Append error for", index);
+      }
+    }
+  );
   return client.index({
     index,
     body: document,

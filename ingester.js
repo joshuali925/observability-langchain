@@ -3,7 +3,7 @@ import moment from "moment";
 import cron from "node-cron";
 import { Tail } from "tail";
 import zlib from "zlib";
-import { log, putOpenSearch, putS3, randint, randomRequest } from "./utils.js";
+import { log, putOpenSearch, putS3, startRandomRequest } from "./utils.js";
 
 const tail = new Tail("../logs/dashboards.stdout.log", {
   fromBeginning: false,
@@ -72,6 +72,7 @@ const batch = async () => {
   metadata.meta.object = s3Object;
   metadata.meta.startTime = startTime;
   metadata.meta.endTime = endTime;
+  metadata["@timestamp"] = now.toISOString();
   await putOpenSearch(METADATA_INDEX, metadata);
 
   metadata = {
@@ -91,7 +92,7 @@ cron.schedule("* * * * *", () => {
   batch();
 });
 
-cron.schedule("14-59/15 * * * * *", async () => {
+cron.schedule("*/15 * * * * *", async () => {
   const date = moment().toISOString();
   metrics["@timestamp"] = date;
   if (metrics.throughput > 0) {
@@ -135,4 +136,4 @@ tail.on("line", function (line) {
   buffer.push(line);
 });
 
-setInterval(() => randomRequest(), randint(1500, 3000));
+startRandomRequest();
