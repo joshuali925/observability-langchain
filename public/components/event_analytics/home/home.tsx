@@ -56,6 +56,7 @@ import { getSampleDataModal } from '../../common/helpers/add_sample_modal';
 import { DeleteModal } from '../../common/helpers/delete_modal';
 import { onItemSelect, parseGetSuggestions } from '../../common/search/autocomplete_logic';
 import { Search } from '../../common/search/search';
+import { Input } from '../explorer/llm/input';
 import { init as initFields } from '../redux/slices/field_slice';
 import { init as initPatterns } from '../redux/slices/patterns_slice';
 import { init as initQueryResult, selectQueryResult } from '../redux/slices/query_result_slice';
@@ -358,6 +359,7 @@ const EventAnalyticsHome = (props: IHomeProps) => {
               <EuiTitle data-test-subj="eventHomePageTitle" size="l">
                 <h1>Logs</h1>
               </EuiTitle>
+              <Input />
             </EuiPageHeaderSection>
           </EuiPageHeader>
           <EuiPageContent className="event-home">
