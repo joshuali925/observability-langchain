@@ -28,6 +28,7 @@ import { uiSettingsService } from '../../../../common/utils';
 import { APP_ANALYTICS_TAB_ID_REGEX } from '../../../../common/constants/explorer';
 import { LiveTailButton, StopLiveButton } from '../live_tail/live_tail_button';
 import { PPL_SPAN_REGEX } from '../../../../common/constants/shared';
+import { LLMInput } from '../../event_analytics/explorer/llm/input';
 export interface IQueryBarProps {
   query: string;
   tempQuery: string;
@@ -131,6 +132,7 @@ export const Search = (props: any) => {
 
   return (
     <div className="globalQueryBar">
+      <LLMInput handleQueryChange={handleQueryChange} />
       <EuiFlexGroup gutterSize="s" justifyContent="flexStart" alignItems="flexStart">
         {appLogEvents && (
           <EuiFlexItem style={{ minWidth: 110 }} grow={false}>

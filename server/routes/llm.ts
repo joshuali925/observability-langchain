@@ -5,13 +5,14 @@
 
 import { schema } from '@osd/config-schema';
 import { IOpenSearchDashboardsResponse, IRouter, ResponseError } from '../../../../src/core/server';
+import { LANGCHAIN_API } from '../../common/constants/langchain';
 import { generatePPL } from '../langchain/tools/generate_ppl';
 import { flattenMappings } from '../langchain/utils/utils';
 
 export function registerLLMRoute(router: IRouter) {
   router.post(
     {
-      path: '/api/langchain/llm',
+      path: LANGCHAIN_API.PPL_GENERATOR,
       validate: {
         body: schema.object({
           index: schema.string(),
@@ -31,7 +32,7 @@ export function registerLLMRoute(router: IRouter) {
           index: request.body.index,
         });
         const fields = flattenMappings(mappings);
-        const ppl = await generatePPL({ question, index, fields });
+        const ppl = await generatePPL({ question, index, timeField, fields });
         return response.ok({ body: ppl });
       } catch (error) {
         return response.custom({

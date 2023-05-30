@@ -3,31 +3,70 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { EuiFieldText } from '@elastic/eui';
-import React, { useRef } from 'react';
+import {
+  EuiButton,
+  EuiCode,
+  EuiFieldText,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiSpacer,
+  EuiText,
+} from '@elastic/eui';
+import React, { useEffect, useRef, useState } from 'react';
+import { LANGCHAIN_API } from '../../../../../common/constants/langchain';
 import { getOSDHttp } from '../../../../../common/utils';
 
-export const Input: React.FC = () => {
-  console.count('Input rerender');
-  const ref = useRef<HTMLInputElement>(null);
+interface Props {
+  handleQueryChange: (query: string) => void;
+}
+
+export const LLMInput: React.FC<Props> = (props) => {
+  const indexRef = useRef<HTMLInputElement>(null);
+  const timeFieldRef = useRef<HTMLInputElement>(null);
+  const questionRef = useRef<HTMLInputElement>(null);
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    if (indexRef.current) {
+      indexRef.current.value = 'opensearch_dashboards_sample_data_flights';
+    }
+    if (questionRef.current) {
+      questionRef.current.value = 'How many flights were there in the past hour';
+      questionRef.current.value = 'what are the longest flights in the past day';
+    }
+  }, []);
 
   const request = async () => {
-    const response = await getOSDHttp().post('/api/langchain/llm', {
+    const response = await getOSDHttp().post(LANGCHAIN_API.PPL_GENERATOR, {
       body: JSON.stringify({
-        question: ref.current?.value,
-        index: 'jaeger',
-        timeField: 'timestamp',
+        question: questionRef.current?.value,
+        index: indexRef.current?.value,
+        timeField: '',
       }),
     });
     console.info('❗response:', response);
+    setQuery(response.query);
+    props.handleQueryChange(response.query);
   };
 
   return (
     <>
-      <EuiFieldText inputRef={ref} />
-      <button style={{ border: 'solid red', padding: 3 }} onClick={request}>
-        TEST
-      </button>
+      <EuiFlexGroup>
+        <EuiFlexItem grow={1}>
+          <EuiFieldText prepend={['Index']} fullWidth inputRef={indexRef} />
+        </EuiFlexItem>
+        <EuiFlexItem grow={4}>
+          <EuiFieldText prepend={['Question']} fullWidth inputRef={questionRef} />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButton onClick={request}>Predict</EuiButton>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+      <EuiSpacer size="s" />
+      <EuiText>
+        PPL Query: <EuiCode>{query}</EuiCode>
+      </EuiText>
+      <EuiSpacer />
     </>
   );
 };
