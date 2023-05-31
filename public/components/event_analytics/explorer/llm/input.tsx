@@ -55,7 +55,7 @@ export const LLMInput: React.FC<Props> = (props) => {
         <EuiFlexItem grow={1}>
           <EuiFieldText prepend={['Index']} fullWidth inputRef={indexRef} />
         </EuiFlexItem>
-        <EuiFlexItem grow={4}>
+        <EuiFlexItem grow={2}>
           <EuiFieldText prepend={['Question']} fullWidth inputRef={questionRef} />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
