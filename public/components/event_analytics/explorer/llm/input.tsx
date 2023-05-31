@@ -64,19 +64,24 @@ export const LLMInput: React.FC<Props> = (props) => {
           <EuiButton onClick={request}>Predict</EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiSpacer size="s" />
-      <EuiText>
-        PPL Query: <EuiCode>{query}</EuiCode>
-        {query && (
-          <EuiCopy textToCopy={query}>
-            {(copy) => (
-              <EuiButtonIcon aria-label="Copy PPL query" iconType="copyClipboard" onClick={copy}>
-                Click to copy
-              </EuiButtonIcon>
-            )}
-          </EuiCopy>
-        )}
-      </EuiText>
+      {query ? (
+        <>
+          <EuiSpacer size="s" />
+          <EuiText>
+            Copy/paste the query below to test:{' '}
+            <EuiCopy textToCopy={query}>
+              {(copy) => (
+                <EuiButtonIcon aria-label="Copy PPL query" iconType="copyClipboard" onClick={copy}>
+                  Click to copy
+                </EuiButtonIcon>
+              )}
+            </EuiCopy>
+          </EuiText>
+          <EuiText>
+            <EuiCode>{query}</EuiCode>
+          </EuiText>
+        </>
+      ) : null}
       <EuiSpacer />
     </>
   );
