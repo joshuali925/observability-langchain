@@ -7,7 +7,7 @@ import { schema } from '@osd/config-schema';
 import { IOpenSearchDashboardsResponse, IRouter, ResponseError } from '../../../../src/core/server';
 import { LANGCHAIN_API } from '../../common/constants/langchain';
 import { generatePPL } from '../langchain/tools/generate_ppl';
-import { flattenMappings } from '../langchain/utils/utils';
+import { generateFieldContext } from '../langchain/utils/utils';
 
 export function registerLLMRoute(router: IRouter) {
   router.post(
@@ -31,7 +31,11 @@ export function registerLLMRoute(router: IRouter) {
         const mappings = await context.core.opensearch.client.asCurrentUser.indices.getMapping({
           index: request.body.index,
         });
-        const fields = flattenMappings(mappings);
+        const sampleDoc = await context.core.opensearch.client.asCurrentUser.search({
+          index: request.body.index,
+          size: 1,
+        });
+        const fields = generateFieldContext(mappings, sampleDoc);
         const ppl = await generatePPL({ question, index, timeField, fields });
         return response.ok({ body: ppl });
       } catch (error) {
