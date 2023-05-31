@@ -5,7 +5,9 @@
 
 import {
   EuiButton,
+  EuiButtonIcon,
   EuiCode,
+  EuiCopy,
   EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
@@ -65,6 +67,15 @@ export const LLMInput: React.FC<Props> = (props) => {
       <EuiSpacer size="s" />
       <EuiText>
         PPL Query: <EuiCode>{query}</EuiCode>
+        {query && (
+          <EuiCopy textToCopy={query}>
+            {(copy) => (
+              <EuiButtonIcon aria-label="Copy PPL query" iconType="copyClipboard" onClick={copy}>
+                Click to copy
+              </EuiButtonIcon>
+            )}
+          </EuiCopy>
+        )}
       </EuiText>
       <EuiSpacer />
     </>
