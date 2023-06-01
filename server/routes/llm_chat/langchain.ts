@@ -4,12 +4,16 @@
  */
 
 import { schema } from '@osd/config-schema';
-import { IOpenSearchDashboardsResponse, IRouter, ResponseError } from '../../../../src/core/server';
-import { LANGCHAIN_API } from '../../common/constants/langchain';
-import { generatePPL } from '../langchain/tools/generate_ppl';
-import { generateFieldContext } from '../langchain/utils/utils';
+import {
+  IOpenSearchDashboardsResponse,
+  IRouter,
+  ResponseError,
+} from '../../../../../src/core/server';
+import { LANGCHAIN_API } from '../../../common/constants/llm';
+import { generatePPL } from '../../langchain/tools/generate_ppl';
+import { generateFieldContext } from '../../langchain/utils/utils';
 
-export function registerLLMRoute(router: IRouter) {
+export function registerLangChainRoutes(router: IRouter) {
   router.post(
     {
       path: LANGCHAIN_API.PPL_GENERATOR,

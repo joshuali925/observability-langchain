@@ -1,0 +1,14 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { OBSERVABILITY_BASE } from './shared';
+
+export const CHAT_API = {
+  LLM: `${OBSERVABILITY_BASE}/chat/llm`,
+} as const;
+
+export const LANGCHAIN_API = {
+  PPL_GENERATOR: `${OBSERVABILITY_BASE}/langchain/ppl`,
+} as const;

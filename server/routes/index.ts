@@ -14,8 +14,8 @@ import { VisualizationsRouter } from './custom_panels/visualizations_router';
 import { registerDslRoute } from './dsl';
 import { registerEventAnalyticsRouter } from './event_analytics/event_analytics_router';
 import { registerChatRoute } from './llm_chat/chat_router';
+import { registerLangChainRoutes } from './llm_chat/langchain';
 import { registerMetricsRoute } from './metrics/metrics_rounter';
-import { registerLLMRoute } from './llm';
 import { registerNoteRoute } from './notebooks/noteRouter';
 import { registerParaRoute } from './notebooks/paraRouter';
 import { registerSqlRoute } from './notebooks/sqlRouter';
@@ -43,6 +43,6 @@ export function setupRoutes({ router, client }: { router: IRouter; client: ILega
 
   registerMetricsRoute(router);
 
-  registerLLMRoute(router);
   registerChatRoute(router);
+  registerLangChainRoutes(router);
 }

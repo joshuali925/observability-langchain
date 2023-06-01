@@ -15,7 +15,7 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { useEffect, useRef, useState } from 'react';
-import { LANGCHAIN_API } from '../../../../../common/constants/langchain';
+import { LANGCHAIN_API } from '../../../../../common/constants/llm';
 import { getOSDHttp } from '../../../../../common/utils';
 
 interface Props {
