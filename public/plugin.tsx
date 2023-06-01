@@ -3,38 +3,38 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import './index.scss';
-
 import { i18n } from '@osd/i18n';
+import React from 'react';
 import {
   AppCategory,
   AppMountParameters,
   CoreSetup,
   CoreStart,
   Plugin,
+  SavedObject,
 } from '../../../src/core/public';
+import { toMountPoint } from '../../../src/plugins/opensearch_dashboards_react/public';
 import { CREATE_TAB_PARAM, CREATE_TAB_PARAM_KEY, TAB_CHART_ID } from '../common/constants/explorer';
-
 import {
   observabilityApplicationsID,
   observabilityApplicationsPluginOrder,
   observabilityApplicationsTitle,
-  observabilityTracesTitle,
+  observabilityLogsID,
+  observabilityLogsPluginOrder,
+  observabilityLogsTitle,
   observabilityMetricsID,
   observabilityMetricsPluginOrder,
   observabilityMetricsTitle,
   observabilityNotebookID,
   observabilityNotebookPluginOrder,
   observabilityNotebookTitle,
+  observabilityPanelsID,
+  observabilityPanelsPluginOrder,
+  observabilityPanelsTitle,
+  observabilityPluginOrder,
   observabilityTracesID,
   observabilityTracesPluginOrder,
-  observabilityPanelsID,
-  observabilityPanelsTitle,
-  observabilityPanelsPluginOrder,
-  observabilityLogsID,
-  observabilityLogsTitle,
-  observabilityLogsPluginOrder,
-  observabilityPluginOrder,
+  observabilityTracesTitle,
 } from '../common/constants/shared';
 import { QueryManager } from '../common/query_manager';
 import { VISUALIZATION_SAVED_OBJECT } from '../common/types/observability_saved_object_attributes';
@@ -44,11 +44,9 @@ import {
   setPPLService,
   uiSettingsService,
 } from '../common/utils';
+import { CoreServicesContext, HeaderChatButton } from './components/llm_chat/chat_header_button';
 import { convertLegacyNotebooksUrl } from './components/notebooks/components/helpers/legacy_route_helpers';
 import { convertLegacyTraceAnalyticsUrl } from './components/trace_analytics/components/common/legacy_route_helpers';
-import { SavedObject } from '../../../src/core/public';
-import { coreRefs } from './framework/core_refs';
-
 import {
   OBSERVABILITY_EMBEDDABLE,
   OBSERVABILITY_EMBEDDABLE_DESCRIPTION,
@@ -57,6 +55,7 @@ import {
   OBSERVABILITY_EMBEDDABLE_ID,
 } from './embeddable/observability_embeddable';
 import { ObservabilityEmbeddableFactoryDefinition } from './embeddable/observability_embeddable_factory';
+import { coreRefs } from './framework/core_refs';
 import './index.scss';
 import DSLService from './services/requests/dsl';
 import PPLService from './services/requests/ppl';
@@ -126,7 +125,7 @@ export class ObservabilityPlugin
 
       return Observability(
         coreStart,
-        depsStart as AppPluginStartDependencies,
+        depsStart,
         params,
         pplService,
         dslService,
@@ -223,9 +222,25 @@ export class ObservabilityPlugin
     return {};
   }
 
-  public start(core: CoreStart): ObservabilityStart {
-    const pplService: PPLService = new PPLService(core.http);
+  public start(core: CoreStart, startDeps: AppPluginStartDependencies): ObservabilityStart {
+    core.chrome.navControls.registerRight({
+      order: 10000,
+      mount: toMountPoint(
+        <CoreServicesContext.Provider
+          value={{
+            http: core.http,
+            savedObjectsClient: core.savedObjects.client,
+            DashboardContainerByValueRenderer:
+              startDeps.dashboard.DashboardContainerByValueRenderer,
+          }}
+        >
+          <HeaderChatButton application={core.application} />
+        </CoreServicesContext.Provider>
+      ),
+    });
+    // core.chrome.navControls.getRight$().forEach((x) => console.log(x));
 
+    const pplService: PPLService = new PPLService(core.http);
     coreRefs.http = core.http;
     coreRefs.savedObjectsClient = core.savedObjects.client;
     coreRefs.pplService = pplService;
