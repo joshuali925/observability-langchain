@@ -29,9 +29,9 @@ export const LLMInput: React.FC<Props> = (props) => {
   const questionRef = useRef<HTMLInputElement>(null);
   const { data, loading } = useCatIndices();
   const [query, setQuery] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState<
-    Array<EuiComboBoxOptionOption<{ label: string }>>
-  >([{ label: 'opensearch_dashboards_sample_data_flights' }]);
+  const [selectedIndex, setSelectedIndex] = useState<EuiComboBoxOptionOption[]>([
+    { label: 'opensearch_dashboards_sample_data_flights' },
+  ]);
 
   useEffect(() => {
     if (questionRef.current) {
@@ -122,7 +122,7 @@ const genericReducer: GenericReducer = (state, action) => {
   }
 };
 export const useCatIndices = () => {
-  const reducer: GenericReducer<Array<{ label: string }>> = genericReducer;
+  const reducer: GenericReducer<EuiComboBoxOptionOption[]> = genericReducer;
   const [state, dispatch] = useReducer(reducer, { loading: false });
   const [refresh, setRefresh] = useState({});
 
