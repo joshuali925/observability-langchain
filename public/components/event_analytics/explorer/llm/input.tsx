@@ -45,7 +45,6 @@ export const LLMInput: React.FC<Props> = (props) => {
       body: JSON.stringify({
         question: questionRef.current?.value,
         index: selectedIndex[0].label,
-        timeField: '',
       }),
     });
     console.info('❗response:', response);
