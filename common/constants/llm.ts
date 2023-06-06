@@ -11,4 +11,5 @@ export const CHAT_API = {
 
 export const LANGCHAIN_API = {
   PPL_GENERATOR: `${OBSERVABILITY_BASE}/langchain/ppl`,
+  AGENT_TEST: `${OBSERVABILITY_BASE}/langchain/agent`,
 } as const;
