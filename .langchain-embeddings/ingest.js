@@ -37,7 +37,7 @@ const loadDocuments = async () => {
 };
 
 const documents = await loadDocuments();
-log('Loaded documents:', JSON.stringify([documents[0]]));
+log(`Loaded ${documents.length} documents, example:`, JSON.stringify(documents[0]));
 
 const client = new Client({
   nodes: [process.env.OPENSEARCH_URL ?? 'http://localhost:9200'],
@@ -52,11 +52,8 @@ if (exists) {
 }
 
 log('Ingesting to vector store');
-const response = await OpenSearchVectorStore.fromDocuments(
+OpenSearchVectorStore.fromDocuments(
   documents,
-  new HuggingFaceInferenceEmbeddings(),
-  {
-    client,
-    indexName,
-  }
+  new HuggingFaceInferenceEmbeddings({ model: 'sentence-transformers/all-mpnet-base-v2' }),
+  { client, indexName }
 );
