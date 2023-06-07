@@ -12,7 +12,7 @@ import path from 'path';
 const log = (...args) => console.log(`[${new Date().toISOString()}]`, ...args);
 
 const __dirname = path.resolve();
-const indexName = process.env.OPENSEARCH_INDEX || 'documents';
+const indexName = '.llm-vector-store';
 
 const loadDocuments = async () => {
   const loader = new DirectoryLoader(__dirname + '/static_data', {
