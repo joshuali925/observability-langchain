@@ -47,9 +47,8 @@ export const LLMInput: React.FC<Props> = (props) => {
         index: selectedIndex[0].label,
       }),
     });
-    console.info('❗response:', response);
-    setQuery(response.query);
-    props.handleQueryChange(response.query);
+    setQuery(response);
+    props.handleQueryChange(response);
   };
 
   return (
