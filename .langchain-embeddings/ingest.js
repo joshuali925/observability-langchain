@@ -19,6 +19,7 @@ const loadDocuments = async () => {
     '.json': (path) => new JSONLoader(path),
     '.csv': (path) => new CSVLoader(path),
     '.txt': (path) => new TextLoader(path),
+    '.md': (path) => new TextLoader(path),
   });
   const documents = await loader.load();
 
@@ -54,6 +55,6 @@ if (exists) {
 log('Ingesting to vector store');
 OpenSearchVectorStore.fromDocuments(
   documents,
-  new HuggingFaceInferenceEmbeddings({ model: 'sentence-transformers/all-mpnet-base-v2' }),
+  new HuggingFaceInferenceEmbeddings({ model: 'sentence-transformers/paraphrase-albert-small-v2' }),
   { client, indexName }
 );
