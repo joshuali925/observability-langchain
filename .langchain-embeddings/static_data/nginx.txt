@@ -1,0 +1,364 @@
+Logs in NGINX
+By default, NGINX writes its events in two types of logs - the error log and the access log. In most of the popular Linux distro like Ubuntu, CentOS or Debian, both the access and error log can be found in /var/log/nginx, assuming you have already enabled the access and error logs in the core NGINX configuration file. Let us find out more about NGINX access log, error log and how to enable them if you have not done it earlier.
+
+What is NGINX access log?
+The NGINX logs the activities of all the visitors to your site in the access logs. Here you can find which files are accessed, how NGINX responded to a request, what browser a client is using, IP address of clients and more. It is possible to use the information from the access log to analyze the traffic to find sites usages over time. Further, by monitoring the access logs properly, one can find out if a user is sending some unusual request for finding flaws in the deployed web application.
+
+What is NGINX error log?
+On the other hand, if NGINX faces any glitches then it will record the event to the error log. This may happen if there is some error in the configuration file. Therefore if NGINX is unable to start or abruptly stopped running then you should check the error logs to find more details. You may also find few warnings in the error log but it does not indicate that a problem has occurred but the event may pose a serious issue in the near future.
+
+How to enable NGINX access log?
+In general, the access log can be enabled with access_log directive either in http or in server section. The first argument log_file is mandatory whereas the second argument log_format is optional. If you don’t specify any format then logs will be written in default combined format.
+
+access_log log_file log_format;
+The access log is enabled by default in the http context of core NGINX configuration file. That means access log of all the virtual host will be recorded in the same file.
+
+http {
+      ...
+      ...
+      access_log  /var/log/nginx/access.log;
+      ...
+      ...
+}
+It is always better to segregate the access logs of all the virtual hosts by recording them in a separate file. To do that, you need to override the access_log directive that is defined in the http section with another access_log directive in the server context.
+
+
+http {
+      ...
+      ...
+      access_log  /var/log/nginx/access.log;
+
+         server {
+                  listen 80;
+                  server_name domain1.com
+                  access_log  /var/log/nginx/domain1.access.log;
+                  ...
+                  ...
+                }
+}
+Reload NGINX to apply the new settings. To view the access logs for the domain domain1.com in the file /var/log/nginx/domain1.access.log, use the following tail command in the terminal.
+
+# tail -f /var/log/nginx/domain1.access.log
+Apply Custom Format in Access Log
+The default log format used to record an event in the access log is combined log format. You can override the default behavior by creating your own custom log format and then specify the name of the custom format in the access_log directive. The following example defines a custom log format by extending the predefined combined format with the value of gzip compression ratio of the response. The format is then applied by indicating the log format with the access_log directive.
+
+http {
+            log_format custom '$remote_addr - $remote_user [$time_local] '
+                           '"$request" $status $body_bytes_sent '
+                           '"$http_referer" "$http_user_agent" "$gzip_ratio"';
+
+            server {
+                    gzip on;
+                    ...
+                    access_log /var/log/nginx/domain1.access.log custom;
+                    ...
+            }
+}
+Once you have applied above log format in your environment, reload NGINX. Now tail the access log to find the gzip ratio at the end of the log event.
+
+# tail -f /var/log/nginx/domain1.access.log
+47.29.201.179 - - [28/Feb/2019:13:17:10 +0000] "GET /?p=1 HTTP/2.0" 200 5316 "https://domain1.com/?p=1" "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" "2.75"
+How to enable NGINX error log?
+The error_log directive sets up error logging to file or stderr, or syslog by specifying minimal severity level of error messages to be logged. The syntax of error_log directive is:
+
+error_log log_file log_level;
+The first argument log_file defines the path of the log file and the second argument log_level defines the severity level of the log event to be recorded. If you don’t specify the log_level then by default, only log events with a severity level of error are recorded. For example, the following example sets the severity level of error messages to be logged to crit. Further, the error_log directive in the http context implies that the error log for all the virtual host will be available in a single file.
+
+http {
+       	  ...
+	  error_log  /var/log/nginx/error_log  crit;
+	  ...
+}
+It is also possible to record error logs for all the virtual host separately by overriding the error_log directive in the server context. The following example exactly does that by overriding error_log directive in the server context.
+
+http {
+       ...
+       ...
+       error_log  /var/log/nginx/error_log;
+       server {
+	        	listen 80;
+		        server_name domain1.com;
+       		        error_log  /var/log/nginx/domain1.error_log  warn;
+                        ...
+	   }
+       server {
+	        	listen 80;
+		        server_name domain2.com;
+      		        error_log  /var/log/nginx/domain2.error_log  debug;
+                        ...
+	   }
+}
+All the examples described above records the log events to a file. You can also configure the error_log directive for sending the log events to a syslog server. The following error_log directive sends the error logs to syslog server with an IP address of 192.168.10.11 in debug format.
+
+error_log syslog:server=192.168.10.11 debug;
+In some situation, you might want to disable the error log. To do that, set the log file name to /dev/null.
+
+error_log /dev/null;
+Nginx Error Log Severity Levels
+There are many types of log levels that are associated with a log event and with a different priority. All the log levels are listed below. In the following log levels, debug has top priority and includes the rest of the levels too. For example, if you specify error as a log level, then it will also capture log events those are labeled as crit, alert and emergency.
+
+emerg: Emergency messages when your system may be unstable.
+alert: Alert messages of serious issues.
+crit: Critical issues that need to be taken care of immediately.
+error: An error has occured. Something went wrong while processing a page.
+warn: A warning messages that you should look into it.
+notice: A simple log notice that you can ignore.
+info: Just an information messages that you might want to know.
+debug: Debugging information used to pinpoint the location of error.
+Summary
+The access and error logs in NGINX will not only keep a tab on users activity but also save your time and effort in the process of debugging. Further, you can also customize the access log if you need more information at your disposal. It is always better to enable access and error logs because these two files contain all the clues for better maintenance of the NGINX server.
+
+Beginner’s Guide
+Starting, Stopping, and Reloading Configuration
+Configuration File’s Structure
+Serving Static Content
+Setting Up a Simple Proxy Server
+Setting Up FastCGI Proxying
+This guide gives a basic introduction to nginx and describes some simple tasks that can be done with it. It is supposed that nginx is already installed on the reader’s machine. If it is not, see the Installing nginx page. This guide describes how to start and stop nginx, and reload its configuration, explains the structure of the configuration file and describes how to set up nginx to serve out static content, how to configure nginx as a proxy server, and how to connect it with a FastCGI application.
+
+nginx has one master process and several worker processes. The main purpose of the master process is to read and evaluate configuration, and maintain worker processes. Worker processes do actual processing of requests. nginx employs event-based model and OS-dependent mechanisms to efficiently distribute requests among worker processes. The number of worker processes is defined in the configuration file and may be fixed for a given configuration or automatically adjusted to the number of available CPU cores (see worker_processes).
+
+The way nginx and its modules work is determined in the configuration file. By default, the configuration file is named nginx.conf and placed in the directory /usr/local/nginx/conf, /etc/nginx, or /usr/local/etc/nginx.
+
+Starting, Stopping, and Reloading Configuration
+To start nginx, run the executable file. Once nginx is started, it can be controlled by invoking the executable with the -s parameter. Use the following syntax:
+
+nginx -s signal
+Where signal may be one of the following:
+
+stop — fast shutdown
+quit — graceful shutdown
+reload — reloading the configuration file
+reopen — reopening the log files
+For example, to stop nginx processes with waiting for the worker processes to finish serving current requests, the following command can be executed:
+
+nginx -s quit
+This command should be executed under the same user that started nginx.
+Changes made in the configuration file will not be applied until the command to reload configuration is sent to nginx or it is restarted. To reload configuration, execute:
+
+nginx -s reload
+Once the master process receives the signal to reload configuration, it checks the syntax validity of the new configuration file and tries to apply the configuration provided in it. If this is a success, the master process starts new worker processes and sends messages to old worker processes, requesting them to shut down. Otherwise, the master process rolls back the changes and continues to work with the old configuration. Old worker processes, receiving a command to shut down, stop accepting new connections and continue to service current requests until all such requests are serviced. After that, the old worker processes exit.
+
+A signal may also be sent to nginx processes with the help of Unix tools such as the kill utility. In this case a signal is sent directly to a process with a given process ID. The process ID of the nginx master process is written, by default, to the nginx.pid in the directory /usr/local/nginx/logs or /var/run. For example, if the master process ID is 1628, to send the QUIT signal resulting in nginx’s graceful shutdown, execute:
+
+kill -s QUIT 1628
+For getting the list of all running nginx processes, the ps utility may be used, for example, in the following way:
+
+ps -ax | grep nginx
+For more information on sending signals to nginx, see Controlling nginx.
+
+Configuration File’s Structure
+nginx consists of modules which are controlled by directives specified in the configuration file. Directives are divided into simple directives and block directives. A simple directive consists of the name and parameters separated by spaces and ends with a semicolon (;). A block directive has the same structure as a simple directive, but instead of the semicolon it ends with a set of additional instructions surrounded by braces ({ and }). If a block directive can have other directives inside braces, it is called a context (examples: events, http, server, and location).
+
+Directives placed in the configuration file outside of any contexts are considered to be in the main context. The events and http directives reside in the main context, server in http, and location in server.
+
+The rest of a line after the # sign is considered a comment.
+
+Serving Static Content
+An important web server task is serving out files (such as images or static HTML pages). You will implement an example where, depending on the request, files will be served from different local directories: /data/www (which may contain HTML files) and /data/images (containing images). This will require editing of the configuration file and setting up of a server block inside the http block with two location blocks.
+
+First, create the /data/www directory and put an index.html file with any text content into it and create the /data/images directory and place some images in it.
+
+Next, open the configuration file. The default configuration file already includes several examples of the server block, mostly commented out. For now comment out all such blocks and start a new server block:
+
+http {
+    server {
+    }
+}
+Generally, the configuration file may include several server blocks distinguished by ports on which they listen to and by server names. Once nginx decides which server processes a request, it tests the URI specified in the request’s header against the parameters of the location directives defined inside the server block.
+
+Add the following location block to the server block:
+
+location / {
+    root /data/www;
+}
+This location block specifies the “/” prefix compared with the URI from the request. For matching requests, the URI will be added to the path specified in the root directive, that is, to /data/www, to form the path to the requested file on the local file system. If there are several matching location blocks nginx selects the one with the longest prefix. The location block above provides the shortest prefix, of length one, and so only if all other location blocks fail to provide a match, this block will be used.
+
+Next, add the second location block:
+
+location /images/ {
+    root /data;
+}
+It will be a match for requests starting with /images/ (location / also matches such requests, but has shorter prefix).
+
+The resulting configuration of the server block should look like this:
+
+server {
+    location / {
+        root /data/www;
+    }
+
+    location /images/ {
+        root /data;
+    }
+}
+This is already a working configuration of a server that listens on the standard port 80 and is accessible on the local machine at http://localhost/. In response to requests with URIs starting with /images/, the server will send files from the /data/images directory. For example, in response to the http://localhost/images/example.png request nginx will send the /data/images/example.png file. If such file does not exist, nginx will send a response indicating the 404 error. Requests with URIs not starting with /images/ will be mapped onto the /data/www directory. For example, in response to the http://localhost/some/example.html request nginx will send the /data/www/some/example.html file.
+
+To apply the new configuration, start nginx if it is not yet started or send the reload signal to the nginx’s master process, by executing:
+
+nginx -s reload
+In case something does not work as expected, you may try to find out the reason in access.log and error.log files in the directory /usr/local/nginx/logs or /var/log/nginx.
+Setting Up a Simple Proxy Server
+One of the frequent uses of nginx is setting it up as a proxy server, which means a server that receives requests, passes them to the proxied servers, retrieves responses from them, and sends them to the clients.
+
+We will configure a basic proxy server, which serves requests of images with files from the local directory and sends all other requests to a proxied server. In this example, both servers will be defined on a single nginx instance.
+
+First, define the proxied server by adding one more server block to the nginx’s configuration file with the following contents:
+
+server {
+    listen 8080;
+    root /data/up1;
+
+    location / {
+    }
+}
+This will be a simple server that listens on the port 8080 (previously, the listen directive has not been specified since the standard port 80 was used) and maps all requests to the /data/up1 directory on the local file system. Create this directory and put the index.html file into it. Note that the root directive is placed in the server context. Such root directive is used when the location block selected for serving a request does not include its own root directive.
+
+Next, use the server configuration from the previous section and modify it to make it a proxy server configuration. In the first location block, put the proxy_pass directive with the protocol, name and port of the proxied server specified in the parameter (in our case, it is http://localhost:8080):
+
+server {
+    location / {
+        proxy_pass http://localhost:8080;
+    }
+
+    location /images/ {
+        root /data;
+    }
+}
+We will modify the second location block, which currently maps requests with the /images/ prefix to the files under the /data/images directory, to make it match the requests of images with typical file extensions. The modified location block looks like this:
+
+location ~ \.(gif|jpg|png)$ {
+    root /data/images;
+}
+The parameter is a regular expression matching all URIs ending with .gif, .jpg, or .png. A regular expression should be preceded with ~. The corresponding requests will be mapped to the /data/images directory.
+
+When nginx selects a location block to serve a request it first checks location directives that specify prefixes, remembering location with the longest prefix, and then checks regular expressions. If there is a match with a regular expression, nginx picks this location or, otherwise, it picks the one remembered earlier.
+
+The resulting configuration of a proxy server will look like this:
+
+server {
+    location / {
+        proxy_pass http://localhost:8080/;
+    }
+
+    location ~ \.(gif|jpg|png)$ {
+        root /data/images;
+    }
+}
+This server will filter requests ending with .gif, .jpg, or .png and map them to the /data/images directory (by adding URI to the root directive’s parameter) and pass all other requests to the proxied server configured above.
+
+To apply new configuration, send the reload signal to nginx as described in the previous sections.
+
+There are many more directives that may be used to further configure a proxy connection.
+
+Setting Up FastCGI Proxying
+nginx can be used to route requests to FastCGI servers which run applications built with various frameworks and programming languages such as PHP.
+
+The most basic nginx configuration to work with a FastCGI server includes using the fastcgi_pass directive instead of the proxy_pass directive, and fastcgi_param directives to set parameters passed to a FastCGI server. Suppose the FastCGI server is accessible on localhost:9000. Taking the proxy configuration from the previous section as a basis, replace the proxy_pass directive with the fastcgi_pass directive and change the parameter to localhost:9000. In PHP, the SCRIPT_FILENAME parameter is used for determining the script name, and the QUERY_STRING parameter is used to pass request parameters. The resulting configuration would be:
+
+server {
+    location / {
+        fastcgi_pass  localhost:9000;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param QUERY_STRING    $query_string;
+    }
+
+    location ~ \.(gif|jpg|png)$ {
+        root /data/images;
+    }
+}
+This will set up a server that will route all requests except for requests for static images to the proxied server operating on localhost:9000 through the FastCGI protocol.
+
+Controlling nginx
+Changing Configuration
+Rotating Log-files
+Upgrading Executable on the Fly
+nginx can be controlled with signals. The process ID of the master process is written to the file /usr/local/nginx/logs/nginx.pid by default. This name may be changed at configuration time, or in nginx.conf using the pid directive. The master process supports the following signals:
+
+TERM, INT	fast shutdown
+QUIT	graceful shutdown
+HUP	changing configuration, keeping up with a changed time zone (only for FreeBSD and Linux), starting new worker processes with a new configuration, graceful shutdown of old worker processes
+USR1	re-opening log files
+USR2	upgrading an executable file
+WINCH	graceful shutdown of worker processes
+Individual worker processes can be controlled with signals as well, though it is not required. The supported signals are:
+
+TERM, INT	fast shutdown
+QUIT	graceful shutdown
+USR1	re-opening log files
+WINCH	abnormal termination for debugging (requires debug_points to be enabled)
+Changing Configuration
+In order for nginx to re-read the configuration file, a HUP signal should be sent to the master process. The master process first checks the syntax validity, then tries to apply new configuration, that is, to open log files and new listen sockets. If this fails, it rolls back changes and continues to work with old configuration. If this succeeds, it starts new worker processes, and sends messages to old worker processes requesting them to shut down gracefully. Old worker processes close listen sockets and continue to service old clients. After all clients are serviced, old worker processes are shut down.
+
+Let’s illustrate this by example. Imagine that nginx is run on FreeBSD and the command
+
+ps axw -o pid,ppid,user,%cpu,vsz,wchan,command | egrep '(nginx|PID)'
+produces the following output:
+
+  PID  PPID USER    %CPU   VSZ WCHAN  COMMAND
+33126     1 root     0.0  1148 pause  nginx: master process /usr/local/nginx/sbin/nginx
+33127 33126 nobody   0.0  1380 kqread nginx: worker process (nginx)
+33128 33126 nobody   0.0  1364 kqread nginx: worker process (nginx)
+33129 33126 nobody   0.0  1364 kqread nginx: worker process (nginx)
+If HUP is sent to the master process, the output becomes:
+
+  PID  PPID USER    %CPU   VSZ WCHAN  COMMAND
+33126     1 root     0.0  1164 pause  nginx: master process /usr/local/nginx/sbin/nginx
+33129 33126 nobody   0.0  1380 kqread nginx: worker process is shutting down (nginx)
+33134 33126 nobody   0.0  1368 kqread nginx: worker process (nginx)
+33135 33126 nobody   0.0  1368 kqread nginx: worker process (nginx)
+33136 33126 nobody   0.0  1368 kqread nginx: worker process (nginx)
+One of the old worker processes with PID 33129 still continues to work. After some time it exits:
+
+  PID  PPID USER    %CPU   VSZ WCHAN  COMMAND
+33126     1 root     0.0  1164 pause  nginx: master process /usr/local/nginx/sbin/nginx
+33134 33126 nobody   0.0  1368 kqread nginx: worker process (nginx)
+33135 33126 nobody   0.0  1368 kqread nginx: worker process (nginx)
+33136 33126 nobody   0.0  1368 kqread nginx: worker process (nginx)
+Rotating Log-files
+In order to rotate log files, they need to be renamed first. After that USR1 signal should be sent to the master process. The master process will then re-open all currently open log files and assign them an unprivileged user under which the worker processes are running, as an owner. After successful re-opening, the master process closes all open files and sends the message to worker process to ask them to re-open files. Worker processes also open new files and close old files right away. As a result, old files are almost immediately available for post processing, such as compression.
+
+Upgrading Executable on the Fly
+In order to upgrade the server executable, the new executable file should be put in place of an old file first. After that USR2 signal should be sent to the master process. The master process first renames its file with the process ID to a new file with the .oldbin suffix, e.g. /usr/local/nginx/logs/nginx.pid.oldbin, then starts a new executable file that in turn starts new worker processes:
+
+  PID  PPID USER    %CPU   VSZ WCHAN  COMMAND
+33126     1 root     0.0  1164 pause  nginx: master process /usr/local/nginx/sbin/nginx
+33134 33126 nobody   0.0  1368 kqread nginx: worker process (nginx)
+33135 33126 nobody   0.0  1380 kqread nginx: worker process (nginx)
+33136 33126 nobody   0.0  1368 kqread nginx: worker process (nginx)
+36264 33126 root     0.0  1148 pause  nginx: master process /usr/local/nginx/sbin/nginx
+36265 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
+36266 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
+36267 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
+After that all worker processes (old and new ones) continue to accept requests. If the WINCH signal is sent to the first master process, it will send messages to its worker processes, requesting them to shut down gracefully, and they will start to exit:
+
+  PID  PPID USER    %CPU   VSZ WCHAN  COMMAND
+33126     1 root     0.0  1164 pause  nginx: master process /usr/local/nginx/sbin/nginx
+33135 33126 nobody   0.0  1380 kqread nginx: worker process is shutting down (nginx)
+36264 33126 root     0.0  1148 pause  nginx: master process /usr/local/nginx/sbin/nginx
+36265 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
+36266 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
+36267 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
+After some time, only the new worker processes will process requests:
+
+  PID  PPID USER    %CPU   VSZ WCHAN  COMMAND
+33126     1 root     0.0  1164 pause  nginx: master process /usr/local/nginx/sbin/nginx
+36264 33126 root     0.0  1148 pause  nginx: master process /usr/local/nginx/sbin/nginx
+36265 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
+36266 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
+36267 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
+It should be noted that the old master process does not close its listen sockets, and it can be managed to start its worker processes again if needed. If for some reason the new executable file works unacceptably, one of the following can be done:
+
+Send the HUP signal to the old master process. The old master process will start new worker processes without re-reading the configuration. After that, all new processes can be shut down gracefully, by sending the QUIT signal to the new master process.
+
+Send the TERM signal to the new master process. It will then send a message to its worker processes requesting them to exit immediately, and they will all exit almost immediately. (If new processes do not exit for some reason, the KILL signal should be sent to them to force them to exit.) When the new master process exits, the old master process will start new worker processes automatically.
+
+If the new master process exits then the old master process discards the .oldbin suffix from the file name with the process ID.
+
+If upgrade was successful, then the QUIT signal should be sent to the old master process, and only new processes will stay:
+
+  PID  PPID USER    %CPU   VSZ WCHAN  COMMAND
+36264     1 root     0.0  1148 pause  nginx: master process /usr/local/nginx/sbin/nginx
+36265 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
+36266 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
+36267 36264 nobody   0.0  1364 kqread nginx: worker process (nginx)
