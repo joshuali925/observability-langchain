@@ -719,6 +719,7 @@ export const Explorer = ({
           changeQuery({
             tabId,
             query: {
+              [RAW_QUERY]: tempQuery,
               [SELECTED_TIMESTAMP]: '',
             },
           })
