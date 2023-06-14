@@ -6,11 +6,13 @@
 import { SavedQuery, SavedVisualization } from '../../../../common/types/explorer';
 import { SAVED_QUERY, SAVED_VISUALIZATION } from '../../../../common/constants/explorer';
 
-export interface SavedObjectsCreateResponse {
+interface IdObject {
   objectId: string;
 }
 
-export type SavedObjectsUpdateResponse = SavedObjectsCreateResponse;
+export type SavedObjectsCreateResponse = IdObject;
+export type SavedObjectsUpdateResponse = IdObject;
+export type PPLQueryCreateResponse = IdObject;
 
 interface ObservabilitySavedObjectBase {
   createdTimeMs: number;
@@ -29,9 +31,7 @@ export interface ObservabilitySavedQuery extends ObservabilitySavedObjectBase {
 
 export type ObservabilitySavedObject = ObservabilitySavedVisualization | ObservabilitySavedQuery;
 
-export interface SavedObjectsGetParams {
-  objectId: string;
-}
+export type SavedObjectsGetParams = IdObject;
 
 export interface SavedObjectsGetResponse<
   T extends ObservabilitySavedObject = ObservabilitySavedObject
@@ -42,9 +42,7 @@ export interface SavedObjectsGetResponse<
   observabilityObjectList: T[];
 }
 
-export interface SavedObjectsDeleteParams {
-  objectId: string;
-}
+export type SavedObjectsDeleteParams = IdObject;
 
 export interface SavedObjectsDeleteBulkParams {
   objectIdList: string[];

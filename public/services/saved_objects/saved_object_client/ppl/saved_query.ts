@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { IField } from '../../../../../common/types/explorer';
-import { PPLSavedObjectClient } from './ppl_client';
 import {
-  OBSERVABILITY_BASE,
   EVENT_ANALYTICS,
+  OBSERVABILITY_BASE,
   SAVED_OBJECTS,
   SAVED_QUERY,
 } from '../../../../../common/constants/shared';
+import { IField } from '../../../../../common/types/explorer';
 import { getOSDHttp } from '../../../../../common/utils';
+import { PPLQueryCreateResponse } from '../types';
+import { PPLSavedObjectClient } from './ppl_client';
 
 interface CommonParams {
   query: string;
@@ -29,7 +30,7 @@ type UpdateQueryParams = CommonParams & {
 export class PPLSavedQueryClient extends PPLSavedObjectClient {
   private static instance: PPLSavedQueryClient;
 
-  async create(params: CreateQueryParams): Promise<any> {
+  async create(params: CreateQueryParams): Promise<PPLQueryCreateResponse> {
     return await this.client.post(
       `${OBSERVABILITY_BASE}${EVENT_ANALYTICS}${SAVED_OBJECTS}${SAVED_QUERY}`,
       {
