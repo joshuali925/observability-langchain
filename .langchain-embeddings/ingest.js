@@ -42,6 +42,10 @@ log(`Loaded ${documents.length} documents, example:`, JSON.stringify(documents[0
 
 const client = new Client({
   nodes: [process.env.OPENSEARCH_URL ?? 'http://localhost:9200'],
+  auth: {
+    username: process.env.OPENSEARCH_USERNAME ?? '',
+    password: process.env.OPENSEARCH_PASSWORD ?? '',
+  },
 });
 
 const exists = await client.indices.exists({ index: indexName }).then((r) => r.body);
