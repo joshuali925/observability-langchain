@@ -67,7 +67,11 @@ export class PPLDataFetcher extends DataFetcherBase implements IDataFetcher {
 
     if (isEmpty(query)) return;
 
-    this.queryIndex = this.getIndex(buildRawQuery(query, appBaseQuery));
+    // this.queryIndex = this.getIndex(buildRawQuery(query, appBaseQuery));
+
+    this.queryIndex = this.getIndex(query.rawQuery);
+
+    console.log('this.queryIndex: ', this.queryIndex);
 
     if (this.queryIndex === '') return; // Returns if page is refreshed
 
