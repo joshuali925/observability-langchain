@@ -725,9 +725,9 @@ export const Explorer = ({
         );
         await setDefaultPatternsField('', '');
       }
-      if (availability !== true) {
-        await updateQueryInStore(tempQuery);
-      }
+      // if (availability !== true) {
+      //   await updateQueryInStore(tempQuery);
+      // }
       await fetchData();
     },
     [tempQuery, query]

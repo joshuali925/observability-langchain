@@ -18,14 +18,20 @@ import {
 } from '@elastic/eui';
 import { CatIndicesResponse } from '@opensearch-project/opensearch/api/types';
 import React, { Reducer, useEffect, useReducer, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { LANGCHAIN_API } from '../../../../../common/constants/llm';
 import { DSL_BASE, DSL_CAT } from '../../../../../common/constants/shared';
 import { getOSDHttp } from '../../../../../common/utils';
+import { changeDateRange } from '../../redux/slices/query_slice';
+import { RAW_QUERY } from '../../../../../common/constants/explorer';
 
 interface Props {
   handleQueryChange: (query: string) => void;
+  handleTimeRangePickerRefresh: () => void;
+  tabId: string;
 }
 export const LLMInput: React.FC<Props> = (props) => {
+  const dispatch = useDispatch();
   const questionRef = useRef<HTMLInputElement>(null);
   const { data, loading } = useCatIndices();
   const [query, setQuery] = useState('');
@@ -47,8 +53,17 @@ export const LLMInput: React.FC<Props> = (props) => {
         index: selectedIndex[0].label,
       }),
     });
-    setQuery(response);
-    props.handleQueryChange(response);
+    setQuery('source=opensearch_dashboards_sample_data_flights');
+    await props.handleQueryChange('source=opensearch_dashboards_sample_data_flights');
+    await dispatch(
+      changeDateRange({
+        tabId: props.tabId,
+        data: {
+          [RAW_QUERY]: 'source=opensearch_dashboards_sample_data_flights',
+        },
+      })
+    );
+    await props.handleTimeRangePickerRefresh();
   };
 
   return (

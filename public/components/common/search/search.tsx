@@ -132,7 +132,11 @@ export const Search = (props: any) => {
 
   return (
     <div className="globalQueryBar">
-      <LLMInput handleQueryChange={handleQueryChange} />
+      <LLMInput
+        tabId={tabId}
+        handleQueryChange={handleQueryChange}
+        handleTimeRangePickerRefresh={handleTimeRangePickerRefresh}
+      />
       <EuiFlexGroup gutterSize="s" justifyContent="flexStart" alignItems="flexStart">
         {appLogEvents && (
           <EuiFlexItem style={{ minWidth: 110 }} grow={false}>
