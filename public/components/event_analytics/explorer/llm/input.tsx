@@ -22,7 +22,7 @@ import { useDispatch } from 'react-redux';
 import { LANGCHAIN_API } from '../../../../../common/constants/llm';
 import { DSL_BASE, DSL_CAT } from '../../../../../common/constants/shared';
 import { getOSDHttp } from '../../../../../common/utils';
-import { changeDateRange } from '../../redux/slices/query_slice';
+import { changeQuery } from '../../redux/slices/query_slice';
 import { RAW_QUERY } from '../../../../../common/constants/explorer';
 
 interface Props {
@@ -53,13 +53,13 @@ export const LLMInput: React.FC<Props> = (props) => {
         index: selectedIndex[0].label,
       }),
     });
-    setQuery('source=opensearch_dashboards_sample_data_flights');
-    await props.handleQueryChange('source=opensearch_dashboards_sample_data_flights');
+    setQuery(response);
+    await props.handleQueryChange(response);
     await dispatch(
-      changeDateRange({
+      changeQuery({
         tabId: props.tabId,
         data: {
-          [RAW_QUERY]: 'source=opensearch_dashboards_sample_data_flights',
+          [RAW_QUERY]: response,
         },
       })
     );
