@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { initTools } from '../langchain/tools/tools_helper';
 import { ILegacyClusterClient, IRouter } from '../../../../src/core/server';
 import DSLFacet from '../services/facets/dsl_facet';
 import PPLFacet from '../services/facets/ppl_facet';
@@ -23,8 +22,6 @@ import { registerSqlRoute } from './notebooks/sqlRouter';
 import { registerVizRoute } from './notebooks/vizRouter';
 import { registerPplRoute } from './ppl';
 import { registerTraceAnalyticsDslRouter } from './trace_analytics_dsl_router';
-import { pluginAgentsInit } from '../langchain/agents/plugin_agents/plugin_helpers';
-import { chatAgentInit } from '../langchain/agents/agent_helpers';
 
 export function setupRoutes({ router, client }: { router: IRouter; client: ILegacyClusterClient }) {
   PanelsRouter(router);
@@ -45,10 +42,6 @@ export function setupRoutes({ router, client }: { router: IRouter; client: ILega
   registerSqlRoute(router, queryService);
 
   registerMetricsRoute(router);
-
-  const pluginTools = initTools();
-  const pluginAgentTools = pluginAgentsInit(pluginTools);
-  const chatAgent = chatAgentInit(pluginAgentTools);
 
   registerChatRoute(router);
   registerLangChainRoutes(router);
