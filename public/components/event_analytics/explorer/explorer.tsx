@@ -203,12 +203,14 @@ export const Explorer = ({
   const isLiveTailOnRef = useRef(false);
   const liveTailTabIdRef = useRef('');
   const liveTailNameRef = useRef('Live');
+  const tempQueryRef = useRef('');
   queryRef.current = query;
   selectedPanelNameRef.current = selectedPanelName;
   explorerFieldsRef.current = explorerFields;
   isLiveTailOnRef.current = isLiveTailOn;
   liveTailTabIdRef.current = liveTailTabId;
   liveTailNameRef.current = liveTailName;
+  tempQueryRef.current = tempQuery;
 
   const findAutoInterval = (start: string = '', end: string = '') => {
     const momentStart = dateMath.parse(start)!;
@@ -711,28 +713,25 @@ export const Explorer = ({
     );
   };
 
-  const handleQuerySearch = useCallback(
-    async (availability?: boolean) => {
-      // clear previous selected timestamp when index pattern changes
-      if (isIndexPatternChanged(tempQuery, query[RAW_QUERY])) {
-        await dispatch(
-          changeQuery({
-            tabId,
-            query: {
-              [RAW_QUERY]: tempQuery,
-              [SELECTED_TIMESTAMP]: '',
-            },
-          })
-        );
-        await setDefaultPatternsField('', '');
-      }
-      // if (availability !== true) {
-      //   await updateQueryInStore(tempQuery);
-      // }
-      await fetchData();
-    },
-    [tempQuery, query]
-  );
+  const handleQuerySearch = async (availability?: boolean) => {
+    // clear previous selected timestamp when index pattern changes
+    const searchedQuery = tempQueryRef.current;
+    if (isIndexPatternChanged(searchedQuery, query[RAW_QUERY])) {
+      await dispatch(
+        changeQuery({
+          tabId,
+          query: {
+            [SELECTED_TIMESTAMP]: '',
+          },
+        })
+      );
+      await setDefaultPatternsField('', '');
+    }
+    if (availability !== true) {
+      await updateQueryInStore(searchedQuery);
+    }
+    await fetchData();
+  };
 
   const handleQueryChange = async (newQuery: string) => setTempQuery(newQuery);
 
