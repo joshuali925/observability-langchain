@@ -5,25 +5,21 @@
 
 import {
   EuiButton,
-  EuiButtonIcon,
-  EuiCode,
   EuiComboBox,
   EuiComboBoxOptionOption,
-  EuiCopy,
   EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiSpacer,
-  EuiText,
 } from '@elastic/eui';
 import { CatIndicesResponse } from '@opensearch-project/opensearch/api/types';
 import React, { Reducer, useEffect, useReducer, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { RAW_QUERY } from '../../../../../common/constants/explorer';
 import { LANGCHAIN_API } from '../../../../../common/constants/llm';
 import { DSL_BASE, DSL_CAT } from '../../../../../common/constants/shared';
 import { getOSDHttp } from '../../../../../common/utils';
 import { changeQuery } from '../../redux/slices/query_slice';
-import { RAW_QUERY } from '../../../../../common/constants/explorer';
 
 interface Props {
   handleQueryChange: (query: string) => void;
@@ -34,7 +30,6 @@ export const LLMInput: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   const questionRef = useRef<HTMLInputElement>(null);
   const { data, loading } = useCatIndices();
-  const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState<EuiComboBoxOptionOption[]>([
     { label: 'opensearch_dashboards_sample_data_flights' },
   ]);
@@ -45,6 +40,9 @@ export const LLMInput: React.FC<Props> = (props) => {
     }
   }, []);
 
+  // hide if not in a tab
+  if (props.tabId === '') return null;
+
   const request = async () => {
     if (!selectedIndex.length) return;
     const response = await getOSDHttp().post(LANGCHAIN_API.PPL_GENERATOR, {
@@ -53,7 +51,6 @@ export const LLMInput: React.FC<Props> = (props) => {
         index: selectedIndex[0].label,
       }),
     });
-    setQuery(response);
     await props.handleQueryChange(response);
     await dispatch(
       changeQuery({
@@ -89,24 +86,6 @@ export const LLMInput: React.FC<Props> = (props) => {
           <EuiButton onClick={request}>Predict</EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
-      {query ? (
-        <>
-          <EuiSpacer size="s" />
-          <EuiText>
-            Copy/paste the query below to test:{' '}
-            <EuiCopy textToCopy={query}>
-              {(copy) => (
-                <EuiButtonIcon aria-label="Copy PPL query" iconType="copyClipboard" onClick={copy}>
-                  Click to copy
-                </EuiButtonIcon>
-              )}
-            </EuiCopy>
-          </EuiText>
-          <EuiText>
-            <EuiCode>{query}</EuiCode>
-          </EuiText>
-        </>
-      ) : null}
       <EuiSpacer />
     </>
   );
