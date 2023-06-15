@@ -66,10 +66,9 @@ export const LLMInput: React.FC<Props> = (props) => {
   return (
     <>
       <EuiFlexGroup>
-        <EuiFlexItem grow={1}>
+        <EuiFlexItem grow={false} style={{ width: 300 }}>
           <EuiComboBox
             placeholder="Select an index"
-            fullWidth
             isClearable={false}
             prepend={['Index']}
             singleSelection={{ asPlainText: true }}
@@ -79,14 +78,18 @@ export const LLMInput: React.FC<Props> = (props) => {
             onChange={(index) => setSelectedIndex(index)}
           />
         </EuiFlexItem>
-        <EuiFlexItem grow={2}>
-          <EuiFieldText prepend={['Question']} fullWidth inputRef={questionRef} />
+        <EuiFlexItem>
+          <EuiFieldText
+            placeholder="What are the longest flights in the past day"
+            prepend={['Question']}
+            fullWidth
+            inputRef={questionRef}
+          />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiButton onClick={request}>Predict</EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiSpacer />
     </>
   );
 };
