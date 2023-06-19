@@ -1,28 +1,31 @@
 #!/usr/bin/env python3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+import os
 from socketserver import ThreadingMixIn
 
 import requests
 
 
-target = "localhost:8000"
+target = os.getenv("TARGET", "localhost:8000")
+host = os.getenv("OS_HOST", "https://localhost:9200")
+auth = (os.getenv("OS_USER", "admin"), os.getenv("OS_PASS", "admin"))
 
 
 def init_index():
     try:
         requests.put(
-            "https://localhost:9200/langchain",
-            auth=("admin", "admin"),
+            f"{host}/langchain",
+            auth=auth,
             verify=False,
         )
         f = open("mappings.json")
         data = json.load(f)
         f.close()
         requests.post(
-            "https://localhost:9200/langchain/_mapping",
+            f"{host}/langchain/_mapping",
             json=data,
-            auth=("admin", "admin"),
+            auth=auth,
             verify=False,
         )
     except Exception as e:
@@ -32,9 +35,9 @@ def init_index():
 def post(bstr):
     data = json.loads(bstr.decode())
     requests.post(
-        "https://localhost:9200/langchain/_doc",
+        f"{host}/langchain/_doc",
         json=data,
-        auth=("admin", "admin"),
+        auth=auth,
         verify=False,
     )
 
