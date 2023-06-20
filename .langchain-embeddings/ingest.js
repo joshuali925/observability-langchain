@@ -46,6 +46,9 @@ const client = new Client({
     username: process.env.OPENSEARCH_USERNAME ?? '',
     password: process.env.OPENSEARCH_PASSWORD ?? '',
   },
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 const exists = await client.indices.exists({ index: indexName }).then((r) => r.body);
@@ -59,6 +62,9 @@ if (exists) {
 log('Ingesting to vector store');
 OpenSearchVectorStore.fromDocuments(
   documents,
-  new HuggingFaceInferenceEmbeddings({ model: 'sentence-transformers/paraphrase-albert-small-v2' }),
+  new HuggingFaceInferenceEmbeddings({
+    model: 'sentence-transformers/paraphrase-albert-small-v2',
+    apiKey: process.env.HUGGINGFACEHUB_API_TOKEN,
+  }),
   { client, indexName }
 );
