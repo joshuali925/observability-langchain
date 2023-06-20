@@ -15,7 +15,7 @@ const __dirname = path.resolve();
 const indexName = '.llm-vector-store';
 
 const loadDocuments = async () => {
-  const loader = new DirectoryLoader(__dirname + '/static_data', {
+  const loader = new DirectoryLoader(__dirname + '/static_data/mock_tickets', {
     '.json': (path) => new JSONLoader(path),
     '.csv': (path) => new CSVLoader(path),
     '.txt': (path) => new TextLoader(path),
@@ -63,7 +63,7 @@ log('Ingesting to vector store');
 OpenSearchVectorStore.fromDocuments(
   documents,
   new HuggingFaceInferenceEmbeddings({
-    model: 'sentence-transformers/paraphrase-albert-small-v2',
+    model: 'sentence-transformers/all-mpnet-base-v2',
     apiKey: process.env.HUGGINGFACEHUB_API_TOKEN,
   }),
   { client, indexName }
