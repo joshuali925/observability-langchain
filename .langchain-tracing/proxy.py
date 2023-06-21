@@ -1,28 +1,31 @@
 #!/usr/bin/env python3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+import os
 from socketserver import ThreadingMixIn
 
 import requests
 
 
-target = "localhost:8000"
+target = os.getenv("TARGET", "localhost:8000")
+host = os.getenv("OS_HOST", "http://localhost:9200")
+auth = (os.getenv("OS_USER", ""), os.getenv("OS_PASS", ""))
 
 
 def init_index():
     try:
         requests.put(
-            "https://localhost:9200/langchain",
-            auth=("admin", "admin"),
+            f"{host}/langchain",
+            auth=auth,
             verify=False,
         )
         f = open("mappings.json")
         data = json.load(f)
         f.close()
         requests.post(
-            "https://localhost:9200/langchain/_mapping",
+            f"{host}/langchain/_mapping",
             json=data,
-            auth=("admin", "admin"),
+            auth=auth,
             verify=False,
         )
     except Exception as e:
@@ -32,11 +35,14 @@ def init_index():
 def post(bstr):
     data = json.loads(bstr.decode())
     requests.post(
-        "https://localhost:9200/langchain/_doc",
+        f"{host}/langchain/_doc",
         json=data,
-        auth=("admin", "admin"),
+        auth=auth,
         verify=False,
     )
+
+
+session_id = ""
 
 
 class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -47,13 +53,15 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         return
 
     def do_GET(self, body=True):
+        global session_id
         sent = False
         try:
             url = "http://{}{}".format(target, self.path)
             req_header = self.parse_headers()
 
-            print(req_header)
-            print(url)
+            print("GET url:", url)
+            print("req_header:", req_header)
+            session_id = self.path.removeprefix("/sessions?name=")
             resp = requests.get(
                 url, headers=req_header | {"Host": target}, verify=False
             )
@@ -70,12 +78,17 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 self.send_error(404, "error trying to proxy")
 
     def do_POST(self, body=True):
+        global session_id
         sent = False
         try:
             url = "http://{}{}".format(target, self.path)
+            print("POST url:", url)
             content_len = int(self.headers.get("content-length", 0))
             post_body = self.rfile.read(content_len)
-            post(post_body)
+            post_body_with_session = post_body.replace(
+                b',"session_id":1,', str.encode(f',"session_id":"{session_id}",')
+            )
+            post(post_body_with_session)
             req_header = self.parse_headers()
 
             resp = requests.post(
@@ -84,7 +97,10 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 headers=req_header | {"Host": target},
                 verify=False,
             )
-            post(resp.content)
+            content_with_session = resp.content.replace(
+                b',"session_id":1,', str.encode(f',"session_id":"{session_id}",')
+            )
+            post(content_with_session)
             sent = True
 
             self.send_response(resp.status_code)

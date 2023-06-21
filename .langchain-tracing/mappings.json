@@ -80,7 +80,7 @@
           }
         },
         "session_id": {
-          "type": "long"
+          "type": "keyword"
         },
         "start_time": {
           "type": "date"
@@ -151,7 +151,7 @@
       }
     },
     "session_id": {
-      "type": "long"
+      "type": "keyword"
     },
     "start_time": {
       "type": "date"
