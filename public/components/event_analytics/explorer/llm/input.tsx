@@ -10,15 +10,15 @@ import {
   EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiSpacer,
 } from '@elastic/eui';
 import { CatIndicesResponse } from '@opensearch-project/opensearch/api/types';
-import React, { Reducer, useEffect, useReducer, useRef, useState } from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { RAW_QUERY } from '../../../../../common/constants/explorer';
 import { LANGCHAIN_API } from '../../../../../common/constants/llm';
 import { DSL_BASE, DSL_CAT } from '../../../../../common/constants/shared';
 import { getOSDHttp } from '../../../../../common/utils';
+import { genericReducer, GenericReducer } from '../../../llm_chat/hooks/fetch_reducer';
 import { changeQuery } from '../../redux/slices/query_slice';
 
 interface Props {
@@ -94,28 +94,6 @@ export const LLMInput: React.FC<Props> = (props) => {
   );
 };
 
-interface State<T> {
-  data?: T;
-  loading: boolean;
-  error?: Error;
-}
-type Action<T> =
-  | { type: 'request' }
-  | { type: 'success'; payload: State<T>['data'] }
-  | { type: 'failure'; error: Required<State<T>['error']> };
-type GenericReducer<T = any> = Reducer<State<T>, Action<T>>;
-const genericReducer: GenericReducer = (state, action) => {
-  switch (action.type) {
-    case 'request':
-      return { loading: true };
-    case 'success':
-      return { loading: false, data: action.payload };
-    case 'failure':
-      return { loading: false, error: action.error };
-    default:
-      return state;
-  }
-};
 export const useCatIndices = () => {
   const reducer: GenericReducer<EuiComboBoxOptionOption[]> = genericReducer;
   const [state, dispatch] = useReducer(reducer, { loading: false });
