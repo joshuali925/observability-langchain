@@ -139,9 +139,9 @@ export const Search = (props: any) => {
         handleQueryChange={handleQueryChange}
         handleTimeRangePickerRefresh={handleTimeRangePickerRefresh}
       />
-      {query && (
+      {tabId && (
         <EuiLink onClick={() => setIsQueryBarVisible(!isQueryBarVisible)}>
-          <EuiText size="s">{isQueryBarVisible ? 'Hide' : 'Show'} query</EuiText>
+          <EuiText size="s">{isQueryBarVisible ? 'Hide' : 'Show'} query bar</EuiText>
         </EuiLink>
       )}
       {(isQueryBarVisible || tabId === '') && (
