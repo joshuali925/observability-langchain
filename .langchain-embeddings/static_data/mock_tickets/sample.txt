@@ -1,13 +1,12 @@
 The following is a ticket for a 404 and 503 errors incident:
-Ticket 1:
-ID: 123456
+ID: d31911d8-a98c-4fc9-a25c-108ea68d9b66
 Title: Multiple 404 and 503 Errors
 Time: 2023-06-01 10:15 AM
 Username: john.doe
 
 Summary: The system experienced a high number of 404 and 503 errors, affecting multiple microservices.
 
-Root Cause: The issue was caused by a misconfiguration in the Nginx load balancer, leading to improper routing of requests.
+Root Cause: The issue was caused by a misconfiguration in the Nginx load balancer, leading to improper routing of requests, caused 404 and 503 errors.
 The ops team has deployed a new version of the application servers behind an Nginx load balancer. However, in the Nginx config, they forgot to update the server entries to point to the new application servers. So Nginx is still routing traffic to the old application servers.
 Users start reporting errors and issues with the application. The error logs on the new application servers show no requests coming in. The ops team checks the Nginx load balancer and realizes their mistake - the config still has the old server entries. They quickly update the config to point to the new set of application servers.
 However, some users may have experienced errors and outage during this time. The ops team does a post-mortem and updates their deployment runbooks to include an explicit check to verify server entries are updated on the load balancers during future deployments. They also decide to build more monitoring and alerts to quickly detect such issues - things like:
@@ -37,20 +36,15 @@ upstream app_servers {
 4. Verify Nginx is now routing requests to the new backend servers
 So the misconfiguration was simply that step #2 was missed, and Nginx was not updated with the correct server entries pointing to the new app servers. This is a common mistake that can happen during production changes, which is why the ops team added more checks and monitoring in the post-mortem to catch these types of issues quickly in the future.
 
-Resolution Steps:
-1. Identified the misconfiguration in the Nginx load balancer.
-2. Corrected the configuration to ensure proper routing.
-3. Monitored the system to verify the fix.
-4. Observed a significant decrease in 404 and 503 errors.
-5. Closed the ticket.
+Resolution Steps: not resolved yet, ongoing issue.
 
 Comment Thread:
 John Doe: "I noticed a high number of errors in the system. Can you investigate?"
 On-Call: "I'm looking into it. I suspect it could be an issue with the load balancer configuration."
 John Doe: "Please let me know if you find anything."
 On-Call: "Found a misconfiguration in the Nginx load balancer. Fixing it now."
-John Doe: "Thank you for resolving the issue. The errors seem to have decreased."
 
+---
 The following is a ticket for an incident happened in Project ThunderShift:
 ID: IN-001
 Title: API gateway latency spike
