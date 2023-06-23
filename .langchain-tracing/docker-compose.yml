@@ -19,10 +19,12 @@ services:
       - 8000:8000  # somehow langchain.js is calling port 1984 instead of 8000
     depends_on:
       - langchain-db
+    restart: unless-stopped
+
   langchain-db:
     image: postgres:14.1
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./data/postgresql:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
@@ -33,3 +35,17 @@ services:
       - "postgres"
       - "-c"
       - "wal_level=logical"
+    restart: unless-stopped
+
+  proxy:
+    build: .
+    ports:
+      - "1984:1984"
+    environment:
+      - TARGET=langchain-backend:8000
+      - OS_HOST=http://host.docker.internal:9200
+      - OS_USER=
+      - OS_PASS=
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

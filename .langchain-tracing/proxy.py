@@ -144,8 +144,8 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 
 def main():
     init_index()
-    print("http server is starting on {} port {}...".format("127.0.0.1", 1984))
-    server_address = ("127.0.0.1", 1984)
+    print("http server is starting on {} port {}...".format("0.0.0.0", 1984))
+    server_address = ("0.0.0.0", 1984)
     httpd = ThreadedHTTPServer(server_address, ProxyHTTPRequestHandler)
     print("http server is running as reverse proxy")
     httpd.serve_forever()
