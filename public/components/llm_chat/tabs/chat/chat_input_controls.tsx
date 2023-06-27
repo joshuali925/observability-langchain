@@ -38,6 +38,7 @@ export const ChatInputControls: React.FC<ChatInputControlsProps> = (props) => {
       contentType: 'text',
       context: {
         appId: chatContext.appId,
+        appURL: window.location.href,
       },
     };
     props.setInput('');

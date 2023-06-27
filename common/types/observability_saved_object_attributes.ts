@@ -32,6 +32,7 @@ interface IInput extends SavedObjectAttributes {
   content: string;
   context?: {
     appId?: string;
+    appURL?: string;
   };
 }
 interface IOutput extends SavedObjectAttributes {

@@ -39,6 +39,7 @@ export function registerChatRoute(router: IRouter) {
             type: schema.string(),
             context: schema.object({
               appId: schema.maybe(schema.string()),
+              appURL: schema.maybe(schema.string()),
             }),
             content: schema.string(),
             contentType: schema.string(),
@@ -54,6 +55,7 @@ export function registerChatRoute(router: IRouter) {
       try {
         const client = context.core.savedObjects.client;
         const { chatId, input, messages } = request.body;
+        console.log('input.context.appURL ##################', input.context.appURL);
         const sessionId = uuid();
         const opensearchObservabilityClient: ILegacyScopedClusterClient = context.observability_plugin.observabilityClient.asScoped(
           request
@@ -76,7 +78,8 @@ export function registerChatRoute(router: IRouter) {
 
         const suggestions = await requestSuggestionsChain(
           pluginTools.flatMap((tool) => tool.toolsList),
-          memory
+          memory,
+          input.context.appURL
         );
 
         const traces = await fetchLangchainTraces(

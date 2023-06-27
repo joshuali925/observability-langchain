@@ -25,13 +25,20 @@ Assistant can access a set of tools listed below to answer questions given by th
 Here's the chat history between the human and the Assistant.
 {chat_history}
 
+
+The Human is currently on this screen in the OpenSearch Dashboards app page
+{app_url}
+
+
 Use the following steps to generate follow up questions Human may ask after the response of the Assistant:
 
 Step 1. Use the chat history to understand what human is trying to search and explore.
 
 Step 2. Understand what capabilities the assistant has with the set of tools it has access to.
 
-Step 3. Use the above context and generate follow up questions.
+Step 3. Use the app page and try to relate tools for this page.
+
+Step 4. Use the above context and generate follow up questions.
 
 ----------------
 {format_instructions}
@@ -46,7 +53,7 @@ const formatInstructions = parser.getFormatInstructions();
 
 const prompt = new PromptTemplate({
   template,
-  inputVariables: ['tools_description', 'chat_history'],
+  inputVariables: ['tools_description', 'chat_history', 'app_url'],
   partialVariables: { format_instructions: formatInstructions },
 });
 
@@ -57,13 +64,19 @@ const convertChatToStirng = (chatMessages: BaseChatMessage[]) => {
   return chatString;
 };
 
-export const requestSuggestionsChain = async (tools: Tool[], memory: BufferMemory) => {
+export const requestSuggestionsChain = async (tools: Tool[], memory: BufferMemory, appURL = '') => {
   const toolsContext = tools.map((tool) => `${tool.name}: ${tool.description}`).join('\n');
 
   const chatHistory = memory.chatHistory;
   // TODO: Reduce the message history (may be to last six chat pairs) sent to the chain in the context.
   const chatContext = convertChatToStirng(await chatHistory.getMessages());
   const chain = new LLMChain({ llm: llmModel.model, prompt });
-  const output = await chain.call({ tools_description: toolsContext, chat_history: chatContext });
+  const parsedAppURL = appURL !== '' ? appURL.split('/app/')[-1] : '';
+
+  const output = await chain.call({
+    tools_description: toolsContext,
+    chat_history: chatContext,
+    app_url: parsedAppURL,
+  });
   return parser.parse(output.text);
 };
