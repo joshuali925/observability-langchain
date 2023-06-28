@@ -21,22 +21,20 @@ The Assistant is an expert in
 Assistant can access a set of tools listed below to answer questions given by the Human:
 {tools_description}
 
+The Human is currently on this screen in the OpenSearch Dashboards app page
+{app_url}
 
 Here's the chat history between the human and the Assistant.
 {chat_history}
-
-
-The Human is currently on this screen in the OpenSearch Dashboards app page
-{app_url}
 
 
 Use the following steps to generate follow up questions Human may ask after the response of the Assistant:
 
 Step 1. Use the chat history to understand what human is trying to search and explore.
 
-Step 2. Understand what capabilities the assistant has with the set of tools it has access to.
+Step 2. Use the app page and try to relate tools for this page.
 
-Step 3. Use the app page and try to relate tools for this page.
+Step 3. Understand what capabilities the assistant has with the set of tools it has access to.
 
 Step 4. Use the above context and generate follow up questions.
 
@@ -64,6 +62,33 @@ const convertChatToStirng = (chatMessages: BaseChatMessage[]) => {
   return chatString;
 };
 
+const parseURL = (appURL: string) => {
+  let appURLContents = '';
+
+  if (appURL !== '') {
+    const parsedAppURL = appURL.split('/app/').at(-1);
+    const appName = parsedAppURL.split('#/').at(0) || '';
+    const appContent = parsedAppURL.split('#/').at(-1) || '';
+    const appContentPrefix = appContent.split('?').at(0) || '';
+    const appParams = appContent.split('?').at(-1) || '';
+    const searchParams = {};
+    if (appParams) {
+      appParams.split('&').forEach((param) => {
+        const [key, value] = param.split('=');
+        searchParams[key] = value;
+      });
+    }
+    const params = JSON.stringify(searchParams);
+    console.log();
+    appURLContents = `App Name: ${appName} \n App Content: ${appContentPrefix} \n App Params: ${params.substring(
+      1,
+      params.length - 1
+    )}`;
+  }
+  console.log('appURLContents ##############', appURLContents);
+  return appURLContents;
+};
+
 export const requestSuggestionsChain = async (tools: Tool[], memory: BufferMemory, appURL = '') => {
   const toolsContext = tools.map((tool) => `${tool.name}: ${tool.description}`).join('\n');
 
@@ -71,12 +96,11 @@ export const requestSuggestionsChain = async (tools: Tool[], memory: BufferMemor
   // TODO: Reduce the message history (may be to last six chat pairs) sent to the chain in the context.
   const chatContext = convertChatToStirng(await chatHistory.getMessages());
   const chain = new LLMChain({ llm: llmModel.model, prompt });
-  const parsedAppURL = appURL !== '' ? appURL.split('/app/')[-1] : '';
 
   const output = await chain.call({
     tools_description: toolsContext,
     chat_history: chatContext,
-    app_url: parsedAppURL,
+    app_url: parseURL(appURL),
   });
   return parser.parse(output.text);
 };
