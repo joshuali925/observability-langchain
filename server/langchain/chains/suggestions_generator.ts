@@ -66,26 +66,17 @@ const parseURL = (appURL: string) => {
   let appURLContents = '';
 
   if (appURL !== '') {
+    // TODO: Remove the split functions and use inbuilt functions for URL parsing
     const parsedAppURL = appURL.split('/app/').at(-1);
-    const appName = parsedAppURL.split('#/').at(0) || '';
-    const appContent = parsedAppURL.split('#/').at(-1) || '';
+    const appName = parsedAppURL!.split('#/').at(0) || '';
+    const appContent = parsedAppURL!.split('#/').at(-1) || '';
     const appContentPrefix = appContent.split('?').at(0) || '';
     const appParams = appContent.split('?').at(-1) || '';
-    const searchParams = {};
-    if (appParams) {
-      appParams.split('&').forEach((param) => {
-        const [key, value] = param.split('=');
-        searchParams[key] = value;
-      });
-    }
-    const params = JSON.stringify(searchParams);
-    console.log();
-    appURLContents = `App Name: ${appName} \n App Content: ${appContentPrefix} \n App Params: ${params.substring(
-      1,
-      params.length - 1
-    )}`;
+
+    let params = appParams.replaceAll('=', ': ');
+    params = params.replaceAll('&', ', ');
+    appURLContents = `App name: ${appName} \n hash route: ${appContentPrefix} \n params: ${params}`;
   }
-  console.log('appURLContents ##############', appURLContents);
   return appURLContents;
 };
 
