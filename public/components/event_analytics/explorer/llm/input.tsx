@@ -14,11 +14,14 @@ import {
 import { CatIndicesResponse } from '@opensearch-project/opensearch/api/types';
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { toMountPoint } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { RAW_QUERY } from '../../../../../common/constants/explorer';
 import { LANGCHAIN_API } from '../../../../../common/constants/llm';
 import { DSL_BASE, DSL_CAT } from '../../../../../common/constants/shared';
 import { getOSDHttp } from '../../../../../common/utils';
-import { genericReducer, GenericReducer } from '../../../llm_chat/hooks/fetch_reducer';
+import { coreRefs } from '../../../../framework/core_refs';
+import { FeedbackFormData, FeedbackModal } from '../../../llm_chat/components/feedback_modal';
+import { GenericReducer, genericReducer } from '../../../llm_chat/hooks/fetch_reducer';
 import { changeQuery } from '../../redux/slices/query_slice';
 
 interface Props {
@@ -33,6 +36,15 @@ export const LLMInput: React.FC<Props> = (props) => {
   const [selectedIndex, setSelectedIndex] = useState<EuiComboBoxOptionOption[]>([
     { label: 'opensearch_dashboards_sample_data_flights' },
   ]);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [feedbackForm, setFeedbackForm] = useState<FeedbackFormData>({
+    type: 'event_analytics',
+    input: '',
+    output: '',
+    correct: true,
+    expectedOutput: '',
+    comment: '',
+  });
 
   useEffect(() => {
     if (questionRef.current) {
@@ -51,6 +63,11 @@ export const LLMInput: React.FC<Props> = (props) => {
         index: selectedIndex[0].label,
       }),
     });
+    setFeedbackForm({
+      ...feedbackForm,
+      input: questionRef.current?.value || '',
+      output: response,
+    });
     await props.handleQueryChange(response);
     await dispatch(
       changeQuery({
@@ -65,7 +82,7 @@ export const LLMInput: React.FC<Props> = (props) => {
 
   return (
     <>
-      <EuiFlexGroup>
+      <EuiFlexGroup gutterSize="s">
         <EuiFlexItem grow={false} style={{ width: 300 }}>
           <EuiComboBox
             placeholder="Select an index"
@@ -89,7 +106,17 @@ export const LLMInput: React.FC<Props> = (props) => {
         <EuiFlexItem grow={false}>
           <EuiButton onClick={request}>Predict</EuiButton>
         </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButton onClick={() => setIsFeedbackOpen(true)}>Feedback</EuiButton>
+        </EuiFlexItem>
       </EuiFlexGroup>
+      {isFeedbackOpen && (
+        <FeedbackModal
+          data={feedbackForm}
+          setData={setFeedbackForm}
+          onClose={() => setIsFeedbackOpen(false)}
+        />
+      )}
     </>
   );
 };
