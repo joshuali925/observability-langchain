@@ -43,7 +43,7 @@ export const LLMInput: React.FC<Props> = (props) => {
   const [feedbackFormData, setFeedbackFormData] = useState<FeedbackFormData>({
     input: '',
     output: '',
-    correct: true,
+    correct: undefined,
     expectedOutput: '',
     comment: '',
   });
