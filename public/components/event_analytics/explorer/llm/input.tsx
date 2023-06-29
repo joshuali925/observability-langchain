@@ -129,7 +129,7 @@ export const LLMInput: React.FC<Props> = (props) => {
       {isFeedbackOpen && (
         <EuiModal onClose={() => setIsFeedbackOpen(false)}>
           <FeedbackModalContent
-            metadata={{ type: 'event_analytics' }}
+            metadata={{ type: 'event_analytics', selectedIndex: selectedIndex[0].label }}
             formData={feedbackFormData}
             setFormData={setFeedbackFormData}
             onClose={() => setIsFeedbackOpen(false)}
