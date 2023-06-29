@@ -7,6 +7,7 @@ import { OBSERVABILITY_BASE } from './shared';
 
 export const CHAT_API = {
   LLM: `${OBSERVABILITY_BASE}/chat/llm`,
+  HISTORY: `${OBSERVABILITY_BASE}/chat/history`,
 } as const;
 
 export const LANGCHAIN_API = {
