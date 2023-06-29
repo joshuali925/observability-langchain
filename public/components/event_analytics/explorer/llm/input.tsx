@@ -36,6 +36,7 @@ export const LLMInput: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   const questionRef = useRef<HTMLInputElement>(null);
   const { data, loading } = useCatIndices();
+  const [generating, setGenerating] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<EuiComboBoxOptionOption[]>([
     { label: 'opensearch_dashboards_sample_data_flights' },
   ]);
@@ -60,6 +61,7 @@ export const LLMInput: React.FC<Props> = (props) => {
   const request = async () => {
     if (!selectedIndex.length) return;
     try {
+      setGenerating(true);
       const response = await getOSDHttp().post(LANGCHAIN_API.PPL_GENERATOR, {
         body: JSON.stringify({
           question: questionRef.current?.value,
@@ -87,6 +89,8 @@ export const LLMInput: React.FC<Props> = (props) => {
         input: questionRef.current?.value || '',
       });
       coreRefs.toasts?.addError(error, { title: 'Failed to generate PPL query' });
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -114,7 +118,9 @@ export const LLMInput: React.FC<Props> = (props) => {
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiButton onClick={request}>Predict</EuiButton>
+          <EuiButton isLoading={generating} onClick={request}>
+            Predict
+          </EuiButton>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiButton onClick={() => setIsFeedbackOpen(true)}>Feedback</EuiButton>
