@@ -14,3 +14,8 @@ export const LANGCHAIN_API = {
   AGENT_TEST: `${OBSERVABILITY_BASE}/langchain/agent`,
   FEEDBACK: `${OBSERVABILITY_BASE}/chat/feedback`,
 } as const;
+
+export const LLM_INDEX = {
+  TRACES: 'langchain',
+  FEEDBACK: '.llm-feedback',
+};
