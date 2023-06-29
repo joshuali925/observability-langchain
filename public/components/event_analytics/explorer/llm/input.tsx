@@ -19,6 +19,7 @@ import { RAW_QUERY } from '../../../../../common/constants/explorer';
 import { LANGCHAIN_API } from '../../../../../common/constants/llm';
 import { DSL_BASE, DSL_CAT } from '../../../../../common/constants/shared';
 import { getOSDHttp } from '../../../../../common/utils';
+import { coreRefs } from '../../../../framework/core_refs';
 import {
   FeedbackFormData,
   FeedbackModalContent,
@@ -39,8 +40,7 @@ export const LLMInput: React.FC<Props> = (props) => {
     { label: 'opensearch_dashboards_sample_data_flights' },
   ]);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
-  const [feedbackForm, setFeedbackForm] = useState<FeedbackFormData>({
-    type: 'event_analytics',
+  const [feedbackFormData, setFeedbackFormData] = useState<FeedbackFormData>({
     input: '',
     output: '',
     correct: true,
@@ -59,27 +59,35 @@ export const LLMInput: React.FC<Props> = (props) => {
 
   const request = async () => {
     if (!selectedIndex.length) return;
-    const response = await getOSDHttp().post(LANGCHAIN_API.PPL_GENERATOR, {
-      body: JSON.stringify({
-        question: questionRef.current?.value,
-        index: selectedIndex[0].label,
-      }),
-    });
-    setFeedbackForm({
-      ...feedbackForm,
-      input: questionRef.current?.value || '',
-      output: response,
-    });
-    await props.handleQueryChange(response);
-    await dispatch(
-      changeQuery({
-        tabId: props.tabId,
-        data: {
-          [RAW_QUERY]: response,
-        },
-      })
-    );
-    await props.handleTimeRangePickerRefresh();
+    try {
+      const response = await getOSDHttp().post(LANGCHAIN_API.PPL_GENERATOR, {
+        body: JSON.stringify({
+          question: questionRef.current?.value,
+          index: selectedIndex[0].label,
+        }),
+      });
+      setFeedbackFormData({
+        ...feedbackFormData,
+        input: questionRef.current?.value || '',
+        output: response,
+      });
+      await props.handleQueryChange(response);
+      await dispatch(
+        changeQuery({
+          tabId: props.tabId,
+          data: {
+            [RAW_QUERY]: response,
+          },
+        })
+      );
+      await props.handleTimeRangePickerRefresh();
+    } catch (error) {
+      setFeedbackFormData({
+        ...feedbackFormData,
+        input: questionRef.current?.value || '',
+      });
+      coreRefs.toasts?.addError(error, { title: 'Failed to generate PPL query' });
+    }
   };
 
   return (
@@ -115,8 +123,9 @@ export const LLMInput: React.FC<Props> = (props) => {
       {isFeedbackOpen && (
         <EuiModal onClose={() => setIsFeedbackOpen(false)}>
           <FeedbackModalContent
-            data={feedbackForm}
-            setData={setFeedbackForm}
+            metadata={{ type: 'event_analytics' }}
+            formData={feedbackFormData}
+            setFormData={setFeedbackFormData}
             onClose={() => setIsFeedbackOpen(false)}
           />
         </EuiModal>
