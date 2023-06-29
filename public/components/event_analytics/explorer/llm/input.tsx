@@ -10,17 +10,19 @@ import {
   EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiModal,
 } from '@elastic/eui';
 import { CatIndicesResponse } from '@opensearch-project/opensearch/api/types';
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { toMountPoint } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { RAW_QUERY } from '../../../../../common/constants/explorer';
 import { LANGCHAIN_API } from '../../../../../common/constants/llm';
 import { DSL_BASE, DSL_CAT } from '../../../../../common/constants/shared';
 import { getOSDHttp } from '../../../../../common/utils';
-import { coreRefs } from '../../../../framework/core_refs';
-import { FeedbackFormData, FeedbackModal } from '../../../llm_chat/components/feedback_modal';
+import {
+  FeedbackFormData,
+  FeedbackModalContent,
+} from '../../../llm_chat/components/feedback_modal';
 import { GenericReducer, genericReducer } from '../../../llm_chat/hooks/fetch_reducer';
 import { changeQuery } from '../../redux/slices/query_slice';
 
@@ -111,11 +113,13 @@ export const LLMInput: React.FC<Props> = (props) => {
         </EuiFlexItem>
       </EuiFlexGroup>
       {isFeedbackOpen && (
-        <FeedbackModal
-          data={feedbackForm}
-          setData={setFeedbackForm}
-          onClose={() => setIsFeedbackOpen(false)}
-        />
+        <EuiModal onClose={() => setIsFeedbackOpen(false)}>
+          <FeedbackModalContent
+            data={feedbackForm}
+            setData={setFeedbackForm}
+            onClose={() => setIsFeedbackOpen(false)}
+          />
+        </EuiModal>
       )}
     </>
   );
