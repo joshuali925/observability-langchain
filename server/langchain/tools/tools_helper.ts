@@ -9,6 +9,7 @@ import { OSAlertingTools } from './tool_sets/aleritng_apis';
 import { KnowledgeTools } from './tool_sets/knowledges';
 import { OSAPITools } from './tool_sets/os_apis';
 import { PPLTools } from './tool_sets/ppl';
+import { LogSummaryTools } from './tool_sets/log';
 
 export const initTools = (
   opensearchClient: OpenSearchClient,
@@ -18,5 +19,6 @@ export const initTools = (
   const alertingTools = new OSAlertingTools(opensearchClient, observabilityClient);
   const knowledgeTools = new KnowledgeTools(opensearchClient, observabilityClient);
   const opensearchTools = new OSAPITools(opensearchClient, observabilityClient);
-  return [pplTools, alertingTools, knowledgeTools, opensearchTools];
+  const logsummaryTools = new LogSummaryTools(opensearchClient, observabilityClient);
+  return [pplTools, alertingTools, knowledgeTools, opensearchTools, logsummaryTools];
 };
