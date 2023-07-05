@@ -123,7 +123,9 @@ export const LLMInput: React.FC<Props> = (props) => {
           </EuiButton>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiButton onClick={() => setIsFeedbackOpen(true)}>Feedback</EuiButton>
+          <EuiButton iconType="faceHappy" iconSide="right" onClick={() => setIsFeedbackOpen(true)}>
+            Feedback
+          </EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
       {isFeedbackOpen && (
