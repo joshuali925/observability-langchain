@@ -15,6 +15,7 @@ import {
 import { CatIndicesResponse } from '@opensearch-project/opensearch/api/types';
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { IndexPatternAttributes } from '../../../../../../../src/plugins/data/common';
 import { RAW_QUERY } from '../../../../../common/constants/explorer';
 import { LANGCHAIN_API } from '../../../../../common/constants/llm';
 import { DSL_BASE, DSL_CAT } from '../../../../../common/constants/shared';
@@ -35,7 +36,8 @@ interface Props {
 export const LLMInput: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   const questionRef = useRef<HTMLInputElement>(null);
-  const { data, loading } = useCatIndices();
+  const { data: indices, loading: indicesLoading } = useCatIndices();
+  const { data: indexPatterns, loading: indexPatternsLoading } = useGetIndexPatterns();
   const [generating, setGenerating] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<EuiComboBoxOptionOption[]>([
     { label: 'opensearch_dashboards_sample_data_flights' },
@@ -48,6 +50,13 @@ export const LLMInput: React.FC<Props> = (props) => {
     expectedOutput: '',
     comment: '',
   });
+  const data =
+    indexPatterns && indices
+      ? [...indexPatterns, ...indices].filter(
+          (v1, index, array) => array.findIndex((v2) => v1.label === v2.label) === index
+        )
+      : undefined;
+  const loading = indicesLoading || indexPatternsLoading;
 
   useEffect(() => {
     if (questionRef.current) {
@@ -158,6 +167,36 @@ export const useCatIndices = () => {
       .catch((error) => dispatch({ type: 'failure', error }));
 
     return () => abortController.abort();
+  }, [refresh]);
+
+  return { ...state, refresh: () => setRefresh({}) };
+};
+
+export const useGetIndexPatterns = () => {
+  const reducer: GenericReducer<EuiComboBoxOptionOption[]> = genericReducer;
+  const [state, dispatch] = useReducer(reducer, { loading: false });
+  const [refresh, setRefresh] = useState({});
+
+  useEffect(() => {
+    let abort = false;
+    dispatch({ type: 'request' });
+
+    coreRefs
+      .savedObjectsClient!.find<IndexPatternAttributes>({ type: 'index-pattern', perPage: 10000 })
+      .then((payload) => {
+        if (!abort)
+          dispatch({
+            type: 'success',
+            payload: payload.savedObjects.map((meta) => ({ label: meta.attributes.title })),
+          });
+      })
+      .catch((error) => {
+        if (!abort) dispatch({ type: 'failure', error });
+      });
+
+    return () => {
+      abort = true;
+    };
   }, [refresh]);
 
   return { ...state, refresh: () => setRefresh({}) };
