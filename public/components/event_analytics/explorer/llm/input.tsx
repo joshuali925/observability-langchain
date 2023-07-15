@@ -144,6 +144,9 @@ export const LLMInput: React.FC<Props> = (props) => {
             formData={feedbackFormData}
             setFormData={setFeedbackFormData}
             onClose={() => setIsFeedbackOpen(false)}
+            displayLabels={{
+              correct: 'Did the results from the generated query answer your question?',
+            }}
           />
         </EuiModal>
       )}
