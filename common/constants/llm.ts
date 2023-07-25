@@ -17,6 +17,7 @@ export const LANGCHAIN_API = {
 } as const;
 
 export const LLM_INDEX = {
-  TRACES: 'langchain',
   FEEDBACK: '.llm-feedback',
+  TRACES: '.llm-traces',
+  VECTOR_STORE: '.llm-vector-store',
 };
