@@ -29,6 +29,7 @@ import { LiveTailButton, StopLiveButton } from '../live_tail/live_tail_button';
 import { Autocomplete } from './autocomplete';
 import { DatePicker } from './date_picker';
 import './search.scss';
+import { coreRefs } from '../../../framework/core_refs';
 
 export interface IQueryBarProps {
   query: string;
@@ -92,7 +93,7 @@ export const Search = (props: any) => {
   const appLogEvents = tabId.match(APP_ANALYTICS_TAB_ID_REGEX);
   const [isSavePanelOpen, setIsSavePanelOpen] = useState(false);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
-  const [isQueryBarVisible, setIsQueryBarVisible] = useState(false);
+  const [isQueryBarVisible, setIsQueryBarVisible] = useState(!coreRefs.llm_enabled);
 
   const closeFlyout = () => {
     setIsFlyoutVisible(false);
@@ -134,12 +135,14 @@ export const Search = (props: any) => {
 
   return (
     <div className="globalQueryBar">
-      <LLMInput
-        tabId={tabId}
-        handleQueryChange={handleQueryChange}
-        handleTimeRangePickerRefresh={handleTimeRangePickerRefresh}
-      />
-      {tabId && (
+      {coreRefs.llm_enabled && (
+        <LLMInput
+          tabId={tabId}
+          handleQueryChange={handleQueryChange}
+          handleTimeRangePickerRefresh={handleTimeRangePickerRefresh}
+        />
+      )}
+      {coreRefs.llm_enabled && tabId && (
         <EuiLink onClick={() => setIsQueryBarVisible(!isQueryBarVisible)}>
           <EuiText size="s">{isQueryBarVisible ? 'Hide' : 'Show'} query bar</EuiText>
         </EuiLink>
@@ -267,6 +270,11 @@ export const Search = (props: any) => {
                       </EuiFlexGroup>
                     </EuiPopoverFooter>
                   </EuiPopover>
+                </EuiFlexItem>
+                <EuiFlexItem key={'search-submit-'} className="euiFlexItem--flexGrowZero">
+                  <EuiButton fill iconType="faceHappy" iconSide="right" onClick={() => {}}>
+                    Submit PPL Query
+                  </EuiButton>
                 </EuiFlexItem>
               </>
             )}
