@@ -22,7 +22,7 @@ import React, { useState } from 'react';
 import { APP_ANALYTICS_TAB_ID_REGEX } from '../../../../common/constants/explorer';
 import { PPL_SPAN_REGEX } from '../../../../common/constants/shared';
 import { uiSettingsService } from '../../../../common/utils';
-import { LLMInput } from '../../event_analytics/explorer/llm/input';
+import { LLMInput, SubmitPPLButton } from '../../event_analytics/explorer/llm/input';
 import { SavePanel } from '../../event_analytics/explorer/save_panel';
 import { PPLReferenceFlyout } from '../helpers';
 import { LiveTailButton, StopLiveButton } from '../live_tail/live_tail_button';
@@ -30,6 +30,8 @@ import { Autocomplete } from './autocomplete';
 import { DatePicker } from './date_picker';
 import './search.scss';
 import { coreRefs } from '../../../framework/core_refs';
+import { useSelector } from 'react-redux';
+import { selectQueries } from '../../event_analytics/redux/slices/query_slice';
 
 export interface IQueryBarProps {
   query: string;
@@ -94,6 +96,9 @@ export const Search = (props: any) => {
   const [isSavePanelOpen, setIsSavePanelOpen] = useState(false);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [isQueryBarVisible, setIsQueryBarVisible] = useState(!coreRefs.llm_enabled);
+
+  // const queries = useSelector(selectQueries);
+  // queryRef.current = queries;
 
   const closeFlyout = () => {
     setIsFlyoutVisible(false);
@@ -272,9 +277,7 @@ export const Search = (props: any) => {
                   </EuiPopover>
                 </EuiFlexItem>
                 <EuiFlexItem key={'search-submit-'} className="euiFlexItem--flexGrowZero">
-                  <EuiButton fill iconType="faceHappy" iconSide="right" onClick={() => {}}>
-                    Submit PPL Query
-                  </EuiButton>
+                  <SubmitPPLButton />
                 </EuiFlexItem>
               </>
             )}
