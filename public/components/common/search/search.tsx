@@ -276,9 +276,11 @@ export const Search = (props: any) => {
                     </EuiPopoverFooter>
                   </EuiPopover>
                 </EuiFlexItem>
-                <EuiFlexItem key={'search-submit-'} className="euiFlexItem--flexGrowZero">
-                  <SubmitPPLButton />
-                </EuiFlexItem>
+                {!coreRefs.llm_enabled && (
+                  <EuiFlexItem key={'search-submit-'} className="euiFlexItem--flexGrowZero">
+                    <SubmitPPLButton />
+                  </EuiFlexItem>
+                )}
               </>
             )}
           </EuiFlexGroup>
