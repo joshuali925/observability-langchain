@@ -205,12 +205,12 @@ export const useGetIndexPatterns = () => {
   return { ...state, refresh: () => setRefresh({}) };
 };
 
-export const SubmitPPLButton = () => {
+export const SubmitPPLButton: React.FC<{ pplQuery: string }> = (props) => {
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [submitFormData, setSubmitFormData] = useState<FeedbackFormData>({
-    input: '',
+    input: props.pplQuery,
     output: '',
-    correct: undefined,
+    correct: true,
     expectedOutput: '',
     comment: '',
   });

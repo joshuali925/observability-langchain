@@ -18,7 +18,7 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import { isEqual } from 'lodash';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { APP_ANALYTICS_TAB_ID_REGEX } from '../../../../common/constants/explorer';
 import { PPL_SPAN_REGEX } from '../../../../common/constants/shared';
 import { uiSettingsService } from '../../../../common/utils';
@@ -32,6 +32,7 @@ import './search.scss';
 import { coreRefs } from '../../../framework/core_refs';
 import { useSelector } from 'react-redux';
 import { selectQueries } from '../../event_analytics/redux/slices/query_slice';
+import { useEffect } from 'react';
 
 export interface IQueryBarProps {
   query: string;
@@ -97,8 +98,9 @@ export const Search = (props: any) => {
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [isQueryBarVisible, setIsQueryBarVisible] = useState(!coreRefs.llm_enabled);
 
-  // const queries = useSelector(selectQueries);
-  // queryRef.current = queries;
+  const queries = useSelector(selectQueries);
+  const queryRef = useRef();
+  queryRef.current = queries;
 
   const closeFlyout = () => {
     setIsFlyoutVisible(false);
@@ -278,7 +280,7 @@ export const Search = (props: any) => {
                 </EuiFlexItem>
                 {!coreRefs.llm_enabled && (
                   <EuiFlexItem key={'search-submit-'} className="euiFlexItem--flexGrowZero">
-                    <SubmitPPLButton />
+                    <SubmitPPLButton pplQuery={queryRef.current![tabId].rawQuery} />
                   </EuiFlexItem>
                 )}
               </>
