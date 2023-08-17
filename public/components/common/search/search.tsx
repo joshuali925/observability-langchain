@@ -18,17 +18,21 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import { isEqual } from 'lodash';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { APP_ANALYTICS_TAB_ID_REGEX } from '../../../../common/constants/explorer';
 import { PPL_SPAN_REGEX } from '../../../../common/constants/shared';
 import { uiSettingsService } from '../../../../common/utils';
-import { LLMInput } from '../../event_analytics/explorer/llm/input';
+import { LLMInput, SubmitPPLButton } from '../../event_analytics/explorer/llm/input';
 import { SavePanel } from '../../event_analytics/explorer/save_panel';
 import { PPLReferenceFlyout } from '../helpers';
 import { LiveTailButton, StopLiveButton } from '../live_tail/live_tail_button';
 import { Autocomplete } from './autocomplete';
 import { DatePicker } from './date_picker';
 import './search.scss';
+import { coreRefs } from '../../../framework/core_refs';
+import { useSelector } from 'react-redux';
+import { selectQueries } from '../../event_analytics/redux/slices/query_slice';
+import { useEffect } from 'react';
 
 export interface IQueryBarProps {
   query: string;
@@ -92,7 +96,11 @@ export const Search = (props: any) => {
   const appLogEvents = tabId.match(APP_ANALYTICS_TAB_ID_REGEX);
   const [isSavePanelOpen, setIsSavePanelOpen] = useState(false);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
-  const [isQueryBarVisible, setIsQueryBarVisible] = useState(false);
+  const [isQueryBarVisible, setIsQueryBarVisible] = useState(!coreRefs.llm_enabled);
+
+  const queries = useSelector(selectQueries);
+  const queryRef = useRef();
+  queryRef.current = queries;
 
   const closeFlyout = () => {
     setIsFlyoutVisible(false);
@@ -134,12 +142,14 @@ export const Search = (props: any) => {
 
   return (
     <div className="globalQueryBar">
-      <LLMInput
-        tabId={tabId}
-        handleQueryChange={handleQueryChange}
-        handleTimeRangePickerRefresh={handleTimeRangePickerRefresh}
-      />
-      {tabId && (
+      {coreRefs.llm_enabled && (
+        <LLMInput
+          tabId={tabId}
+          handleQueryChange={handleQueryChange}
+          handleTimeRangePickerRefresh={handleTimeRangePickerRefresh}
+        />
+      )}
+      {coreRefs.llm_enabled && tabId && (
         <EuiLink onClick={() => setIsQueryBarVisible(!isQueryBarVisible)}>
           <EuiText size="s">{isQueryBarVisible ? 'Hide' : 'Show'} query bar</EuiText>
         </EuiLink>
@@ -268,6 +278,11 @@ export const Search = (props: any) => {
                     </EuiPopoverFooter>
                   </EuiPopover>
                 </EuiFlexItem>
+                {!coreRefs.llm_enabled && (
+                  <EuiFlexItem key={'search-submit-'} className="euiFlexItem--flexGrowZero">
+                    <SubmitPPLButton pplQuery={queryRef.current![tabId].rawQuery} />
+                  </EuiFlexItem>
+                )}
               </>
             )}
           </EuiFlexGroup>

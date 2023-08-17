@@ -204,3 +204,35 @@ export const useGetIndexPatterns = () => {
 
   return { ...state, refresh: () => setRefresh({}) };
 };
+
+export const SubmitPPLButton: React.FC<{ pplQuery: string }> = (props) => {
+  const [isSubmitOpen, setIsSubmitOpen] = useState(false);
+  const [submitFormData, setSubmitFormData] = useState<FeedbackFormData>({
+    input: props.pplQuery,
+    output: '',
+    correct: true,
+    expectedOutput: '',
+    comment: '',
+  });
+  return (
+    <>
+      <EuiButton iconType="faceHappy" iconSide="right" onClick={() => setIsSubmitOpen(true)}>
+        Submit PPL Query
+      </EuiButton>
+      {isSubmitOpen && (
+        <EuiModal onClose={() => setIsSubmitOpen(false)}>
+          <FeedbackModalContent
+            metadata={{ type: 'ppl_submit' }}
+            formData={submitFormData}
+            setFormData={setSubmitFormData}
+            onClose={() => setIsSubmitOpen(false)}
+            displayLabels={{
+              input: 'Your PPL Query',
+              output: 'Please write a Natural Language Question for the above Query',
+            }}
+          />
+        </EuiModal>
+      )}
+    </>
+  );
+};
