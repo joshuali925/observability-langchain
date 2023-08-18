@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { EuiButton, EuiSuperDatePicker, EuiFlexGroup, EuiFlexItem, EuiToolTip } from '@elastic/eui';
+import { EuiSuperDatePicker, EuiToolTip } from '@elastic/eui';
 import { IDatePickerProps } from './search';
 import { uiSettingsService } from '../../../../common/utils';
 import { coreRefs } from '../../../framework/core_refs';
@@ -34,37 +34,22 @@ export function DatePicker(props: IDatePickerProps) {
     />
   ) : (
     <>
-      <EuiFlexGroup>
-        <EuiFlexItem grow={false}>
-          <EuiToolTip
-            position="bottom"
-            content="Date range has been disabled to accomodate timerange of all datasets"
-          >
-            <EuiSuperDatePicker
-              data-test-subj="pplSearchDatePicker"
-              start={fixedStartTime}
-              end={fixedEndTime}
-              dateFormat={uiSettingsService.get('dateFormat')}
-              onTimeChange={handleTimeChange}
-              onRefresh={handleTimeRangePickerRefresh}
-              className="osdQueryBar__datePicker"
-              showUpdateButton={false}
-              isDisabled={true}
-            />
-          </EuiToolTip>
-        </EuiFlexItem>
-
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            iconSide="right"
-            iconType="refresh"
-            fill
-            onClick={handleTimeRangePickerRefresh}
-          >
-            Refresh
-          </EuiButton>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+      <EuiToolTip
+        position="bottom"
+        content="Date range has been disabled to accomodate timerange of all datasets"
+      >
+        <EuiSuperDatePicker
+          data-test-subj="pplSearchDatePicker"
+          start={fixedStartTime}
+          end={fixedEndTime}
+          dateFormat={uiSettingsService.get('dateFormat')}
+          onTimeChange={handleTimeChange}
+          onRefresh={handleTimeRangePickerRefresh}
+          className="osdQueryBar__datePicker"
+          showUpdateButton={false}
+          isDisabled={true}
+        />
+      </EuiToolTip>
     </>
   );
 }

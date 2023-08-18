@@ -201,6 +201,18 @@ export const Search = (props: any) => {
                 />
               )}
             </EuiFlexItem>
+            {!coreRefs.llm_enabled && !isLiveTailOn && (
+              <EuiFlexItem grow={false}>
+                <EuiButton
+                  iconSide="right"
+                  iconType="refresh"
+                  fill
+                  onClick={handleTimeRangePickerRefresh}
+                >
+                  Refresh
+                </EuiButton>
+              </EuiFlexItem>
+            )}
             {showSaveButton && !showSavePanelOptionsList && (
               <EuiFlexItem className="euiFlexItem--flexGrowZero live-tail">
                 <EuiPopover

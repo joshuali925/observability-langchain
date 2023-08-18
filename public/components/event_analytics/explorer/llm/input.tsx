@@ -14,9 +14,9 @@ import {
 } from '@elastic/eui';
 import { CatIndicesResponse } from '@opensearch-project/opensearch/api/types';
 import React, { useEffect, useReducer, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { IndexPatternAttributes } from '../../../../../../../src/plugins/data/common';
-import { APP_ANALYTICS_TAB_ID_REGEX, RAW_QUERY } from '../../../../../common/constants/explorer';
+import { RAW_QUERY } from '../../../../../common/constants/explorer';
 import { LANGCHAIN_API } from '../../../../../common/constants/llm';
 import { DSL_BASE, DSL_CAT } from '../../../../../common/constants/shared';
 import { getOSDHttp } from '../../../../../common/utils';
@@ -26,8 +26,7 @@ import {
   FeedbackModalContent,
 } from '../../../llm_chat/components/feedback_modal';
 import { GenericReducer, genericReducer } from '../../../llm_chat/hooks/fetch_reducer';
-import { changeQuery, selectQueries } from '../../redux/slices/query_slice';
-import { selectQueryTabs } from '../../redux/slices/query_tab_slice';
+import { changeQuery } from '../../redux/slices/query_slice';
 
 interface Props {
   handleQueryChange: (query: string) => void;
@@ -216,6 +215,17 @@ export const SubmitPPLButton: React.FC<{ pplQuery: string }> = (props) => {
     expectedOutput: '',
     comment: '',
   });
+
+  useEffect(() => {
+    setSubmitFormData({
+      input: props.pplQuery,
+      output: '',
+      correct: true,
+      expectedOutput: '',
+      comment: '',
+    });
+  }, [props.pplQuery]);
+
   return (
     <>
       <EuiButton iconType="faceHappy" iconSide="right" onClick={() => setIsSubmitOpen(true)}>
@@ -229,8 +239,11 @@ export const SubmitPPLButton: React.FC<{ pplQuery: string }> = (props) => {
             setFormData={setSubmitFormData}
             onClose={() => setIsSubmitOpen(false)}
             displayLabels={{
+              formHeader: 'Submit PPL Query',
               input: 'Your PPL Query',
+              inputPlaceholder: 'PPL Query',
               output: 'Please write a Natural Language Question for the above Query',
+              outputPlaceholder: 'Natural Language Question',
             }}
           />
         </EuiModal>
