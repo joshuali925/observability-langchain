@@ -3,42 +3,104 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamicTool } from 'langchain/tools';
+import { DynamicTool } from '../../../../node_modules/langchain/tools';
 import { PluginToolsFactory } from '../tools_factory/tools_factory';
 
-import { getDashboardQuery } from '../../../../public/components/trace_analytics/requests/queries/dashboard_queries';
-import DSLFacet from '../../../services/facets/dsl_facet';
+import {
+  getDashboardQuery,
+  getDashboardTraceGroupPercentiles,
+} from '../../../../public/components/trace_analytics/requests/queries/dashboard_queries';
 import { swallowErrors } from '../../utils/utils';
-
-interface DSLResponse {
-  schema: Array<{ name: string; type: string }>;
-  datarows: unknown[][];
-  total: number;
-  size: number;
-}
+import { handleDslRequest } from '../../../../public/components/trace_analytics/requests/request_handler';
+import { coreRefs } from '../../../../public/framework/core_refs';
+import {
+  filtersToDsl,
+  processTimeStamp,
+} from '../../../../public/components/trace_analytics/components/common/helper_functions';
+import core from '../../../../../../node_modules/ajv/dist/core';
 
 export class TracesTools extends PluginToolsFactory {
   static TOOL_NAMES = {
-    ERROR_RATES: 'Get error rates',
+    TRACE_GROUPS: 'Get trace groups',
+    SERVICES: 'Get trace services',
   } as const;
 
   toolsList = [
     new DynamicTool({
-      name: TracesTools.TOOL_NAMES.ERROR_RATES,
+      name: TracesTools.TOOL_NAMES.TRACE_GROUPS,
       description:
-        'Use this to get information about each trace group, including its latency average and variance, error rate, and number of traces in that trace group',
-      func: swallowErrors(async () => this.getTracesQuery().then()),
+        'Use this to get information about each trace group. The key is the name of the trace group, the doc_count is the number of spans, the trace_count is the number of traces, the average latency is measured in milliseconds, and the error rate is the percentage of traces with errors. You can specify a start and end time, formatted in %',
+      func: swallowErrors(async (startTime?: string) => this.getTraceGroupsQuery(startTime).then()),
     }),
+    // new DynamicTool({
+    //   name: TracesTools.TOOL_NAMES.SERVICES,
+    //   description:
+    //     'Use this to get information about each service in the system of traces. The key is the name of the service, the average latency is measured in milliseconds, the error rate is the percentage of spans in that service with errors, the throughput is the number of traces through that service, and the trace_count is the number of traces',
+    //   func: swallowErrors(async () => this.getServicesQuery().then()),
+    // }),
   ];
 
-  public async getTracesQuery() {
-    // const query = "{ size: 0, query: { bool: { must: [], filter: [], should: [], must_not: [], }, }, aggs: { trace_group_name: { terms: { field: 'traceGroup', size: 10000, }, aggs: { average_latency: { scripted_metric: { init_script: 'state.traceIdToLatencyMap = [:];', map_script: ` if (doc.containsKey('traceGroupFields.durationInNanos') && !doc['traceGroupFields.durationInNanos'].empty) { def traceId = doc['traceId'].value; if (!state.traceIdToLatencyMap.containsKey(traceId)) { state.traceIdToLatencyMap[traceId] = doc['traceGroupFields.durationInNanos'].value; } } `, combine_script: 'return state.traceIdToLatencyMap', reduce_script: ` def seenTraceIdsMap = [:]; def totalLatency = 0.0; def traceCount = 0.0; for (s in states) { if (s == null) { continue; } for (entry in s.entrySet()) { def traceId = entry.getKey(); def traceLatency = entry.getValue(); if (!seenTraceIdsMap.containsKey(traceId)) { seenTraceIdsMap[traceId] = true; totalLatency += traceLatency; traceCount++; } } } def average_latency_nanos = totalLatency / traceCount; return Math.round(average_latency_nanos / 10000) / 100.0; `, }, }, trace_count: { cardinality: { field: 'traceId', }, }, error_count: { filter: { term: { 'traceGroupFields.statusCode': '2', }, }, aggs: { trace_count: { cardinality: { field: 'traceId', }, }, }, }, error_rate: { bucket_script: { buckets_path: { total: 'trace_count.value', errors: 'error_count>trace_count.value', }, script: 'params.errors / params.total * 100', }, }, }, }, }, };"
-    const query = getDashboardQuery();
-    // const response = await this.opensearchClient.search()
+  public async getTraceGroupsQuery(startTime: string | undefined) {
+    // const query = JSON.stringify(getDashboardQuery());
+    // try {
+    //   const traceGroupsResponse = await this.observabilityClient.callAsCurrentUser('search', {
+    //     body: query,
+    //   });
 
-    const response: DSLResponse = await this.observabilityClient.callAsCurrentUser('dsl.dslQuery', {
-      body: { query },
-    });
-    return response;
+    //   console.log(traceGroupsResponse.aggregations.trace_group_name.buckets)
+    //   return JSON.stringify(traceGroupsResponse.aggregations.trace_group_name.buckets)
+    // } catch (error) {
+    //   return 'error in running trace groups query' + error;
+    // }
+    const mode = 'data_prepper';
+    const query = JSON.stringify(getDashboardQuery());
+    startTime = startTime ? startTime : '';
+    const endTime = 'now';
+    const page = 'dashboard';
+
+    const timeFilterDSL = filtersToDsl(
+      mode,
+      [],
+      query,
+      processTimeStamp(startTime, mode),
+      processTimeStamp(endTime, mode),
+      page,
+      []
+    );
+    const res = handleDslRequest(
+      core.http,
+      timeFilterDSL,
+      getDashboardTraceGroupPercentiles(mode),
+      mode
+    );
+    console.log(res);
+    return res;
   }
+
+  // public async getServicesQuery() {
+  //   // const query = JSON.stringify(getServicesQuery('data_prepper', undefined));
+  //   // const query = JSON.stringify(getDashboardQuery());
+  //   const filters =
+  //   const DSL = filtersToDsl(
+  //     mode, // data prepper or jaeger
+  //     filters, //
+  //     query,
+  //     processTimeStamp(startTime, mode),
+  //     processTimeStamp(endTime, mode),
+  //     page,
+  //     appConfigs
+  //   );
+  //   handleDslRequest(http, DSL, getServicesQuery(mode, serviceNameFilter, DSL), mode)
+  //   try {
+  //     const servicesResponse = await this.observabilityClient.callAsCurrentUser('search', {
+  //       body: JSON.stringify(query),
+  //     });
+  //     // return jsonToCsv(traceGroupsResponse.body);
+  //     // console.log(jsonToCsv(traceGroupsResponse.aggregations.trace_group_name.buckets))
+  //     console.log(servicesResponse.aggregations.service.buckets)
+  //     return JSON.stringify(servicesResponse.aggregations.service.buckets)
+  //   } catch (error) {
+  //     return 'error in running services query' + error;
+  //   }
+  // }
 }
