@@ -4,11 +4,7 @@
  */
 
 import { TraceAnalyticsMode } from 'public/components/trace_analytics/home';
-import { ServiceObject } from 'public/components/trace_analytics/components/common/plots/service_map';
-import {
-  SERVICE_MAP_MAX_NODES,
-  TRACES_MAX_NUM,
-} from '../../../../../common/constants/trace_analytics';
+import { TRACES_MAX_NUM } from '../../../../../common/constants/trace_analytics';
 
 import { OpenSearchClient } from '../../../../../../../src/core/server';
 
@@ -19,22 +15,6 @@ export async function getIndexName(opensearchClient: OpenSearchClient) {
   });
   return indexExistsResponse ? indexName : '*jaeger-span-*';
 }
-
-// export function addFilters(bodyQuery: any, startTime?: string) {
-//     const endTime = 'now'
-//     if (startTime) {
-//         const timeFilter = {
-//             range: {
-//               startTime: {
-//                 gte: startTime,
-//                 lte: endTime,
-//               },
-//             },
-//         };
-//         bodyQuery.query.bool.must.push(timeFilter);
-//         bodyQuery.custom.timeFilter.push(timeFilter);
-//     }
-// }
 
 export const getDashboardQuery = (indexName: string) => {
   return {
