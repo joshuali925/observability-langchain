@@ -12,12 +12,7 @@ import { None } from 'vega';
 import { PluginToolsFactory } from '../tools_factory/tools_factory';
 
 import { swallowErrors } from '../../utils/utils';
-import {
-  getDashboardQuery,
-  getIndexName,
-  getServicesQuery,
-  getTracesQuery,
-} from './trace_tools/queries';
+import { getDashboardQuery, getIndexName, getTracesQuery } from './trace_tools/queries';
 import { ServiceObject } from '../../../../public/components/trace_analytics/components/common/plots/service_map';
 
 export class TracesTools extends PluginToolsFactory {
