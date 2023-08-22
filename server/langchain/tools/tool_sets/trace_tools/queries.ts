@@ -4,9 +4,13 @@
  */
 
 import { TraceAnalyticsMode } from 'public/components/trace_analytics/home';
-import { TRACES_MAX_NUM } from '../../../../../common/constants/trace_analytics';
+import {
+  SERVICE_MAP_MAX_NODES,
+  TRACES_MAX_NUM,
+} from '../../../../../common/constants/trace_analytics';
 
 import { OpenSearchClient } from '../../../../../../../src/core/server';
+import { ServiceObject } from '../../../../../public/components/trace_analytics/components/common/plots/service_map';
 
 export async function getIndexName(opensearchClient: OpenSearchClient) {
   const indexName = 'otel-v1-apm-span-*';

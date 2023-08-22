@@ -11,7 +11,7 @@ import {
 import { None } from 'vega';
 import { PluginToolsFactory } from '../tools_factory/tools_factory';
 
-import { swallowErrors } from '../../utils/utils';
+import { flatten, jsonToCsv, swallowErrors } from '../../utils/utils';
 import { getDashboardQuery, getIndexName, getTracesQuery } from './trace_tools/queries';
 import { ServiceObject } from '../../../../public/components/trace_analytics/components/common/plots/service_map';
 
@@ -32,7 +32,7 @@ export class TracesTools extends PluginToolsFactory {
     new DynamicTool({
       name: TracesTools.TOOL_NAMES.TRACES,
       description:
-        'Use this to get information about each trace. The key is the ID of the trace. The doc_count is the number of spans in that particular trace. The latency is measured in ms. If the error count is not 0, that trace had an error. The trace group is what trace group the trace belongs to. This tool takes in no inputs.',
+        'Use this to get information about each trace. The key is the ID of the trace. The doc_count is the number of spans in that particular trace. The latency is measured in ms: the higher the number, the higher the latency. If the error count is not 0, that trace had an error. The trace group is what trace group the trace belongs to. This tool takes in no inputs.',
       func: swallowErrors(async () => this.getTracesQuery().then()),
     }),
   ];
@@ -44,8 +44,8 @@ export class TracesTools extends PluginToolsFactory {
       const traceGroupsResponse = await this.observabilityClient.callAsCurrentUser('search', {
         body: JSON.stringify(query),
       });
-      console.log(traceGroupsResponse.aggregations.trace_group_name.buckets);
-      return JSON.stringify(traceGroupsResponse.aggregations.trace_group_name.buckets);
+      const traceGroups = traceGroupsResponse.aggregations.trace_group_name.buckets;
+      return jsonToCsv(flatten(traceGroups));
     } catch (error) {
       return 'error in running trace groups query' + error;
     }
@@ -53,16 +53,13 @@ export class TracesTools extends PluginToolsFactory {
 
   public async getTracesQuery() {
     const indexName = getIndexName(this.opensearchClient);
-
     const query = getTracesQuery('data_prepper', '');
-    console.log(JSON.stringify(query));
     try {
       const tracesResponse = await this.observabilityClient.callAsCurrentUser('search', {
         body: JSON.stringify(query),
       });
-      console.log(tracesResponse);
-      console.log(tracesResponse.aggregations.traces.buckets);
-      return JSON.stringify(tracesResponse.aggregations.traces.buckets);
+      const traces = tracesResponse.aggregations.traces.buckets;
+      return jsonToCsv(flatten(traces));
     } catch (error) {
       return 'error in running trace groups query' + error;
     }
