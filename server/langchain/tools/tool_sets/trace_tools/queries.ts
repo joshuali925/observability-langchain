@@ -3,24 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { TraceAnalyticsMode } from 'public/components/trace_analytics/home';
-import {
-  SERVICE_MAP_MAX_NODES,
-  TRACES_MAX_NUM,
-} from '../../../../../common/constants/trace_analytics';
-
+import { TraceAnalyticsMode } from '../../../utils/utils';
 import { OpenSearchClient } from '../../../../../../../src/core/server';
-import { ServiceObject } from '../../../../../public/components/trace_analytics/components/common/plots/service_map';
+import { TRACES_MAX_NUM } from '../../../../../common/constants/trace_analytics';
 
 export async function getIndexName(opensearchClient: OpenSearchClient) {
   const indexName = 'otel-v1-apm-span-*';
   const indexExistsResponse = await opensearchClient.indices.exists({
     index: indexName,
   });
-  return indexExistsResponse ? indexName : '*jaeger-span-*';
+  return indexExistsResponse ? 'data_prepper' : 'jaeger';
 }
 
-export const getDashboardQuery = (indexName: string) => {
+export const getDashboardQuery = () => {
   return {
     size: 0,
     query: {
@@ -37,7 +32,6 @@ export const getDashboardQuery = (indexName: string) => {
           field: 'traceGroup',
           size: 10000,
         },
-        // index: indexName,
         aggs: {
           average_latency: {
             scripted_metric: {
@@ -111,7 +105,7 @@ export const getDashboardQuery = (indexName: string) => {
   };
 };
 
-export const getTracesQuery = (mode: TraceAnalyticsMode, traceId: string = '') => {
+export const getTracesQuery = (mode: TraceAnalyticsMode) => {
   const jaegerQuery = {
     size: 0,
     query: {
@@ -226,17 +220,5 @@ export const getTracesQuery = (mode: TraceAnalyticsMode, traceId: string = '') =
       },
     },
   };
-  // if (traceId) {
-  //   jaegerQuery.query.bool.must.push({
-  //     term: {
-  //       "traceID": traceId,
-  //     },
-  //   });
-  //   dataPrepperQuery.query.bool.must.push({
-  //     term: {
-  //       traceId,
-  //     },
-  //   });
-  // }
   return mode === 'jaeger' ? jaegerQuery : dataPrepperQuery;
 };

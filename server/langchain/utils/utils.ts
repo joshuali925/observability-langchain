@@ -39,3 +39,42 @@ export const jsonToCsv = (json: object[]) => {
 
   return csv;
 };
+
+export const flatten = (response: Array<Record<string, string | object>>) => {
+  for (const bucket in response) {
+    if (response.hasOwnProperty(bucket)) {
+      response[bucket] = flattenObject(response[bucket]);
+    }
+  }
+  return response;
+};
+
+export function flattenObject(object: Record<string, unknown>, prefix = '') {
+  const result: Record<string, string> = {};
+
+  for (const key in object) {
+    if (object.hasOwnProperty(key)) {
+      const combinedKey = prefix ? `${prefix}.${key}` : key;
+
+      if (typeof object[key] === 'object') {
+        if (Array.isArray(object[key])) {
+          for (let i = 0; i < object[key].length; i++) {
+            const nestedObject = flattenObject(object[key][i], `${combinedKey}.${i + 1}`);
+            Object.assign(result, nestedObject);
+          }
+        } else {
+          const nestedObject = flattenObject(
+            object[key] as Record<string, string | object>,
+            combinedKey
+          );
+          Object.assign(result, nestedObject);
+        }
+      } else {
+        result[combinedKey] = object[key];
+      }
+    }
+  }
+  return result;
+}
+
+export type TraceAnalyticsMode = 'jaeger' | 'data_prepper';
