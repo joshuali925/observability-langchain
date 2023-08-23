@@ -7,7 +7,7 @@ import { DynamicTool } from 'langchain/tools';
 import { PluginToolsFactory } from '../tools_factory/tools_factory';
 
 import { flatten, jsonToCsv, swallowErrors } from '../../utils/utils';
-import { getDashboardQuery, getIndexName, getTracesQuery } from './trace_tools/queries';
+import { getDashboardQuery, getMode, getServices, getTracesQuery } from './trace_tools/queries';
 
 export class TracesTools extends PluginToolsFactory {
   static TOOL_NAMES = {
@@ -29,10 +29,14 @@ export class TracesTools extends PluginToolsFactory {
         'Use this to get information about each trace. The tool response includes the key, doc_count, last_updated.value, last_updated.value_as_string, error_count.doc_count, trace_group.doc_count_error_upper_bound, trace_group.sum_other_doc_count, trace_group.buckets.1.key, and trace_groups.buckets.1.doc_count. The key is the ID of the trace. The doc_count is the number of spans in that particular trace. The last_updated.value_as_string is the last time that the trace was updated. The error_count.doc_count is how many spans in that trace has errors. The trace group.buckets.1.key is what trace group the trace belongs to. The other fields are mostly irrelevant data. This tool takes in no inputs.',
       func: swallowErrors(async () => this.getTraces()),
     }),
+    new DynamicTool({
+      name: TracesTools.TOOL_NAMES.SERVICES,
+      description: 'Use this to get information about each service in trace analytics.',
+      func: swallowErrors(async () => this.getServices()),
+    }),
   ];
 
   public async getTraceGroups() {
-    const indexName = await getIndexName(this.opensearchClient);
     const query = getDashboardQuery();
     const traceGroupsResponse = await this.observabilityClient.callAsCurrentUser('search', {
       body: JSON.stringify(query),
@@ -42,12 +46,18 @@ export class TracesTools extends PluginToolsFactory {
   }
 
   public async getTraces() {
-    const indexName = await getIndexName(this.opensearchClient);
-    const query = getTracesQuery(indexName);
+    const mode = await getMode(this.opensearchClient);
+    const query = getTracesQuery(mode);
     const tracesResponse = await this.observabilityClient.callAsCurrentUser('search', {
       body: JSON.stringify(query),
     });
     const traces = tracesResponse.aggregations.traces.buckets;
     return jsonToCsv(flatten(traces));
+  }
+
+  public async getServices() {
+    const mode = await getMode(this.opensearchClient);
+    const services = await getServices(mode, this.observabilityClient);
+    return jsonToCsv(flatten(services));
   }
 }
