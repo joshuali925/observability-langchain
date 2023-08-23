@@ -7,10 +7,9 @@ import { TraceAnalyticsMode } from '../../../utils/utils';
 import { OpenSearchClient } from '../../../../../../../src/core/server';
 import { TRACES_MAX_NUM } from '../../../../../common/constants/trace_analytics';
 
-export async function getIndexName(opensearchClient: OpenSearchClient) {
-  const indexName = 'otel-v1-apm-span-*';
+export async function getMode(opensearchClient: OpenSearchClient) {
   const indexExistsResponse = await opensearchClient.indices.exists({
-    index: indexName,
+    index: 'otel-v1-apm-span-*',
   });
   return indexExistsResponse ? 'data_prepper' : 'jaeger';
 }

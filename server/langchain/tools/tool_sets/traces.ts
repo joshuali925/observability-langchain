@@ -7,7 +7,11 @@ import { DynamicTool } from 'langchain/tools';
 import { PluginToolsFactory } from '../tools_factory/tools_factory';
 
 import { flatten, jsonToCsv, swallowErrors } from '../../utils/utils';
-import { getDashboardQuery, getIndexName, getTracesQuery } from './trace_tools/queries';
+import { getDashboardQuery, getMode, getTracesQuery } from './trace_tools/queries';
+import {
+  DATA_PREPPER_INDEX_NAME,
+  JAEGER_INDEX_NAME,
+} from '../../../../common/constants/trace_analytics';
 
 export class TracesTools extends PluginToolsFactory {
   static TOOL_NAMES = {
@@ -32,22 +36,25 @@ export class TracesTools extends PluginToolsFactory {
   ];
 
   public async getTraceGroups() {
-    const indexName = await getIndexName(this.opensearchClient);
+    const mode = await getMode(this.opensearchClient);
     const query = getDashboardQuery();
-    const traceGroupsResponse = await this.observabilityClient.callAsCurrentUser('search', {
-      body: JSON.stringify(query),
+    console.log(DATA_PREPPER_INDEX_NAME);
+    const traceGroupsResponse = await this.opensearchClient.search({
+      index: DATA_PREPPER_INDEX_NAME,
+      body: query,
     });
-    const traceGroups = traceGroupsResponse.aggregations.trace_group_name.buckets;
+    const traceGroups = traceGroupsResponse.body.aggregations.trace_group_name.buckets;
     return jsonToCsv(flatten(traceGroups));
   }
 
   public async getTraces() {
-    const indexName = await getIndexName(this.opensearchClient);
-    const query = getTracesQuery(indexName);
-    const tracesResponse = await this.observabilityClient.callAsCurrentUser('search', {
-      body: JSON.stringify(query),
+    const mode = await getMode(this.opensearchClient);
+    const query = getTracesQuery(mode);
+    const tracesResponse = await this.opensearchClient.search({
+      index: mode === 'data_prepper' ? DATA_PREPPER_INDEX_NAME : JAEGER_INDEX_NAME,
+      body: query,
     });
-    const traces = tracesResponse.aggregations.traces.buckets;
+    const traces = tracesResponse.body.aggregations.traces.buckets;
     return jsonToCsv(flatten(traces));
   }
 }
