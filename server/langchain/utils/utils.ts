@@ -41,6 +41,7 @@ export const jsonToCsv = (json: object[]) => {
 };
 
 export const flatten = (response: Array<Record<string, string | object>>) => {
+  // Flattens each bucket in the response
   for (const bucket in response) {
     if (response.hasOwnProperty(bucket)) {
       response[bucket] = flattenObject(response[bucket]);
@@ -52,6 +53,7 @@ export const flatten = (response: Array<Record<string, string | object>>) => {
 export function flattenObject(object: Record<string, unknown>, prefix = '') {
   const result: Record<string, string> = {};
 
+  // Recursively flattens object if it's an object or an array
   for (const key in object) {
     if (object.hasOwnProperty(key)) {
       const combinedKey = prefix ? `${prefix}.${key}` : key;

@@ -48,7 +48,6 @@ export class TracesTools extends PluginToolsFactory {
       body: JSON.stringify(query),
     });
     const traces = tracesResponse.aggregations.traces.buckets;
-    console.log(traces);
     return jsonToCsv(flatten(traces));
   }
 }
