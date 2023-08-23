@@ -61,7 +61,7 @@ export function flattenObject(object: Record<string, unknown>, prefix = '') {
       if (typeof object[key] === 'object') {
         if (Array.isArray(object[key])) {
           for (let i = 0; i < object[key].length; i++) {
-            const nestedObject = flattenObject(object[key][i], `${combinedKey}.${i + 1}`);
+            const nestedObject = flattenObject(object[key][i], `${combinedKey}.${i}`);
             Object.assign(result, nestedObject);
           }
         } else {
