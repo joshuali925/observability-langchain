@@ -50,7 +50,7 @@ export const flatten = (response: Array<Record<string, string | object>>) => {
   return response;
 };
 
-export function flattenObject(object: Record<string, unknown>, prefix = '') {
+function flattenObject(object: Record<string, unknown>, prefix = '') {
   const result: Record<string, string> = {};
 
   // Recursively flattens object if it's an object or an array
