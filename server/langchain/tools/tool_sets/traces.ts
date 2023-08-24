@@ -7,7 +7,7 @@ import { DynamicTool } from 'langchain/tools';
 import { PluginToolsFactory } from '../tools_factory/tools_factory';
 
 import { flatten, jsonToCsv, swallowErrors } from '../../utils/utils';
-import { getDashboardQuery, getMode, getTracesQuery } from './trace_tools/queries';
+import { getDashboardQuery, getMode, getServices, getTracesQuery } from './trace_tools/queries';
 import {
   DATA_PREPPER_INDEX_NAME,
   JAEGER_INDEX_NAME,
