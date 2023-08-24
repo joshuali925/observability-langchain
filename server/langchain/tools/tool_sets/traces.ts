@@ -68,7 +68,7 @@ export class TracesTools extends PluginToolsFactory {
 
   public async getServices() {
     const mode = await getMode(this.opensearchClient);
-    const services = await getServices(mode, this.observabilityClient);
+    const services = await getServices(mode, this.opensearchClient);
     return jsonToCsv(flatten(services));
   }
 }
