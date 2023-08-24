@@ -50,7 +50,7 @@ export const flatten = (response: Array<Record<string, string | object>>) => {
   return response;
 };
 
-export function flattenObject(object: Record<string, unknown>, prefix = '') {
+function flattenObject(object: Record<string, unknown>, prefix = '') {
   const result: Record<string, string> = {};
 
   // Recursively flattens object if it's an object or an array
@@ -61,7 +61,7 @@ export function flattenObject(object: Record<string, unknown>, prefix = '') {
       if (typeof object[key] === 'object') {
         if (Array.isArray(object[key])) {
           for (let i = 0; i < object[key].length; i++) {
-            const nestedObject = flattenObject(object[key][i], `${combinedKey}.${i + 1}`);
+            const nestedObject = flattenObject(object[key][i], `${combinedKey}.${i}`);
             Object.assign(result, nestedObject);
           }
         } else {

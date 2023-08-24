@@ -15,9 +15,8 @@ import {
 import { ServiceObject } from '../../../../../public/components/trace_analytics/components/common/plots/service_map';
 
 export async function getMode(opensearchClient: OpenSearchClient) {
-  const indexName = 'otel-v1-apm-span-*';
   const indexExistsResponse = await opensearchClient.indices.exists({
-    index: indexName,
+    index: 'otel-v1-apm-span-*',
   });
   return indexExistsResponse ? 'data_prepper' : 'jaeger';
 }
