@@ -33,8 +33,8 @@ export class TracesTools extends PluginToolsFactory {
     new DynamicTool({
       name: TracesTools.TOOL_NAMES.TRACES,
       description:
-        'Use this to get information about each trace. The tool response includes the key, doc_count, last_updated.value, last_updated.value_as_string, error_count.doc_count, trace_group.doc_count_error_upper_bound, trace_group.sum_other_doc_count, trace_group.buckets.0.key, and trace_groups.buckets.0.doc_count. The key is the ID of the trace. The doc_count is the number of spans in that particular trace. The last_updated.value_as_string is the last time that the trace was updated. The error_count.doc_count is how many spans in that trace has errors. The trace group.buckets.1.key is what trace group the trace belongs to. The other fields are mostly irrelevant data. This tool takes in no inputs.',
-      func: swallowErrors(async () => this.getTraces()),
+        "Use this to get information about each trace. The input must be the entire original USER'S INPUT with no modification.  The tool response includes the key, doc_count, last_updated.value, last_updated.value_as_string, error_count.doc_count, trace_group.doc_count_error_upper_bound, trace_group.sum_other_doc_count, trace_group.buckets.0.key, and trace_groups.buckets.0.doc_count. The key is the ID of the trace. The doc_count is the number of spans in that particular trace. The last_updated.value_as_string is the last time that the trace was updated. The error_count.doc_count is how many spans in that trace has errors. The trace group.buckets.1.key is what trace group the trace belongs to. The other fields are mostly irrelevant data. This tool takes in no inputs.",
+      func: swallowErrors(async (userQuery: string) => this.getTraces(userQuery)),
       callbacks: this.callbacks,
     }),
     new DynamicTool({
@@ -47,13 +47,10 @@ export class TracesTools extends PluginToolsFactory {
   ];
 
   public async getTraceGroups(userQuery: string) {
-    console.log(userQuery);
     const mode = await getMode(this.opensearchClient);
     const times = await requestTimesFiltersChain(this.model, userQuery);
-    console.log(times);
     const query = getDashboardQuery();
     addFilters(query, times);
-    console.log(query);
     const traceGroupsResponse = await this.opensearchClient.search({
       index: mode === 'data_prepper' ? DATA_PREPPER_INDEX_NAME : JAEGER_INDEX_NAME,
       body: query,
@@ -67,9 +64,12 @@ export class TracesTools extends PluginToolsFactory {
     return jsonToCsv(flatten(traceGroupBuckets));
   }
 
-  public async getTraces() {
+  public async getTraces(userQuery: string) {
     const mode = await getMode(this.opensearchClient);
+    const times = await requestTimesFiltersChain(this.model, userQuery);
     const query = getTracesQuery(mode);
+    console.log(times);
+    addFilters(query, times);
     const tracesResponse = await this.opensearchClient.search({
       index: mode === 'data_prepper' ? DATA_PREPPER_INDEX_NAME : JAEGER_INDEX_NAME,
       body: query,
@@ -77,6 +77,9 @@ export class TracesTools extends PluginToolsFactory {
     if (!tracesResponse.body.aggregations) return '';
     const traceBuckets = (tracesResponse.body.aggregations
       .trace_group_name as AggregationsMultiBucketAggregate<AggregationBucket>).buckets;
+    if (traceBuckets.length === 0) {
+      return 'No traces found';
+    }
     return jsonToCsv(flatten(traceBuckets));
   }
 
