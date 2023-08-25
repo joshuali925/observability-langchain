@@ -12,6 +12,8 @@ import {
 import { AggregationBucket, flatten, jsonToCsv, swallowErrors } from '../../utils/utils';
 import { PluginToolsFactory } from '../tools_factory/tools_factory';
 import { getDashboardQuery, getMode, getTracesQuery, getServices } from './trace_tools/queries';
+import { requestTimesFiltersChain } from '../../../../server/langchain/chains/filter_generator';
+import { addFilters } from './trace_tools/filters';
 
 export class TracesTools extends PluginToolsFactory {
   static TOOL_NAMES = {
@@ -24,8 +26,8 @@ export class TracesTools extends PluginToolsFactory {
     new DynamicTool({
       name: TracesTools.TOOL_NAMES.TRACE_GROUPS,
       description:
-        'Use this to get information about each trace group. The tool response includes the key, doc_count, average_latency.value, trace_count.value, error_count.doc_count, error_count.trace_count.value, and error_rate.value. The key is the name of the trace group, the doc_count is the number of spans, the average_latency.value is the average latency of the trace group, measured in milliseconds. The trace_count.value is the number of traces in the trace group. The error_count.doc_count is the number of spans in the trace groups with errors, while the error_count.trace_count.value is the number of different traces in the trace group with errors. The error_rate.value is the percentage of traces in the trace group that has at least one error. This tool takes in no inputs.',
-      func: swallowErrors(async () => this.getTraceGroups()),
+        "Use this to get information about each trace group. The input must be the entire original USER'S INPUT with no modification. The first line of the tool response is the column labels, which includes the key, doc_count, average_latency.value, trace_count.value, error_count.doc_count, error_count.trace_count.value, and error_rate.value. The key is the name of the trace group, the doc_count is the number of spans, the average_latency.value is the average latency of the trace group, measured in milliseconds. The trace_count.value is the number of traces in the trace group. The error_count.doc_count is the number of spans in the trace groups with errors, while the error_count.trace_count.value is the number of different traces in the trace group with errors. The error_rate.value is the percentage of traces in the trace group that has at least one error. There may be no trace groups",
+      func: swallowErrors(async (userQuery: string) => this.getTraceGroups(userQuery)),
       callbacks: this.callbacks,
     }),
     new DynamicTool({
@@ -44,9 +46,14 @@ export class TracesTools extends PluginToolsFactory {
     }),
   ];
 
-  public async getTraceGroups() {
+  public async getTraceGroups(userQuery: string) {
+    console.log(userQuery);
     const mode = await getMode(this.opensearchClient);
+    const times = await requestTimesFiltersChain(this.model, userQuery);
+    console.log(times);
     const query = getDashboardQuery();
+    addFilters(query, times);
+    console.log(query);
     const traceGroupsResponse = await this.opensearchClient.search({
       index: mode === 'data_prepper' ? DATA_PREPPER_INDEX_NAME : JAEGER_INDEX_NAME,
       body: query,
