@@ -61,6 +61,9 @@ export class TracesTools extends PluginToolsFactory {
     if (!traceGroupsResponse.body.aggregations) return '';
     const traceGroupBuckets = (traceGroupsResponse.body.aggregations
       .trace_group_name as AggregationsMultiBucketAggregate<AggregationBucket>).buckets;
+    if (traceGroupBuckets.length === 0) {
+      return 'No trace groups found';
+    }
     return jsonToCsv(flatten(traceGroupBuckets));
   }
 
