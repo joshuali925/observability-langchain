@@ -49,7 +49,6 @@ export class TracesTools extends PluginToolsFactory {
   public async getTraceGroups(userQuery: string) {
     const mode = await getMode(this.opensearchClient);
     const times = await requestTimesFiltersChain(this.model, userQuery);
-    console.log(times);
     const query = getDashboardQuery();
     addFilters(query, times);
     const traceGroupsResponse = await this.opensearchClient.search({
@@ -69,7 +68,6 @@ export class TracesTools extends PluginToolsFactory {
     const mode = await getMode(this.opensearchClient);
     const times = await requestTimesFiltersChain(this.model, userQuery);
     const query = getTracesQuery(mode);
-    console.log(times);
     addFilters(query, times);
     const tracesResponse = await this.opensearchClient.search({
       index: mode === 'data_prepper' ? DATA_PREPPER_INDEX_NAME : JAEGER_INDEX_NAME,
@@ -86,20 +84,15 @@ export class TracesTools extends PluginToolsFactory {
   }
 
   public async getServices(userQuery: string) {
-    console.log(userQuery);
     const mode = await getMode(this.opensearchClient);
     const times = await requestTimesFiltersChain(this.model, userQuery);
-    console.log(times);
     const query = await getServices(mode, this.opensearchClient);
     addFilters(query, times);
-    console.log(query);
     const servicesResponse = await this.opensearchClient.search({
       index: mode === 'data_prepper' ? DATA_PREPPER_INDEX_NAME : JAEGER_INDEX_NAME,
       body: query,
     });
-    console.log(servicesResponse);
     if (!servicesResponse.body.aggregations) return '';
-
     const servicesBuckets = (servicesResponse.body.aggregations
       .service_name as AggregationsMultiBucketAggregate<AggregationBucket>).buckets;
     if (servicesBuckets.length === 0) {
