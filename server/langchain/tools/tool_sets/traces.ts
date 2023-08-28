@@ -3,13 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AggregationsMultiBucketAggregate } from '@opensearch-project/opensearch/api/types';
 import { DynamicTool } from 'langchain/tools';
-import {
-  DATA_PREPPER_INDEX_NAME,
-  JAEGER_INDEX_NAME,
-} from '../../../../common/constants/trace_analytics';
-import { AggregationBucket, flatten, jsonToCsv, swallowErrors } from '../../utils/utils';
+import { swallowErrors } from '../../utils/utils';
 import { PluginToolsFactory } from '../tools_factory/tools_factory';
 import {
   getDashboardQuery,
@@ -18,7 +13,6 @@ import {
   getTracesQuery,
   getServices,
 } from './trace_tools/queries';
-import { requestTimesFiltersChain } from '../../../../server/langchain/chains/filter_generator';
 import { addFilters } from './trace_tools/filters';
 
 export class TracesTools extends PluginToolsFactory {
