@@ -37,12 +37,10 @@ export async function runQuery(
     index: mode === 'data_prepper' ? DATA_PREPPER_INDEX_NAME : JAEGER_INDEX_NAME,
     body: query,
   });
-  console.log(response.body.aggregations);
   if (!response.body.aggregations) return '';
   const buckets = (response.body.aggregations[keyword] as AggregationsMultiBucketAggregate<
     AggregationBucket
   >).buckets;
-  console.log(buckets);
   if (buckets.length === 0) {
     return 'None found';
   }
