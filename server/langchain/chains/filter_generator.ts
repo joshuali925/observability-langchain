@@ -56,7 +56,6 @@ export const requestTimesFiltersChain = async (
   question: string,
   callbacks?: Callbacks
 ) => {
-  console.log(question);
   const chain = new LLMChain({ llm: model, prompt });
   const output = await chain.call({ question }, callbacks);
   return parser.parse(output.text);
