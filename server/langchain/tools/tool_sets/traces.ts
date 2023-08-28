@@ -11,7 +11,13 @@ import {
 } from '../../../../common/constants/trace_analytics';
 import { AggregationBucket, flatten, jsonToCsv, swallowErrors } from '../../utils/utils';
 import { PluginToolsFactory } from '../tools_factory/tools_factory';
-import { getDashboardQuery, getMode, getTracesQuery, getServices } from './trace_tools/queries';
+import {
+  getDashboardQuery,
+  getMode,
+  runQuery,
+  getTracesQuery,
+  getServices,
+} from './trace_tools/queries';
 import { requestTimesFiltersChain } from '../../../../server/langchain/chains/filter_generator';
 import { addFilters } from './trace_tools/filters';
 
@@ -48,56 +54,22 @@ export class TracesTools extends PluginToolsFactory {
 
   public async getTraceGroups(userQuery: string) {
     const mode = await getMode(this.opensearchClient);
-    const times = await requestTimesFiltersChain(this.model, userQuery);
     const query = getDashboardQuery();
-    addFilters(query, times);
-    const traceGroupsResponse = await this.opensearchClient.search({
-      index: mode === 'data_prepper' ? DATA_PREPPER_INDEX_NAME : JAEGER_INDEX_NAME,
-      body: query,
-    });
-    if (!traceGroupsResponse.body.aggregations) return '';
-    const traceGroupBuckets = (traceGroupsResponse.body.aggregations
-      .trace_group_name as AggregationsMultiBucketAggregate<AggregationBucket>).buckets;
-    if (traceGroupBuckets.length === 0) {
-      return 'No trace groups found';
-    }
-    return jsonToCsv(flatten(traceGroupBuckets));
+    addFilters(query, userQuery, this.model);
+    return await runQuery(this.opensearchClient, query, mode, 'trace_group_name');
   }
 
   public async getTraces(userQuery: string) {
     const mode = await getMode(this.opensearchClient);
-    const times = await requestTimesFiltersChain(this.model, userQuery);
     const query = getTracesQuery(mode);
-    addFilters(query, times);
-    const tracesResponse = await this.opensearchClient.search({
-      index: mode === 'data_prepper' ? DATA_PREPPER_INDEX_NAME : JAEGER_INDEX_NAME,
-      body: query,
-    });
-    console.log(tracesResponse);
-    if (!tracesResponse.body.aggregations) return '';
-    const traceBuckets = (tracesResponse.body.aggregations
-      .traces as AggregationsMultiBucketAggregate<AggregationBucket>).buckets;
-    if (traceBuckets.length === 0) {
-      return 'No traces found';
-    }
-    return jsonToCsv(flatten(traceBuckets));
+    addFilters(query, userQuery, this.model);
+    return await runQuery(this.opensearchClient, query, mode, 'traces');
   }
 
   public async getServices(userQuery: string) {
     const mode = await getMode(this.opensearchClient);
-    const times = await requestTimesFiltersChain(this.model, userQuery);
     const query = await getServices(mode, this.opensearchClient);
-    addFilters(query, times);
-    const servicesResponse = await this.opensearchClient.search({
-      index: mode === 'data_prepper' ? DATA_PREPPER_INDEX_NAME : JAEGER_INDEX_NAME,
-      body: query,
-    });
-    if (!servicesResponse.body.aggregations) return '';
-    const servicesBuckets = (servicesResponse.body.aggregations
-      .service_name as AggregationsMultiBucketAggregate<AggregationBucket>).buckets;
-    if (servicesBuckets.length === 0) {
-      return 'No traces found';
-    }
-    return jsonToCsv(flatten(servicesBuckets));
+    addFilters(query, userQuery, this.model);
+    return await runQuery(this.opensearchClient, query, mode, 'service_name');
   }
 }

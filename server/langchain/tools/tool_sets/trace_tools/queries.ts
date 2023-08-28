@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import _ from 'lodash';
-import { SearchRequest } from '@opensearch-project/opensearch/api/types';
-import { TraceAnalyticsMode } from '../../../utils/utils';
+import {
+  AggregationsMultiBucketAggregate,
+  SearchRequest,
+} from '@opensearch-project/opensearch/api/types';
+import { AggregationBucket, TraceAnalyticsMode, flatten, jsonToCsv } from '../../../utils/utils';
 import { OpenSearchClient } from '../../../../../../../src/core/server';
 import {
   DATA_PREPPER_INDEX_NAME,
   DATA_PREPPER_SERVICE_INDEX_NAME,
+  JAEGER_INDEX_NAME,
   JAEGER_SERVICE_INDEX_NAME,
   SERVICE_MAP_MAX_EDGES,
   SERVICE_MAP_MAX_NODES,
@@ -21,6 +25,29 @@ export async function getMode(opensearchClient: OpenSearchClient) {
     index: DATA_PREPPER_INDEX_NAME,
   });
   return indexExistsResponse ? 'data_prepper' : 'jaeger';
+}
+
+export async function runQuery(
+  opensearchClient: OpenSearchClient,
+  query: object,
+  mode: TraceAnalyticsMode,
+  keyword: string
+) {
+  const response = await opensearchClient.search({
+    index: mode === 'data_prepper' ? DATA_PREPPER_INDEX_NAME : JAEGER_INDEX_NAME,
+    body: query,
+  });
+  console.log(response.body.aggregations);
+  if (!response.body.aggregations) return '';
+  const buckets = (response.body.aggregations[keyword] as AggregationsMultiBucketAggregate<
+    AggregationBucket
+  >).buckets;
+  console.log(buckets);
+  if (buckets.length === 0) {
+    return 'None found';
+  }
+
+  return jsonToCsv(flatten(buckets));
 }
 
 export const getDashboardQuery = () => {
