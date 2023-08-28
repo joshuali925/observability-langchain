@@ -304,22 +304,7 @@ export const getServices = async (mode: TraceAnalyticsMode, openSearchClient: Op
     });
   });
 
-  const serviceMetricsResponse = await openSearchClient.search({
-    // @ts-ignore
-    body: getServiceMetricsQuery(Object.keys(map), map, mode),
-  });
-
-  // @ts-ignore
-  serviceMetricsResponse.body.aggregations.service_name.buckets.map((bucket: object) => {
-    // @ts-ignore
-    map[bucket.key].latency = bucket.average_latency.value;
-    // @ts-ignore
-    map[bucket.key].error_rate = _.round(bucket.error_rate.value, 2) || 0;
-    // @ts-ignore
-    map[bucket.key].throughput = bucket.doc_count;
-  });
-  // @ts-ignore
-  return serviceMetricsResponse.body.aggregations.service_name.buckets;
+  return getServiceMetricsQuery(Object.keys(map), map, mode);
 };
 
 export const getServiceNodesQuery = (mode: TraceAnalyticsMode) => {
