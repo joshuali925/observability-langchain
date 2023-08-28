@@ -24,9 +24,7 @@ export async function getMode(opensearchClient: OpenSearchClient) {
   const indexExistsResponse = await opensearchClient.indices.exists({
     index: DATA_PREPPER_INDEX_NAME,
   });
-  // return indexExistsResponse ? 'data_prepper' : 'jaeger';
-  const oops = false;
-  return oops ? 'data_prepper' : 'jaeger';
+  return indexExistsResponse ? 'data_prepper' : 'jaeger';
 }
 
 export async function runQuery(
@@ -164,7 +162,7 @@ export const getDashboardQuery = (mode: TraceAnalyticsMode) => {
             order: {
               latency: 'desc',
             },
-            size: 5,
+            size: 10000,
           },
           aggs: {
             latency: {
