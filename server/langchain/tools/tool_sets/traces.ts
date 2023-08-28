@@ -40,7 +40,7 @@ export class TracesTools extends PluginToolsFactory {
     new DynamicTool({
       name: TracesTools.TOOL_NAMES.SERVICES,
       description:
-        "Use this to get information about each service in trace analytics. The input must be the entire original USER'S INPUT with no modification. The tool response includes the key, doc_count, error_count.doc_count, average_latency_nanos.value, average_latency.value, and error_rate.value. The key is the name of the service. The doc_count is the number of spans in the service. The error_count.doc_count is the number of traces with errors in the service. The average_latency.value is the average latency in milliseconds. The error_rate.value is the percentage of traces that had an error.",
+        "Use this to get information about each service in trace analytics. The input MUST be the USER'S INPUT with no modification. The tool response includes the key, doc_count, error_count.doc_count, average_latency_nanos.value, average_latency.value, and error_rate.value. The key is the name of the service. The doc_count is the number of spans in the service. The error_count.doc_count is the number of traces with errors in the service. The average_latency.value is the average latency in milliseconds. The error_rate.value is the percentage of traces that had an error.",
       func: swallowErrors(async (userQuery: string) => this.getServices(userQuery)),
       callbacks: this.callbacks,
     }),
@@ -61,6 +61,7 @@ export class TracesTools extends PluginToolsFactory {
   }
 
   public async getServices(userQuery: string) {
+    // console.log(userQuery)
     const mode = await getMode(this.opensearchClient);
     const query = await getServices(mode, this.opensearchClient);
     await addFilters(query, userQuery, this.model);
