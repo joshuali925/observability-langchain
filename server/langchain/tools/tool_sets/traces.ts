@@ -33,7 +33,7 @@ export class TracesTools extends PluginToolsFactory {
     new DynamicTool({
       name: TracesTools.TOOL_NAMES.TRACES,
       description:
-        'Use this to get information about traces individually. The input must be the entire original INPUT with no modification.  The tool response includes the key, doc_count, last_updated.value, last_updated.value_as_string, error_count.doc_count, trace_group.doc_count_error_upper_bound, trace_group.sum_other_doc_count, trace_group.buckets.0.key, and trace_groups.buckets.0.doc_count. The key is the ID of the trace. The doc_count is the number of spans in that particular trace. The last_updated.value_as_string is the last time that the trace was updated. The error_count.doc_count is how many spans in that trace has errors. The trace group.buckets.1.key is what trace group the trace belongs to. The other fields are mostly irrelevant data.',
+        'Use this to get information about each trace. The input must be the entire original INPUT with no modification.  The tool response includes the key, doc_count, last_updated.value, last_updated.value_as_string, error_count.doc_count, trace_group.doc_count_error_upper_bound, trace_group.sum_other_doc_count, trace_group.buckets.0.key, and trace_groups.buckets.0.doc_count. The key is the ID of the trace. The doc_count is the number of spans in that particular trace. The last_updated.value_as_string is the last time that the trace was updated. The error_count.doc_count is how many spans in that trace has errors. The trace group.buckets.1.key is what trace group the trace belongs to. The other fields are irrelevant data.',
       func: swallowErrors(async (userQuery: string) => this.getTraces(userQuery)),
       callbacks: this.callbacks,
     }),
@@ -48,7 +48,7 @@ export class TracesTools extends PluginToolsFactory {
 
   public async getTraceGroups(userQuery: string) {
     const mode = await getMode(this.opensearchClient);
-    const query = getDashboardQuery();
+    const query = getDashboardQuery(mode);
     addFilters(query, userQuery, this.model);
     return await runQuery(this.opensearchClient, query, mode, 'trace_group_name');
   }
