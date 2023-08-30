@@ -48,22 +48,22 @@ export class TracesTools extends PluginToolsFactory {
 
   public async getTraceGroups(userQuery: string) {
     const mode = await getMode(this.opensearchClient);
-    const query = getDashboardQuery(mode);
-    addFilters(query, userQuery, this.model);
+    const query = getDashboardQuery();
+    await addFilters(query, userQuery, this.model);
     return await runQuery(this.opensearchClient, query, mode, 'trace_group_name');
   }
 
   public async getTraces(userQuery: string) {
     const mode = await getMode(this.opensearchClient);
     const query = getTracesQuery(mode);
-    addFilters(query, userQuery, this.model);
+    await addFilters(query, userQuery, this.model);
     return await runQuery(this.opensearchClient, query, mode, 'traces');
   }
 
   public async getServices(userQuery: string) {
     const mode = await getMode(this.opensearchClient);
     const query = await getServices(mode, this.opensearchClient);
-    addFilters(query, userQuery, this.model);
+    await addFilters(query, userQuery, this.model);
     return await runQuery(this.opensearchClient, query, mode, 'service_name');
   }
 }

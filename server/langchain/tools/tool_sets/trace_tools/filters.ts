@@ -6,7 +6,13 @@
 import { BaseLanguageModel } from 'langchain/base_language';
 import { requestTimesFiltersChain } from '../../../../../server/langchain/chains/filter_generator';
 
-export async function addFilters(bodyQuery: object, userQuery: string, model: BaseLanguageModel) {
+import { SearchRequest } from '../../../../../../../src/plugins/data/common';
+
+export async function addFilters(
+  bodyQuery: SearchRequest['body'],
+  userQuery: string,
+  model: BaseLanguageModel
+) {
   const time = await requestTimesFiltersChain(model, userQuery);
   const timeFilter = {
     range: {
@@ -16,6 +22,6 @@ export async function addFilters(bodyQuery: object, userQuery: string, model: Ba
       },
     },
   };
-  // @ts-ignore
-  bodyQuery?.query.bool.must.push(timeFilter);
+  const must = bodyQuery?.query?.bool?.must;
+  if (Array.isArray(must)) must.push(timeFilter);
 }
