@@ -21,7 +21,6 @@ export async function addFilters(
       },
     },
   };
-  console.log(time);
   const must = bodyQuery?.query?.bool?.must;
   if (Array.isArray(must)) must.push(timeFilter);
 }
