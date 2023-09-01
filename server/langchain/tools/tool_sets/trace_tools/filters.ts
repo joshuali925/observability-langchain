@@ -32,7 +32,8 @@ export async function getField(userQuery: string, keyword: string, model: BaseLa
     trace_group_name: "doc_count, 'average_latency.value', 'trace_count.value', 'error_rate.value",
     traces:
       'key, doc_count, last_updated.value, last_updated.value_as_string,latency.value,error_count.doc_count,trace_group.doc_count_error_upper_bound,trace_group.sum_other_doc_count,trace_group.buckets.0.key,trace_group.buckets.0.doc_count',
-    service_name: 'doc_count',
+    service_name:
+      'key,doc_count,error_count.doc_count,average_latency_nanos.value,average_latency.value,error_rate.value',
   };
   console.log(fields[keyword]);
   const field = await requestSortChain(model, userQuery, fields[keyword]);
