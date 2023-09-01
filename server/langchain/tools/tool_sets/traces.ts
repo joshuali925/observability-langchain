@@ -13,7 +13,7 @@ import {
   getTracesQuery,
   getServices,
 } from './trace_tools/queries';
-import { addFilters } from './trace_tools/filters';
+import { addFilters, getField } from './trace_tools/filters';
 
 export class TracesTools extends PluginToolsFactory {
   static TOOL_NAMES = {
@@ -47,23 +47,30 @@ export class TracesTools extends PluginToolsFactory {
   ];
 
   public async getTraceGroups(userQuery: string) {
+    const keyword = 'trace_group_name';
+    const field = getField(userQuery, keyword, this.model);
+    console.log(field);
     const mode = await getMode(this.opensearchClient);
     const query = getDashboardQuery(mode);
     await addFilters(query, userQuery, this.model);
-    return await runQuery(this.opensearchClient, query, mode, 'trace_group_name');
+    return await runQuery(this.opensearchClient, query, mode, keyword, await field);
   }
 
   public async getTraces(userQuery: string) {
+    const keyword = 'traces';
+    const field = getField(userQuery, keyword, this.model);
     const mode = await getMode(this.opensearchClient);
     const query = getTracesQuery(mode);
     await addFilters(query, userQuery, this.model);
-    return await runQuery(this.opensearchClient, query, mode, 'traces');
+    return await runQuery(this.opensearchClient, query, mode, keyword);
   }
 
   public async getServices(userQuery: string) {
+    const keyword = 'service_name';
+    const field = getField(userQuery, keyword, this.model);
     const mode = await getMode(this.opensearchClient);
     const query = await getServices(mode, this.opensearchClient);
     await addFilters(query, userQuery, this.model);
-    return await runQuery(this.opensearchClient, query, mode, 'service_name');
+    return await runQuery(this.opensearchClient, query, mode, keyword);
   }
 }
