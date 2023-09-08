@@ -5,11 +5,17 @@
 
 // import '@testing-library/jest-dom/extend-expect';
 import { configure } from '@testing-library/react';
+import { TextDecoder, TextEncoder } from 'util';
 import { setOSDHttp, setOSDSavedObjectsClient } from '../common/utils';
 import { coreRefs } from '../public/framework/core_refs';
 import { coreStartMock } from './__mocks__/coreMocks';
+import 'web-streams-polyfill';
 
 configure({ testIdAttribute: 'data-test-subj' });
+
+// https://github.com/inrupt/solid-client-authn-js/issues/1676#issuecomment-917016646
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
 window.URL.createObjectURL = () => '';
 HTMLCanvasElement.prototype.getContext = () => '' as any;
