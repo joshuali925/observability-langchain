@@ -19,12 +19,20 @@ export interface AppPluginStartDependencies {
   savedObjectsClient: SavedObjectsClient;
 }
 
+type ContentRenderer = (content: unknown) => React.ReactElement;
+type ActionExecutor = (params: Record<string, unknown>) => void;
+export interface AssistantSetup {
+  registerContentRenderer: (contentType: string, render: ContentRenderer) => void;
+  registerActionExecutor: (actionType: string, execute: ActionExecutor) => void;
+}
+
 export interface SetupDependencies {
   embeddable: EmbeddableSetup;
   visualizations: VisualizationsSetup;
   data: DataPublicPluginSetup;
   uiActions: UiActionsStart;
   managementOverview?: ManagementOverViewPluginSetup;
+  assistantDashboards?: AssistantSetup;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

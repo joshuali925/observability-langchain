@@ -75,6 +75,7 @@ import {
   ObservabilityStart,
   SetupDependencies,
 } from './types';
+import { registerAsssitantDependencies } from './dependencies/register_assistant';
 
 export class ObservabilityPlugin
   implements
@@ -251,6 +252,8 @@ export class ObservabilityPlugin
       },
     });
 
+    registerAsssitantDependencies(setupDeps.assistantDashboards);
+
     // Return methods that should be available to other plugins
     return {};
   }
@@ -258,6 +261,7 @@ export class ObservabilityPlugin
   public start(core: CoreStart): ObservabilityStart {
     const pplService: PPLService = new PPLService(core.http);
 
+    coreRefs.core = core;
     coreRefs.http = core.http;
     coreRefs.savedObjectsClient = core.savedObjects.client;
     coreRefs.pplService = pplService;
