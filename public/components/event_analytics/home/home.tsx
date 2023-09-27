@@ -89,7 +89,7 @@ const EventAnalyticsHome = (props: IHomeProps) => {
   const history = useHistory();
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedDateRange, setSelectedDateRange] = useState<string[]>(['now-15m', 'now']);
+  const [selectedDateRange, setSelectedDateRange] = useState<string[]>(['now-40y', 'now']);
   const [savedHistories, setSavedHistories] = useState<any[]>([]);
   const [selectedHistories, setSelectedHistories] = useState<any[]>([]);
   const [isActionsPopoverOpen, setIsActionsPopoverOpen] = useState(false);
