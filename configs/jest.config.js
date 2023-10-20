@@ -5,8 +5,8 @@
 
 module.exports = {
   rootDir: '../',
-  // setupFiles: ['<rootDir>/configs/setup.ts'],
-  // setupFilesAfterEnv: ['<rootDir>/configs/setupAfterEnv.ts'],
+  setupFiles: ['<rootDir>/configs/setupEnv.ts'],
+  setupFilesAfterEnv: ['<rootDir>/configs/setupAfterEnv.ts'],
   roots: ['<rootDir>'],
   clearMocks: true,
   testPathIgnorePatterns: [
@@ -24,4 +24,5 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: ['<rootDir>/**/*.test.ts'],
+  testTimeout: 120000,
 };

@@ -6,22 +6,27 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: ['./tsconfig.json'],
+  },
   env: {
     es6: true,
     node: true,
     jest: true,
   },
   extends: [
-    'eslint:recommended',
     'plugin:jest/recommended',
     'plugin:prettier/recommended',
+    'plugin:@typescript-eslint/recommended-type-checked',
   ],
   plugins: ['jest', 'import', 'license-header'],
   rules: {
+    '@typescript-eslint/no-unused-vars': 'warn',
+    'import/newline-after-import': ['error', { count: 1 }],
     'import/order': [
       'error',
       {
-        'newlines-between': 'always',
+        'newlines-between': 'never',
         alphabetize: {
           order: 'asc',
           caseInsensitive: true,
