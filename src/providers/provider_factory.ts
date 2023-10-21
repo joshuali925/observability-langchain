@@ -10,7 +10,7 @@ import { PROVIDERS } from './utils';
 
 type Provider = (typeof PROVIDERS)[keyof typeof PROVIDERS];
 
-export class ProviderFactory {
+export class ApiProviderFactory {
   static create(provider: Provider): ApiProvider {
     switch (provider) {
       case PROVIDERS.OLLY:

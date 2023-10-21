@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { OllyApiProvider } from '../providers/olly';
+import { ApiProviderFactory } from '../providers/provider_factory';
+import { PROVIDERS } from '../providers/utils';
 
 describe('semantic similarity tests', () => {
-  const api = new OllyApiProvider();
+  const olly = ApiProviderFactory.create(PROVIDERS.OLLY);
 
   test('should pass when strings are semantically similar', async () => {
-    const resp = await api.callApi('what are the indices in my cluster?');
+    const resp = await olly.callApi('what are the indices in my cluster?');
     await expect(resp.output).toMatchSemanticSimilarity('the indices in your cluster are ...');
   });
 });

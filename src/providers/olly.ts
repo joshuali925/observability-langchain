@@ -7,19 +7,8 @@ import { ApiProvider, ProviderResponse } from 'promptfoo';
 import { IMessage } from '../types';
 import { OPENSEARCH_CONFIG, PROVIDERS, getAuthHeader } from './utils';
 
-interface ProviderOptions {
-  id?: string;
-  config?: unknown;
-}
-
 export class OllyApiProvider implements ApiProvider {
-  providerId: string;
-  config: unknown;
-
-  constructor(options: ProviderOptions = {}) {
-    this.providerId = options.id || PROVIDERS.OLLY;
-    this.config = options.config;
-  }
+  constructor(private readonly providerId = PROVIDERS.OLLY) {}
 
   id() {
     return this.providerId;

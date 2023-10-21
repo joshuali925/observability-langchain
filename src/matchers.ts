@@ -5,8 +5,7 @@
 
 import type { GradingConfig } from 'promptfoo';
 import { assertions } from 'promptfoo';
-import { MlCommonsApiProvider } from './providers/ml_commons';
-import { ProviderFactory } from './providers/provider_factory';
+import { ApiProviderFactory } from './providers/provider_factory';
 import { PROVIDERS } from './providers/utils';
 
 declare global {
@@ -29,7 +28,7 @@ export function installJestMatchers() {
       threshold: number = 0.8,
     ): Promise<jest.CustomMatcherResult> {
       const result = await matchesSimilarity(received, expected, threshold, undefined, {
-        provider: ProviderFactory.create(PROVIDERS.ML_COMMONS),
+        provider: ApiProviderFactory.create(PROVIDERS.ML_COMMONS),
       });
       const pass = received === expected || result.pass;
       if (pass) {
@@ -52,7 +51,7 @@ export function installJestMatchers() {
       gradingConfig: GradingConfig,
     ): Promise<jest.CustomMatcherResult> {
       const gradingResult = await matchesLlmRubric(expected, received, {
-        provider: ProviderFactory.create(PROVIDERS.ML_COMMONS),
+        provider: ApiProviderFactory.create(PROVIDERS.ML_COMMONS),
         ...gradingConfig,
       });
       if (gradingResult.pass) {

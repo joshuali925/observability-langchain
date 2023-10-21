@@ -21,19 +21,8 @@ interface MLCommonsPredictionResponse {
   }>;
 }
 
-interface ProviderOptions {
-  id?: string;
-  config?: unknown;
-}
-
 export class MlCommonsApiProvider implements ApiProvider {
-  providerId: string;
-  config: unknown;
-
-  constructor(options: ProviderOptions = {}) {
-    this.providerId = options.id || PROVIDERS.ML_COMMONS;
-    this.config = options.config;
-  }
+  constructor(private readonly providerId = PROVIDERS.ML_COMMONS) {}
 
   id() {
     return this.providerId;
