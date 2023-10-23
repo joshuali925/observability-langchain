@@ -4,8 +4,8 @@
  */
 
 import { ApiProvider, ProviderResponse } from 'promptfoo';
-import { IMessage } from '../types';
-import { OPENSEARCH_CONFIG, PROVIDERS, getAuthHeader } from './utils';
+import { ollyClient } from './clients/olly';
+import { PROVIDERS } from './constants';
 
 export class OllyApiProvider implements ApiProvider {
   constructor(private readonly providerId = PROVIDERS.OLLY) {}
@@ -19,28 +19,12 @@ export class OllyApiProvider implements ApiProvider {
     context?: { vars: Record<string, string | object> },
   ): Promise<ProviderResponse> {
     try {
-      const response = (await fetch(`${OPENSEARCH_CONFIG.OSD_URL}/api/assistant/send_message`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader(),
-          'osd-xsrf': '1',
-        },
-        body: JSON.stringify({
-          input: {
-            type: 'input',
-            content: prompt,
-            contentType: 'text',
-          },
-        }),
-      }).then((resp) => resp.json())) as { sessionId: string; messages: IMessage[] };
+      const response = await ollyClient.sendMessage(prompt);
       return {
-        output: response.messages
-          .reverse()
-          .find((message) => message.type === 'output' && message.contentType === 'markdown')
-          ?.content,
+        output: response.output,
       };
     } catch (error) {
+      console.error('Failed to request Olly:', error);
       return { error: `API call error: ${String(error)}` };
     }
   }

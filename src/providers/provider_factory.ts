@@ -4,9 +4,9 @@
  */
 
 import { ApiProvider } from 'promptfoo';
+import { PROVIDERS } from './constants';
 import { MlCommonsApiProvider } from './ml_commons';
 import { OllyApiProvider } from './olly';
-import { PROVIDERS } from './utils';
 
 type Provider = (typeof PROVIDERS)[keyof typeof PROVIDERS];
 

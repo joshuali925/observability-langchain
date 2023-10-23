@@ -5,8 +5,8 @@
 
 import type { GradingConfig } from 'promptfoo';
 import { assertions } from 'promptfoo';
+import { PROVIDERS } from './providers/constants';
 import { ApiProviderFactory } from './providers/provider_factory';
-import { PROVIDERS } from './providers/utils';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

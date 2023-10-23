@@ -24,7 +24,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'warn',
     'import/newline-after-import': ['error', { count: 1 }],
     'import/order': [
-      'error',
+      'warn',
       {
         'newlines-between': 'never',
         alphabetize: {

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { PROVIDERS } from '../providers/constants';
 import { ApiProviderFactory } from '../providers/provider_factory';
-import { PROVIDERS } from '../providers/utils';
 
 describe('semantic similarity tests', () => {
   const olly = ApiProviderFactory.create(PROVIDERS.OLLY);
