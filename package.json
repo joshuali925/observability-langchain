@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@opensearch-project/opensearch": "^2.4.0",
+    "csv-parse": "^5.5.2",
     "dotenv": "^16.3.1",
     "jest": "^29.7.0",
     "promptfoo": "^0.25.1"
