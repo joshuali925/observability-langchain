@@ -2,6 +2,9 @@ import json
 
 from opensearchpy import OpenSearch
 
+# Claude library, can be 'anthropic' or 'bedrock'
+client_type = 'bedrock'
+# required if type is 'anthropic'
 api_key = ""
 # how many threads can run concurrently
 threads = 8

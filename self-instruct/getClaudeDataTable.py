@@ -2,11 +2,11 @@ import os
 import random
 from threading import Thread
 
-from anthropic import Client
-from configs import seeds_dir, output_dir, api_key, intro_file, threads, per_thread_run
+from configs import seeds_dir, output_dir, intro_file, threads, per_thread_run
+from llm_client import ClaudeClient
 
-client = Client(api_key=api_key)
 intro = open(intro_file).read()
+client = ClaudeClient()
 
 
 def getContent():
@@ -33,16 +33,7 @@ def target(number):
 
         while True:
             try:
-                res = client.completions.create(
-                    prompt=getContent(),
-                    model="claude-2",
-                    max_tokens_to_sample=8192,
-                    temperature=1,
-                    top_k=10,
-                    top_p=0.9,
-                )
-                # print(res.stop_reason)
-                res = res.completion
+                res = client.invokeModel(getContent())
                 with open(output_file, "w") as r:
                     r.write(res)
                 break
