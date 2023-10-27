@@ -1,15 +1,25 @@
 import json
+
 from opensearchpy import OpenSearch
 
 api_key = ""
-intro_file = "./HEAD_EXAMPLE"
-seeds_dir = "./seeds"
-output_dir = "./raw_outputs"
-seed_sections = ["Instruction", "Index", "Fields", "PPL Output"]
+# how many threads can run concurrently
 threads = 8
+# how many times should a thread run
 per_thread_run = 8
 
-def validate(result):
+# file containing the prompt that will be put on top of seed examples
+intro_file = "./HEAD_EXAMPLE"
+# directory containing seeds, each seed will be a text file named `seedQn.txt`
+seeds_dir = "./seeds"
+# sections in each seed and completion, each seed should have these sections
+seed_sections = ["Instruction", "Index", "Fields", "PPL Output"]
+# directory to store LLM generated examples
+output_dir = "./raw_outputs"
+
+
+# function to add a 'validate' field to result
+def validate(result: dict):
     client = OpenSearch(
         hosts=[{"host": "localhost", "port": 9200}],
         http_compress=True,
