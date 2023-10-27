@@ -5,7 +5,7 @@
 
 import fs from 'node:fs/promises';
 import path from 'path';
-import { MappingTypeMapping } from '@opensearch-project/opensearch/api/types';
+import { MappingTypeMapping, SearchResponse } from '@opensearch-project/opensearch/api/types';
 import { openSearchClient } from '../providers/clients/opensearch';
 
 export class OpenSearchTestIndices {
@@ -43,5 +43,27 @@ export class OpenSearchTestIndices {
       .filter((doc) => doc)
       .flatMap((doc) => [{ index: { _index: name } }, JSON.parse(doc) as object]);
     if (bulkBody.length > 0) await openSearchClient.bulk({ refresh: true, body: bulkBody });
+  }
+
+  public static async dumpIndices(...names: string[]) {
+    return Promise.all(
+      names.map(async (name) => {
+        await fs.mkdir(path.join(OpenSearchTestIndices.indicesDir, name), { recursive: true });
+        const mappings = await openSearchClient.indices.get_mapping<{
+          [name: string]: { mappings: MappingTypeMapping };
+        }>({
+          index: name,
+        });
+        const documents = await openSearchClient.search<SearchResponse>({ index: name, size: 10 });
+        await fs.writeFile(
+          path.join(OpenSearchTestIndices.indicesDir, name, 'mappings.json'),
+          JSON.stringify(mappings.body[name].mappings),
+        );
+        await fs.writeFile(
+          path.join(OpenSearchTestIndices.indicesDir, name, 'documents.ndjson'),
+          documents.body.hits.hits.map((hit) => JSON.stringify(hit._source)).join('\n'),
+        );
+      }),
+    );
   }
 }

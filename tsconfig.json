@@ -1,6 +1,6 @@
 {
   "include": ["./**/*", "./.eslintrc.js"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "coverage", "data"],
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",

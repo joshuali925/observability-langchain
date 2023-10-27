@@ -19,6 +19,7 @@ module.exports = {
     'plugin:prettier/recommended',
     'plugin:@typescript-eslint/recommended-type-checked',
   ],
+  ignorePatterns: ['data/documentations', 'coverage'],
   plugins: ['jest', 'import', 'license-header'],
   rules: {
     '@typescript-eslint/no-unused-vars': 'warn',
