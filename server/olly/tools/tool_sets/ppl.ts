@@ -4,12 +4,15 @@
  */
 
 import { DynamicTool } from 'langchain/tools';
+import { BaseLanguageModel } from 'langchain/base_language';
 import { requestGuessingIndexChain } from '../../chains/guessing_index';
 import { requestPPLGeneratorChain } from '../../chains/ppl_generator';
 import { generateFieldContext } from '../../utils/ppl_generator';
 import { protectCall } from '../../utils/utils';
 import { PluginToolsBase } from '../tools_base';
 import { PreservedInputTool } from '../preserved_input_tool';
+import { ASSISTANT_CONFIG_DOCUMENT, ASSISTANT_CONFIG_INDEX } from '../../models/constants';
+import { requestFineTunedPPLGeneratorChain } from '../../chains/fine_tuned_ppl_generator';
 
 const PPL_DATASOURCES_REQUEST =
   'show datasources | where CONNECTOR_TYPE="PROMETHEUS" | fields DATASOURCE_NAME';
@@ -27,6 +30,12 @@ export class PPLTools extends PluginToolsBase {
     LOG_INFO: 'Get log info',
     LOG_ERROR_INFO: 'Get log error info',
   } as const;
+
+  protected fineTunedPPLModel?: BaseLanguageModel;
+
+  public setFineTunedPPLModel(fineTunedPPLModel?: BaseLanguageModel): void {
+    this.fineTunedPPLModel = fineTunedPPLModel;
+  }
 
   toolsList = [
     new PreservedInputTool({
@@ -143,10 +152,29 @@ export class PPLTools extends PluginToolsBase {
     ]);
     const fields = generateFieldContext(mappings, sampleDoc);
 
-    const input = `Fields:\n${fields}\nQuestion: ${question}? index is \`${index}\``;
-    const ppl = await requestPPLGeneratorChain(this.model, input, this.callbacks);
-    ppl.query = ppl.query.replace(/`/g, ''); // workaround for https://github.com/opensearch-project/dashboards-observability/issues/509, https://github.com/opensearch-project/dashboards-observability/issues/557
-    ppl.query = ppl.query.replace(/\bSPAN\(/g, 'span('); // workaround for https://github.com/opensearch-project/dashboards-observability/issues/759
-    return ppl.query;
+    const getResponse = await this.opensearchClient.get<AssistantConfigDoc>({
+      id: ASSISTANT_CONFIG_DOCUMENT,
+      index: ASSISTANT_CONFIG_INDEX,
+    });
+    if (!getResponse.body._source) throw new Error('Assistant config source not found.');
+    if (
+      getResponse.body._source.fine_tuned_ppl_model_id !== undefined &&
+      this.fineTunedPPLModel !== undefined
+    ) {
+      const pplQuery = await requestFineTunedPPLGeneratorChain(
+        this.fineTunedPPLModel,
+        index,
+        fields,
+        question,
+        this.callbacks
+      );
+      return pplQuery;
+    } else {
+      const input = `Fields:\n${fields}\nQuestion: ${question}? index is \`${index}\``;
+      const ppl = await requestPPLGeneratorChain(this.model, input, this.callbacks);
+      ppl.query = ppl.query.replace(/`/g, ''); // workaround for https://github.com/opensearch-project/dashboards-observability/issues/509, https://github.com/opensearch-project/dashboards-observability/issues/557
+      ppl.query = ppl.query.replace(/\bSPAN\(/g, 'span('); // workaround for https://github.com/opensearch-project/dashboards-observability/issues/759
+      return ppl.query;
+    }
   }
 }

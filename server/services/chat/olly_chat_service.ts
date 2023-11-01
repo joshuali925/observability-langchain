@@ -36,8 +36,12 @@ export class OllyChatService implements ChatService {
       const runs: Run[] = [];
       const callbacks = [new OpenSearchTracer(opensearchClient, traceId, runs)];
       const model = LLMModelFactory.createModel({ client: opensearchClient });
+      const fineTunedPPLModel = LLMModelFactory.createFineTunedPPLModel({
+        client: opensearchClient,
+      });
       const embeddings = LLMModelFactory.createEmbeddings({ client: opensearchClient });
       const pluginTools = initTools(
+        fineTunedPPLModel,
         model,
         embeddings,
         opensearchClient,
@@ -92,6 +96,7 @@ export class OllyChatService implements ChatService {
     const traceId = uuid();
     const callbacks = [new OpenSearchTracer(opensearchClient, traceId)];
     const model = LLMModelFactory.createModel({ client: opensearchClient });
+    const fineTunedPPLModel = LLMModelFactory.createFineTunedPPLModel({ client: opensearchClient });
     const embeddings = LLMModelFactory.createEmbeddings({ client: opensearchClient });
     const pplTools = new PPLTools(
       model,
@@ -101,6 +106,7 @@ export class OllyChatService implements ChatService {
       savedObjectsClient,
       callbacks
     );
+    pplTools.setFineTunedPPLModel(fineTunedPPLModel);
     return pplTools.generatePPL(question, index);
   }
 }
