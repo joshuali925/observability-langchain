@@ -5,6 +5,7 @@
 
 export const PROVIDERS = {
   OLLY: 'olly_chat',
+  PPL_GENERATOR: 'ppl_generator',
   ML_COMMONS: 'ml_commons',
 } as const;
 

@@ -5,6 +5,7 @@
 
 import { IMessage } from '../../types';
 import { OPENSEARCH_CONFIG } from '../constants';
+import { OllyProviderResponse } from '../olly';
 
 const getAuthHeader = (): { Authorization: string } | undefined => {
   if (!OPENSEARCH_CONFIG.OPENSEARCH_USERNAME || !OPENSEARCH_CONFIG.OPENSEARCH_PASSWORD) {
@@ -18,7 +19,7 @@ const getAuthHeader = (): { Authorization: string } | undefined => {
 };
 
 class OllyClient {
-  async sendMessage(prompt: string, sessionId?: string) {
+  async sendMessage(prompt: string, sessionId?: string): Promise<OllyProviderResponse> {
     const response = (await fetch(`${OPENSEARCH_CONFIG.OSD_URL}/api/assistant/send_message`, {
       method: 'POST',
       headers: {
@@ -35,13 +36,28 @@ class OllyClient {
         },
       }),
     }).then((resp) => resp.json())) as { sessionId: string; messages: IMessage[] };
+    const outputMessage = response.messages
+      .reverse()
+      .find((message) => message.type === 'output' && message.contentType === 'markdown') as
+      | Extract<IMessage, { type: 'output' }>
+      | undefined;
     return {
       ...response,
-      output: response.messages
-        .reverse()
-        .find((message) => message.type === 'output' && message.contentType === 'markdown')
-        ?.content,
+      output: outputMessage?.content,
+      traceId: outputMessage?.traceId,
     };
+  }
+
+  async generatePPL(question: string, index: string) {
+    return fetch(`${OPENSEARCH_CONFIG.OSD_URL}/api/assistant/generate_ppl`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader(),
+        'osd-xsrf': '1',
+      },
+      body: JSON.stringify({ question, index }),
+    }).then((resp) => resp.text());
   }
 }
 

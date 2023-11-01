@@ -3,6 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { installJestMatchers } from '../src/matchers';
+import { installJestMatchers } from '../src/matchers/matchers';
 
 installJestMatchers();

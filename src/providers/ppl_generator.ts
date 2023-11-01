@@ -4,20 +4,10 @@
  */
 
 import { ApiProvider, ProviderResponse } from 'promptfoo';
-import { IMessage } from '../types';
 import { ollyClient } from './clients/olly';
 import { PROVIDERS } from './constants';
 
-export interface OllyProviderSuccessResponse extends Exclude<ProviderResponse, 'error'> {
-  output: string;
-  traceId: string;
-  sessionId: string;
-  messages: IMessage[];
-}
-
-export type OllyProviderResponse = ProviderResponse | OllyProviderSuccessResponse;
-
-export class OllyApiProvider implements ApiProvider {
+export class PPLGeneratorApiProvider implements ApiProvider {
   constructor(private readonly providerId = PROVIDERS.OLLY) {}
 
   id() {
@@ -27,11 +17,16 @@ export class OllyApiProvider implements ApiProvider {
   async callApi(
     prompt: string,
     context?: { vars: Record<string, string | object> },
-  ): Promise<OllyProviderResponse> {
+  ): Promise<ProviderResponse> {
+    if (!context?.vars.index || typeof context.vars.index !== 'string')
+      throw new Error('a string value is required for context.vars.index');
+
     try {
-      return ollyClient.sendMessage(prompt);
+      return {
+        output: await ollyClient.generatePPL(prompt, context.vars.index),
+      };
     } catch (error) {
-      console.error('Failed to request Olly:', error);
+      console.error('Failed to request PPL generator:', error);
       return { error: `API call error: ${String(error)}` };
     }
   }

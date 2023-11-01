@@ -6,7 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import { PROVIDERS } from '../providers/constants';
-import { ApiProviderFactory } from '../providers/provider_factory';
+import { ApiProviderFactory } from '../providers/factory';
 import { readCsvSync } from '../utils/csv';
 import { OpenSearchTestIndices } from '../utils/indices';
 

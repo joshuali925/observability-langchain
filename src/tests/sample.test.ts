@@ -4,7 +4,7 @@
  */
 
 import { PROVIDERS } from '../providers/constants';
-import { ApiProviderFactory } from '../providers/provider_factory';
+import { ApiProviderFactory } from '../providers/factory';
 
 describe('semantic similarity tests', () => {
   const olly = ApiProviderFactory.create(PROVIDERS.OLLY);

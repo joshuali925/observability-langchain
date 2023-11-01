@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { GradingConfig } from 'promptfoo';
+import type { ApiProvider, GradingConfig } from 'promptfoo';
 import { assertions } from 'promptfoo';
-import { PROVIDERS } from './providers/constants';
-import { ApiProviderFactory } from './providers/provider_factory';
+import { PROVIDERS } from '../providers/constants';
+import { ApiProviderFactory } from '../providers/factory';
+import { TestResult, TestRunner, TestSpec } from '../runners/test_runner';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -14,14 +15,30 @@ declare global {
     interface Matchers<R> {
       toMatchSemanticSimilarity(expected: string, threshold?: number): Promise<R>;
       toPassLLMRubric(expected: string, gradingConfig: GradingConfig): Promise<R>;
+      toMatchRunnerExpectations<T extends TestSpec, U extends ApiProvider>(
+        spec: T,
+        runner: TestRunner<T, U>,
+      ): Promise<R>;
     }
   }
+}
+
+export interface Matcher<T = unknown> {
+  calculateScore(received: T, expected: T, threshold: number): Promise<jest.CustomMatcherResult>;
 }
 
 const { matchesSimilarity, matchesLlmRubric } = assertions;
 
 export function installJestMatchers() {
   expect.extend({
+    async toMatchRunnerExpectations<T extends TestSpec, U extends ApiProvider>(
+      received: Awaited<ReturnType<U['callApi']>>,
+      spec: T,
+      runner: TestRunner<T, U>,
+    ): Promise<TestResult> {
+      return runner.compareResults(received, spec);
+    },
+
     async toMatchSemanticSimilarity(
       received: string,
       expected: string,
