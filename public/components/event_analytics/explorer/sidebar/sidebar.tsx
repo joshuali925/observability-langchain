@@ -103,8 +103,8 @@ export const Sidebar = (props: ISidebarProps) => {
 
   const checkWithStoredFields = () => {
     if (
-      explorerFields.selectedFields.length === 0 &&
-      storedExplorerFields.selectedFields.length !== 0
+      explorerFields?.selectedFields?.length === 0 &&
+      storedExplorerFields?.selectedFields?.length !== 0
     ) {
       return storedExplorerFields;
     }
@@ -162,7 +162,7 @@ export const Sidebar = (props: ISidebarProps) => {
           <EuiSpacer size="s" />
           <div className="sidebar-list">
             {((explorerData && !isEmpty(explorerData.jsonData) && !isEmpty(explorerFields)) ||
-              !isEmpty(explorerFields.availableFields)) && (
+              !isEmpty(explorerFields?.availableFields)) && (
               <>
                 {explorerFields?.queriedFields && explorerFields.queriedFields?.length > 0 && (
                   <EuiAccordion
@@ -242,8 +242,8 @@ export const Sidebar = (props: ISidebarProps) => {
                   >
                     {explorerData &&
                       !isEmpty(explorerData.jsonData) &&
-                      storedExplorerFields.selectedFields &&
-                      storedExplorerFields.selectedFields.map((field, index) => {
+                      storedExplorerFields?.selectedFields &&
+                      storedExplorerFields.selectedFields?.map((field, index) => {
                         return (
                           <EuiDraggable
                             spacing="m"
@@ -300,9 +300,9 @@ export const Sidebar = (props: ISidebarProps) => {
                     droppableId=""
                     spacing="m"
                   >
-                    {storedExplorerFields.availableFields &&
-                      storedExplorerFields.availableFields
-                        .filter(
+                    {storedExplorerFields?.availableFields &&
+                      storedExplorerFields?.availableFields
+                        ?.filter(
                           (field) => searchTerm === '' || field.name.indexOf(searchTerm) !== -1
                         )
                         .map((field, index) => {
