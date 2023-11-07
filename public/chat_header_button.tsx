@@ -45,7 +45,7 @@ export const HeaderChatButton: React.FC<HeaderChatButtonProps> = (props) => {
   });
 
   const toggleFlyoutFullScreen = useCallback(() => {
-    setFlyoutProps((fprops) => (Object.keys(fprops).length ? {} : { size: '100%' }));
+    setFlyoutProps((fprops) => (fprops.size === '100%' ? {} : { size: '100%' }));
   }, []);
 
   const chatContextValue: IChatContext = useMemo(
@@ -91,7 +91,7 @@ export const HeaderChatButton: React.FC<HeaderChatButtonProps> = (props) => {
               flyoutVisible={flyoutVisible}
               overrideComponent={flyoutComponent}
               flyoutProps={flyoutProps}
-              flyoutFullScreen={!!Object.keys(flyoutProps).length}
+              flyoutFullScreen={flyoutProps.size === '100%'}
               toggleFlyoutFullScreen={toggleFlyoutFullScreen}
             />
           ) : null}

@@ -41,7 +41,8 @@ export class AssistantPlugin
             .get<{ data: { roles: string[] } }>('/api/v1/configuration/account')
             .then((res) =>
               res.data.roles.some((role) => ['all_access', 'assistant_user'].includes(role))
-            );
+            )
+            .catch((e) => e.body.statusCode === 404);
         }
         return enabled;
       };
