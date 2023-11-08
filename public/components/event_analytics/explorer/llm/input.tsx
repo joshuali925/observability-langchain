@@ -6,14 +6,17 @@
 import {
   EuiAccordion,
   EuiButton,
+  EuiCallOut,
   EuiComboBox,
   EuiComboBoxOptionOption,
   EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiForm,
+  EuiLink,
   EuiModal,
   EuiSpacer,
+  EuiText,
 } from '@elastic/eui';
 import { CatIndicesResponse } from '@opensearch-project/opensearch/api/types';
 import React, { Reducer, useEffect, useReducer, useRef, useState } from 'react';
@@ -56,6 +59,7 @@ export const LLMInput: React.FC<Props> = (props) => {
         )
       : undefined;
   const loading = indicesLoading || indexPatternsLoading;
+  const [invalidQuery, setInvalidQuery] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (questionRef.current) {
@@ -65,6 +69,19 @@ export const LLMInput: React.FC<Props> = (props) => {
 
   // hide if not in a tab
   if (props.tabId === '') return props.children;
+
+  const runQuery = async (query: string) => {
+    await props.handleQueryChange(query);
+    await dispatch(
+      changeQuery({
+        tabId: props.tabId,
+        data: {
+          [RAW_QUERY]: query,
+        },
+      })
+    );
+    await props.handleTimeRangePickerRefresh();
+  };
 
   const request = async () => {
     if (!selectedIndex.length) return;
@@ -81,25 +98,36 @@ export const LLMInput: React.FC<Props> = (props) => {
         input: questionRef.current?.value || '',
         output: response,
       });
-      await props.handleQueryChange(response);
-      await dispatch(
-        changeQuery({
-          tabId: props.tabId,
-          data: {
-            [RAW_QUERY]: response,
-          },
-        })
-      );
-      await props.handleTimeRangePickerRefresh();
+      const valid = await validate(response);
+      if (!valid) {
+        setInvalidQuery(response);
+        setGenerating(false);
+        return;
+      }
+      if (invalidQuery) setInvalidQuery(undefined);
+      await runQuery(response);
     } catch (error) {
       setFeedbackFormData({
         ...feedbackFormData,
         input: questionRef.current?.value || '',
       });
-      coreRefs.toasts?.addError(error, { title: 'Failed to generate PPL query' });
+      coreRefs.toasts?.addError(error.body, { title: 'Failed to generate PPL query' });
     } finally {
       setGenerating(false);
     }
+  };
+
+  const validate = async (query: string) => {
+    return getOSDHttp()
+      .post('/api/console/proxy', {
+        body: JSON.stringify({ query }),
+        query: {
+          path: `/_plugins/_ppl/_explain`,
+          method: 'POST',
+        },
+      })
+      .then(() => true)
+      .catch(() => false);
   };
 
   return (
@@ -129,7 +157,7 @@ export const LLMInput: React.FC<Props> = (props) => {
             <EuiFlexItem grow={false} style={{ width: 20 }} />
             <EuiFlexItem>
               <EuiFieldText
-                placeholder="Ask a question"
+                placeholder="Ask a question for the selected index"
                 prepend={['Question']}
                 disabled={generating}
                 fullWidth
@@ -160,6 +188,21 @@ export const LLMInput: React.FC<Props> = (props) => {
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiForm>
+        {invalidQuery && (
+          <div style={{ paddingTop: 10 }}>
+            <EuiCallOut
+              title={
+                <EuiText>
+                  There was an error found in generating your query. Resubmit your question or
+                  specify more details in your question.{' '}
+                  <EuiLink onClick={() => runQuery(invalidQuery)}>Show generated query</EuiLink>
+                </EuiText>
+              }
+              color="warning"
+              iconType="alert"
+            />
+          </div>
+        )}
       </EuiAccordion>
       {isFeedbackOpen && (
         <EuiModal onClose={() => setIsFeedbackOpen(false)}>
