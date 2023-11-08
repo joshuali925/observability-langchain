@@ -180,7 +180,7 @@ Fields:
 - trace_id: text ("102981ABCD2901")
 
 Question: What are recent logs with errors and contains word 'test'? index is 'events'
-PPL: source=\`events\` | where \`http.response.status_code\` != "200" AND MATCH(\`body\`, 'test') AND \`observerTime\` < DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') AND MATCH(\`body\`, 'test') AND \`observerTime\` < DATE_SUB(NOW(), INTERVAL 5 MINUTE)
 
 Question: What are the top traces with largest bytes? index is 'events'
 PPL: source=\`events\` | stats SUM(\`http.response.bytes\`) as \`sum_bytes\` by \`trace_id\` | sort -sum_bytes | head
@@ -189,7 +189,7 @@ Question: Give me log patterns? index is 'events'
 PPL: source=\`events\` | patterns \`body\` | stats take(\`body\`, 1) as \`sample_pattern\` by \`patterns_field\` | fields \`sample_pattern\`
 
 Question: Give me log patterns for logs with errors? index is 'events'
-PPL: source=\`events\` | where \`http.response.status_code\` != "200" | patterns \`body\` | stats take(\`body\`, 1) as \`sample_pattern\` by \`patterns_field\` | fields \`sample_pattern\`
+PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') | patterns \`body\` | stats take(\`body\`, 1) as \`sample_pattern\` by \`patterns_field\` | fields \`sample_pattern\`
 
 ----------------
 
@@ -213,6 +213,7 @@ Step 3. Use the choosen fields to write the PPL query. Rules:
 #03 If user asks for current or recent status, filter the time field for last 5 minutes.
 #04 The field used in 'SPAN(\`<field>\`, <interval>)' must have type \`date\`, not \`long\`.
 #05 You must put values in quotes when filtering fields with \`text\` or \`keyword\` field type.
+#06 To find documents that contain certain phrases in a field, use the \`MATCH\` function, eg. "where MATCH(\`field\`, 'phrase')". To do a wildcard search, use \`QUERY_STRING\`, eg. "where QUERY_STRING(['field'], 'prefix*')".
 
 ----------------
 {format_instructions}
