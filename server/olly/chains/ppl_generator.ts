@@ -6,7 +6,6 @@
 import { BaseLanguageModel } from 'langchain/base_language';
 import { Callbacks } from 'langchain/callbacks';
 import { LLMChain } from 'langchain/chains';
-import { StructuredOutputParser } from 'langchain/output_parsers';
 import { PromptTemplate } from 'langchain/prompts';
 
 const template = `
@@ -216,27 +215,25 @@ Step 3. Use the choosen fields to write the PPL query. Rules:
 #06 To find documents that contain certain phrases in a field, use the \`MATCH\` function, eg. "where MATCH(\`field\`, 'phrase')". To do a wildcard search, use \`QUERY_STRING\`, eg. "where QUERY_STRING(['field'], 'prefix*')".
 
 ----------------
-{format_instructions}
+Put your PPL query in <ppl> tags.
 ----------------
 
 {question}
 `.trim();
 
-const parser = StructuredOutputParser.fromNamesAndDescriptions({ query: 'This is a PPL query' });
-const formatInstructions = parser.getFormatInstructions();
-
 const prompt = new PromptTemplate({
   template,
   inputVariables: ['question'],
-  partialVariables: { format_instructions: formatInstructions },
 });
 
 export const requestPPLGeneratorChain = async (
   model: BaseLanguageModel,
   question: string,
   callbacks?: Callbacks
-) => {
+): Promise<{ query: string }> => {
   const chain = new LLMChain({ llm: model, prompt });
   const output = await chain.call({ question }, callbacks);
-  return parser.parse(output.text);
+  const match = output.text.match(/<ppl>((.|[\r\n])+)<\/ppl>/);
+  const query = match[1] ? match[1].replace(/[\r\n]/g, ' ').trim() : output.text;
+  return { query };
 };
