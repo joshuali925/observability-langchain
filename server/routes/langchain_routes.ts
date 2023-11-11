@@ -4,8 +4,10 @@
  */
 
 import { schema, TypeOf } from '@osd/config-schema';
+import { Run } from 'langchain/callbacks';
 import { LLMChain } from 'langchain/chains';
 import { PromptTemplate } from 'langchain/prompts';
+import { v4 as uuid } from 'uuid';
 import {
   HttpResponsePayload,
   ILegacyScopedClusterClient,
@@ -14,6 +16,9 @@ import {
   ResponseError,
 } from '../../../../src/core/server';
 import { ASSISTANT_API, LLM_INDEX } from '../../common/constants/llm';
+import { OpenSearchTracer } from '../olly/callbacks/opensearch_tracer';
+import { requestSummarizationChain } from '../olly/chains/summarization';
+import { LLMModelFactory } from '../olly/models/llm_model_factory';
 import { MLCommonsChatModel } from '../olly/models/mlcommons_chat_model';
 import { OllyChatService } from '../services/chat/olly_chat_service';
 
@@ -40,6 +45,37 @@ export function registerLangchainRoutes(router: IRouter) {
       try {
         const ppl = await chatService.generatePPL(context, request);
         return response.ok({ body: ppl });
+      } catch (error) {
+        context.assistant_plugin.logger.warn(error);
+        return response.custom({ statusCode: error.statusCode || 500, body: error.message });
+      }
+    }
+  );
+
+  router.post(
+    {
+      path: ASSISTANT_API.SUMMARIZATION,
+      validate: {
+        body: schema.object({
+          question: schema.string(),
+          text: schema.string(),
+        }),
+      },
+    },
+    async (
+      context,
+      request,
+      response
+    ): Promise<IOpenSearchDashboardsResponse<HttpResponsePayload | ResponseError>> => {
+      try {
+        const { question, text } = request.body;
+        const runs: Run[] = [];
+        const traceId = uuid();
+        const opensearchClient = context.core.opensearch.client.asCurrentUser;
+        const callbacks = [new OpenSearchTracer(opensearchClient, traceId, runs)];
+        const model = LLMModelFactory.createModel({ client: opensearchClient });
+        const summarized = await requestSummarizationChain(model, question, text, callbacks);
+        return response.ok({ body: summarized });
       } catch (error) {
         context.assistant_plugin.logger.warn(error);
         return response.custom({ statusCode: error.statusCode || 500, body: error.message });
