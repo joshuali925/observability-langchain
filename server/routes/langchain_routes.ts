@@ -58,7 +58,8 @@ export function registerLangchainRoutes(router: IRouter) {
       validate: {
         body: schema.object({
           question: schema.string(),
-          text: schema.string(),
+          response: schema.string(),
+          query: schema.string(),
         }),
       },
     },
@@ -68,13 +69,19 @@ export function registerLangchainRoutes(router: IRouter) {
       response
     ): Promise<IOpenSearchDashboardsResponse<HttpResponsePayload | ResponseError>> => {
       try {
-        const { question, text } = request.body;
+        const { question, response: queryResponse, query } = request.body;
         const runs: Run[] = [];
         const traceId = uuid();
         const opensearchClient = context.core.opensearch.client.asCurrentUser;
         const callbacks = [new OpenSearchTracer(opensearchClient, traceId, runs)];
         const model = LLMModelFactory.createModel({ client: opensearchClient });
-        const summarized = await requestSummarizationChain(model, question, text, callbacks);
+        const summarized = await requestSummarizationChain(
+          model,
+          question,
+          queryResponse,
+          query,
+          callbacks
+        );
         return response.ok({ body: summarized });
       } catch (error) {
         context.assistant_plugin.logger.warn(error);

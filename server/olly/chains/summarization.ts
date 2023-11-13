@@ -11,19 +11,21 @@ import { Document } from 'langchain/document';
 export const requestSummarizationChain = async (
   model: BaseLanguageModel,
   question: string,
-  text: string,
+  query: string,
+  response: string,
   callbacks?: Callbacks
 ) => {
   const chainA = loadQAStuffChain(model);
   // TODO use vector search on splitted documents and loadQAMapReduceChain if text is long
   // without vector search it takes too long for map reduce calls
-  const docs = [new Document({ pageContent: text })];
+  const docs = [new Document({ pageContent: response })];
   const output = await chainA.call(
     {
       input_documents: docs,
       question: `Summarize the below API response given question: ${question}.
-
+PPL (Piped Processing Language) query used: ${query}
 Give documents to support your point.
+If the API response is an error, recommend some steps that could fix the error, and give some suggestions on what questions can be asked.
 
 Skip the preamble; go straight into the summarization`,
     },

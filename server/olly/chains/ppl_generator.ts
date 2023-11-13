@@ -78,6 +78,9 @@ PPL: source=\`accounts\` | where \`firstname\` ='Amber' | stats COUNT() AS \`cou
 Question: How many people are older than 33? index is 'accounts'
 PPL: source=\`accounts\` | where \`age\` > 33 | stats COUNT() AS \`count\`
 
+Question: How many distinct ages? index is 'accounts'
+PPL: source=\`accounts\` | stats DISTINCT_COUNT(age) AS \`count\`
+
 Question: How many males and females in index 'accounts'?
 PPL: source=\`accounts\` | stats COUNT() AS \`count\` BY \`gender\`
 
@@ -181,6 +184,9 @@ Fields:
 Question: What are recent logs with errors and contains word 'test'? index is 'events'
 PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') AND MATCH(\`body\`, 'test') AND \`observerTime\` < DATE_SUB(NOW(), INTERVAL 5 MINUTE)
 
+Question: What is the total number of log errors in 2023? index is 'events'
+PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') AND \`observerTime\` > '2023-01-01 00:00:00' AND \`observerTime\` < '2024-01-01 00:00:00' | stats COUNT() AS \`count\`
+
 Question: What are the top traces with largest bytes? index is 'events'
 PPL: source=\`events\` | stats SUM(\`http.response.bytes\`) as \`sum_bytes\` by \`trace_id\` | sort -sum_bytes | head
 
@@ -207,12 +213,14 @@ Step 2. Pick the fields that are relevant to the question from the provided fiel
 #08 You must pick the field that contains a log line when asked about log patterns. Usually it is one of \`log\`, \`body\`, \`message\`.
 
 Step 3. Use the choosen fields to write the PPL query. Rules:
-#01 Always use comparisons to filter date/time, eg. 'where \`timestamp\` < DATE_SUB(NOW(), INTERVAL 1 DAY)'.
+#01 Always use comparisons to filter date/time, eg. 'where \`timestamp\` < DATE_SUB(NOW(), INTERVAL 1 DAY)', or by absolute time: "where \`timestamp\` < '2023-01-01 00:00:00'".
 #02 Only use PPL syntax and keywords appeared in the question or in the examples.
 #03 If user asks for current or recent status, filter the time field for last 5 minutes.
 #04 The field used in 'SPAN(\`<field>\`, <interval>)' must have type \`date\`, not \`long\`.
-#05 You must put values in quotes when filtering fields with \`text\` or \`keyword\` field type.
-#06 To find documents that contain certain phrases in a field, use the \`MATCH\` function, eg. "where MATCH(\`field\`, 'phrase')". To do a wildcard search, use \`QUERY_STRING\`, eg. "where QUERY_STRING(['field'], 'prefix*')".
+#05 When aggregating by \`SPAN\` and another field, put \`SPAN\` after \`by\` and before the other field.
+#06 You must put values in quotes when filtering fields with \`text\` or \`keyword\` field type.
+#07 To find documents that contain certain phrases in a field, use the \`MATCH\` function, eg. "where MATCH(\`field\`, 'phrase')". To do a wildcard search, use \`QUERY_STRING\`, eg. "where QUERY_STRING(['field'], 'prefix*')".
+#08 To find errors based on status code, if the status code field is a number, then use 'where \`status_code\` >= 400'; if the field is \`text\`, then use "where QUERY_STRING(['status_code'], '4* OR 5*')".
 
 ----------------
 Put your PPL query in <ppl> tags.
