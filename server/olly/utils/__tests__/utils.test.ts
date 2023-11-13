@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MAX_TOOL_OUTPUT_CHAR } from '../constants';
+import { MAX_OUTPUT_CHAR } from '../constants';
 import { flatten, jsonToCsv, protectCall } from '../utils';
 
 describe('protect calls', () => {
@@ -30,7 +30,7 @@ describe('protect calls', () => {
     const truncated = protectCall(tool);
     const res = await truncated('input');
     expect(res).toContain('Output is too long, truncated');
-    expect(res.length).toEqual(MAX_TOOL_OUTPUT_CHAR);
+    expect(res.length).toEqual(MAX_OUTPUT_CHAR);
   });
 });
 

@@ -33,6 +33,20 @@ const pplGenerationRoute = {
 };
 export type PPLGenerationRequestSchema = TypeOf<typeof pplGenerationRoute.validate.body>;
 
+const summarizationRoute = {
+  path: ASSISTANT_API.SUMMARIZATION,
+  validate: {
+    body: schema.object({
+      question: schema.string(),
+      response: schema.string(),
+      query: schema.maybe(schema.string()),
+      isError: schema.boolean(),
+      index: schema.string(),
+    }),
+  },
+};
+export type SummarizationRequestSchema = TypeOf<typeof summarizationRoute.validate.body>;
+
 export function registerLangchainRoutes(router: IRouter) {
   router.post(
     pplGenerationRoute,
@@ -53,33 +67,20 @@ export function registerLangchainRoutes(router: IRouter) {
   );
 
   router.post(
-    {
-      path: ASSISTANT_API.SUMMARIZATION,
-      validate: {
-        body: schema.object({
-          question: schema.string(),
-          response: schema.string(),
-          query: schema.string(),
-        }),
-      },
-    },
+    summarizationRoute,
     async (
       context,
       request,
       response
     ): Promise<IOpenSearchDashboardsResponse<HttpResponsePayload | ResponseError>> => {
       try {
-        const { question, response: queryResponse, query } = request.body;
         const runs: Run[] = [];
         const traceId = uuid();
         const opensearchClient = context.core.opensearch.client.asCurrentUser;
         const callbacks = [new OpenSearchTracer(opensearchClient, traceId, runs)];
         const model = LLMModelFactory.createModel({ client: opensearchClient });
         const summarized = await requestSummarizationChain(
-          model,
-          question,
-          queryResponse,
-          query,
+          { client: opensearchClient, model, ...request.body },
           callbacks
         );
         return response.ok({ body: summarized });

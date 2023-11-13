@@ -7,29 +7,66 @@ import { BaseLanguageModel } from 'langchain/base_language';
 import { Callbacks } from 'langchain/callbacks';
 import { loadQAStuffChain } from 'langchain/chains';
 import { Document } from 'langchain/document';
+import { OpenSearchClient } from '../../../../../src/core/server';
+import { SummarizationRequestSchema } from '../../routes/langchain_routes';
+import { generateFieldContext } from '../utils/ppl_generator';
+import { truncate } from '../utils/utils';
 
+interface SummarizationContext extends SummarizationRequestSchema {
+  client: OpenSearchClient;
+  model: BaseLanguageModel;
+}
+
+const createPrompt = async (context: SummarizationContext) => {
+  if (!context.isError) {
+    return `You will be given a search response, summarize it as a concise paragraph while considering the following:
+User's question on index '${context.index}': ${context.question}
+PPL (Piped Processing Language) query used: ${context.query}
+
+Give some documents to support your point.
+
+Skip the preamble; go straight into the summarization.`;
+  }
+
+  const [mappings, sampleDoc] = await Promise.all([
+    context.client.indices.getMapping({ index: context.index }),
+    context.client.search({ index: context.index, size: 1 }),
+  ]);
+  const fields = generateFieldContext(mappings, sampleDoc);
+
+  return `You will be given an API response with errors, summarize it as a concise paragraph, then give some suggestions on how to fix the error.
+Considering the following:
+User's question on index '${context.index}': ${context.question}
+${context.query ? 'PPL (Piped Processing Language) query used: ' + context.query : ''}
+
+Additionally give 2 sample questions that can be asked about index '${
+    context.index
+  }' given the fields below. Only give the questions, do not give descriptions of questions. The format for a field is
+\`\`\`
+- field_name: field_type (sample field value)
+\`\`\`
+
+Fields:
+${fields}`;
+};
+
+/**
+ * Generate a summary based on user question, corresponding PPL query, and
+ * query results.
+ *
+ * @param context
+ * @param callbacks
+ * @returns summarized text
+ */
 export const requestSummarizationChain = async (
-  model: BaseLanguageModel,
-  question: string,
-  query: string,
-  response: string,
+  context: SummarizationContext,
   callbacks?: Callbacks
 ) => {
-  const chainA = loadQAStuffChain(model);
-  // TODO use vector search on splitted documents and loadQAMapReduceChain if text is long
-  // without vector search it takes too long for map reduce calls
-  const docs = [new Document({ pageContent: response })];
-  const output = await chainA.call(
-    {
-      input_documents: docs,
-      question: `Summarize the below API response given question: ${question}.
-PPL (Piped Processing Language) query used: ${query}
-Give documents to support your point.
-If the API response is an error, recommend some steps that could fix the error, and give some suggestions on what questions can be asked.
-
-Skip the preamble; go straight into the summarization`,
-    },
-    { callbacks }
-  );
+  const chain = loadQAStuffChain(context.model);
+  // vector search doesn't help much since the response is already retrieved based on user's question
+  const docs = [new Document({ pageContent: truncate(context.response) })];
+  const question = await createPrompt(context);
+  console.info('❗question:', question);
+  const output = await chain.call({ input_documents: docs, question }, { callbacks });
   return output.text;
 };

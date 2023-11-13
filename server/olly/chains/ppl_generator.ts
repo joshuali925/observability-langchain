@@ -79,7 +79,7 @@ Question: How many people are older than 33? index is 'accounts'
 PPL: source=\`accounts\` | where \`age\` > 33 | stats COUNT() AS \`count\`
 
 Question: How many distinct ages? index is 'accounts'
-PPL: source=\`accounts\` | stats DISTINCT_COUNT(age) AS \`count\`
+PPL: source=\`accounts\` | stats DISTINCT_COUNT(age) AS \`distinct_count\`
 
 Question: How many males and females in index 'accounts'?
 PPL: source=\`accounts\` | stats COUNT() AS \`count\` BY \`gender\`
@@ -187,6 +187,9 @@ PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* O
 Question: What is the total number of log errors in 2023? index is 'events'
 PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') AND \`observerTime\` > '2023-01-01 00:00:00' AND \`observerTime\` < '2024-01-01 00:00:00' | stats COUNT() AS \`count\`
 
+Question: Count the number of business days that have web category logs last week? index is 'events'
+PPL: source=\`events\` | where \`category\` = 'web' AND \`observerTime\` < DATE_SUB(NOW(), INTERVAL 1 WEEK) AND DAY_OF_WEEK(\`observerTime\`) >= 2 AND DAY_OF_WEEK(\`observerTime\`) <= 6 | stats DISTINCT_COUNT(DATE_FORMAT(\`observerTime\`, 'yyyy-MM-dd')) AS \`distinct_count\`
+
 Question: What are the top traces with largest bytes? index is 'events'
 PPL: source=\`events\` | stats SUM(\`http.response.bytes\`) as \`sum_bytes\` by \`trace_id\` | sort -sum_bytes | head
 
@@ -220,7 +223,7 @@ Step 3. Use the choosen fields to write the PPL query. Rules:
 #05 When aggregating by \`SPAN\` and another field, put \`SPAN\` after \`by\` and before the other field.
 #06 You must put values in quotes when filtering fields with \`text\` or \`keyword\` field type.
 #07 To find documents that contain certain phrases in a field, use the \`MATCH\` function, eg. "where MATCH(\`field\`, 'phrase')". To do a wildcard search, use \`QUERY_STRING\`, eg. "where QUERY_STRING(['field'], 'prefix*')".
-#08 To find errors based on status code, if the status code field is a number, then use 'where \`status_code\` >= 400'; if the field is \`text\`, then use "where QUERY_STRING(['status_code'], '4* OR 5*')".
+#08 To find errors based on status code, if the status code field is a number, then use 'where \`status_code\` >= 400'; if the field is \`text\` or \`keyword\`, then use "where QUERY_STRING(['status_code'], '4* OR 5*')".
 
 ----------------
 Put your PPL query in <ppl> tags.
