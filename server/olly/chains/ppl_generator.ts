@@ -234,6 +234,6 @@ export const requestPPLGeneratorChain = async (
   const chain = new LLMChain({ llm: model, prompt });
   const output = await chain.call({ question }, callbacks);
   const match = output.text.match(/<ppl>((.|[\r\n])+)<\/ppl>/);
-  const query = match[1] ? match[1].replace(/[\r\n]/g, ' ').trim() : output.text;
-  return { query };
+  if (match && match[1]) return { query: match[1].replace(/[\r\n]/g, ' ').trim() };
+  throw new Error(output.text);
 };

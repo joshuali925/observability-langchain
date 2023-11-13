@@ -15,12 +15,13 @@ export const requestSummarizationChain = async (
   callbacks?: Callbacks
 ) => {
   const chainA = loadQAStuffChain(model);
-  // TODO split if text is long
+  // TODO use vector search on splitted documents and loadQAMapReduceChain if text is long
+  // without vector search it takes too long for map reduce calls
   const docs = [new Document({ pageContent: text })];
   const output = await chainA.call(
     {
       input_documents: docs,
-      question: `Summarize the below API response giving question: ${question}.
+      question: `Summarize the below API response given question: ${question}.
 
 Give documents to support your point.
 
