@@ -9,6 +9,8 @@ import { LLMChain } from 'langchain/chains';
 import { PromptTemplate } from 'langchain/prompts';
 
 const template = `
+Today's date: {date}
+
 You will be given a question about some metrics from a user.
 Use context provided to write a PPL query that can be used to retrieve the information.
 
@@ -143,13 +145,13 @@ Fields:
 - user: keyword ("eddie")
 
 Question: What is the average price of products in clothing category ordered in the last 7 days? index is 'ecommerce'
-PPL: source=\`ecommerce\` | where MATCH(\`category\`, 'clothing') AND \`order_date\` < DATE_SUB(NOW(), INTERVAL 7 DAY) | stats AVG(\`taxful_total_price\`) AS \`avg_price\`
+PPL: source=\`ecommerce\` | where MATCH(\`category\`, 'clothing') AND \`order_date\` > DATE_SUB(NOW(), INTERVAL 7 DAY) | stats AVG(\`taxful_total_price\`) AS \`avg_price\`
 
-Question: What is the average price of products ordered today by every 2 hours? index is 'ecommerce'
-PPL: source=\`ecommerce\` | where \`order_date\` < DATE_SUB(NOW(), INTERVAL 24 HOUR) | stats AVG(\`taxful_total_price\`) AS \`avg_price\` by SPAN(\`order_date\`, 2h)
+Question: What is the average price of products in each city ordered today by every 2 hours? index is 'ecommerce'
+PPL: source=\`ecommerce\` | where \`order_date\` > DATE_SUB(NOW(), INTERVAL 24 HOUR) | stats AVG(\`taxful_total_price\`) AS \`avg_price\` by SPAN(\`order_date\`, 2h), \`geoip.city_name\`
 
 Question: What is the total revenue of shoes each day in this week? index is 'ecommerce'
-PPL: source=\`ecommerce\` | where MATCH(\`category\`, 'shoes') AND \`order_date\` < DATE_SUB(NOW(), INTERVAL 1 WEEK) | stats SUM(\`taxful_total_price\`) AS \`revenue\` by SPAN(\`order_date\`, 1d)
+PPL: source=\`ecommerce\` | where MATCH(\`category\`, 'shoes') AND \`order_date\` > DATE_SUB(NOW(), INTERVAL 1 WEEK) | stats SUM(\`taxful_total_price\`) AS \`revenue\` by SPAN(\`order_date\`, 1d)
 
 ----------------
 
@@ -182,13 +184,13 @@ Fields:
 - trace_id: text ("102981ABCD2901")
 
 Question: What are recent logs with errors and contains word 'test'? index is 'events'
-PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') AND MATCH(\`body\`, 'test') AND \`observerTime\` < DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') AND MATCH(\`body\`, 'test') AND \`observerTime\` > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
 
-Question: What is the total number of log errors in 2023? index is 'events'
-PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') AND \`observerTime\` > '2023-01-01 00:00:00' AND \`observerTime\` < '2024-01-01 00:00:00' | stats COUNT() AS \`count\`
+Question: What is the total number of log with a status code other than 200 in 2023 Feburary? index is 'events'
+PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '!200') AND \`observerTime\` >= '2023-03-01 00:00:00' AND \`observerTime\` < '2023-04-01 00:00:00' | stats COUNT() AS \`count\`
 
 Question: Count the number of business days that have web category logs last week? index is 'events'
-PPL: source=\`events\` | where \`category\` = 'web' AND \`observerTime\` < DATE_SUB(NOW(), INTERVAL 1 WEEK) AND DAY_OF_WEEK(\`observerTime\`) >= 2 AND DAY_OF_WEEK(\`observerTime\`) <= 6 | stats DISTINCT_COUNT(DATE_FORMAT(\`observerTime\`, 'yyyy-MM-dd')) AS \`distinct_count\`
+PPL: source=\`events\` | where \`category\` = 'web' AND \`observerTime\` > DATE_SUB(NOW(), INTERVAL 1 WEEK) AND DAY_OF_WEEK(\`observerTime\`) >= 2 AND DAY_OF_WEEK(\`observerTime\`) <= 6 | stats DISTINCT_COUNT(DATE_FORMAT(\`observerTime\`, 'yyyy-MM-dd')) AS \`distinct_count\`
 
 Question: What are the top traces with largest bytes? index is 'events'
 PPL: source=\`events\` | stats SUM(\`http.response.bytes\`) as \`sum_bytes\` by \`trace_id\` | sort -sum_bytes | head
@@ -216,17 +218,17 @@ Step 2. Pick the fields that are relevant to the question from the provided fiel
 #08 You must pick the field that contains a log line when asked about log patterns. Usually it is one of \`log\`, \`body\`, \`message\`.
 
 Step 3. Use the choosen fields to write the PPL query. Rules:
-#01 Always use comparisons to filter date/time, eg. 'where \`timestamp\` < DATE_SUB(NOW(), INTERVAL 1 DAY)', or by absolute time: "where \`timestamp\` < '2023-01-01 00:00:00'".
+#01 Always use comparisons to filter date/time, eg. 'where \`timestamp\` > DATE_SUB(NOW(), INTERVAL 1 DAY)'; or by absolute time: "where \`timestamp\` > 'yyyy-MM-dd HH:mm:ss'", eg.  "where \`timestamp\` < '2023-01-01 00:00:00'". Do not use \`DATE_FORMAT()\`.
 #02 Only use PPL syntax and keywords appeared in the question or in the examples.
 #03 If user asks for current or recent status, filter the time field for last 5 minutes.
 #04 The field used in 'SPAN(\`<field>\`, <interval>)' must have type \`date\`, not \`long\`.
-#05 When aggregating by \`SPAN\` and another field, put \`SPAN\` after \`by\` and before the other field.
+#05 When aggregating by \`SPAN\` and another field, put \`SPAN\` after \`by\` and before the other field, eg. 'stats COUNT() as \`count\` by SPAN(\`timestamp\`, 1d), \`category\`'.
 #06 You must put values in quotes when filtering fields with \`text\` or \`keyword\` field type.
-#07 To find documents that contain certain phrases in a field, use the \`MATCH\` function, eg. "where MATCH(\`field\`, 'phrase')". To do a wildcard search, use \`QUERY_STRING\`, eg. "where QUERY_STRING(['field'], 'prefix*')".
-#08 To find errors based on status code, if the status code field is a number, then use 'where \`status_code\` >= 400'; if the field is \`text\` or \`keyword\`, then use "where QUERY_STRING(['status_code'], '4* OR 5*')".
+#07 To find documents that contain certain phrases in a string field, use the \`MATCH\` function, eg. "where MATCH(\`field\`, 'phrase')". To do a wildcard search, use \`QUERY_STRING\`, eg. "where QUERY_STRING(['field'], 'prefix*')".
+#08 To find 4xx and 5xx errors using status code, if the status code field type is numberic (eg. \`integer\`), then use 'where \`status_code\` >= 400'; if the field is a string (eg. \`text\` or \`keyword\`), then use "where QUERY_STRING(['status_code'], '4* OR 5*')".
 
 ----------------
-Put your PPL query in <ppl> tags.
+Put your PPL query in <ppl> tags. Only give the PPL query that can be used to answer user's question. Do not create new questions.
 ----------------
 
 {question}
@@ -234,7 +236,7 @@ Put your PPL query in <ppl> tags.
 
 const prompt = new PromptTemplate({
   template,
-  inputVariables: ['question'],
+  inputVariables: ['question', 'date'],
 });
 
 export const requestPPLGeneratorChain = async (
@@ -243,8 +245,12 @@ export const requestPPLGeneratorChain = async (
   callbacks?: Callbacks
 ): Promise<{ query: string }> => {
   const chain = new LLMChain({ llm: model, prompt });
-  const output = await chain.call({ question }, callbacks);
-  const match = output.text.match(/<ppl>((.|[\r\n])+)<\/ppl>/);
+  const d = new Date();
+  const date = `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${(
+    '0' + d.getDate()
+  ).slice(-2)}`;
+  const output = await chain.call({ question, date }, callbacks);
+  const match = output.text.match(/<ppl>((.|[\r\n])+?)<\/ppl>/);
   if (match && match[1])
     return {
       query: match[1]

@@ -34,12 +34,12 @@ Skip the introduction; go straight into the summarization.`;
   ]);
   const fields = generateFieldContext(mappings, sampleDoc);
 
-  return `You will be given an API response with errors, summarize it as a concise paragraph, then give some suggestions on how to fix the error.
+  return `You will be given an API response with errors, summarize it as a concise paragraph, then give some suggestions on how to fix the error. Do not try to answer the user's question.
 Considering the following:
 User's question on index '${context.index}': ${context.question}
 ${context.query ? 'PPL (Piped Processing Language) query used: ' + context.query : ''}
 
-Additionally recommend 2 or 3 possible questions on this index given the fields below. Only give the questions, do not give descriptions of questions. The format for a field is
+Additionally recommend 2 or 3 possible questions on this index given the fields below. Only give the questions, do not give descriptions of questions and do not give PPL queries. The format for a field is
 \`\`\`
 - field_name: field_type (sample field value)
 \`\`\`
