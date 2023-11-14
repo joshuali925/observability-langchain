@@ -10,6 +10,14 @@ import {
   SearchResponse,
 } from '@opensearch-project/opensearch/api/types';
 import { get } from 'lodash';
+import { flattenObject, jsonToCsv } from './utils';
+
+export interface PPLResponse {
+  schema: Array<{ name: string; type: string }>;
+  datarows: unknown[][];
+  total: number;
+  size: number;
+}
 
 /**
  * @template T = unknown - mapping Context
@@ -68,4 +76,39 @@ const parseProperties = (
     }
   });
   return fields;
+};
+
+export const convertPPLResponseToCsv = (response: PPLResponse) => {
+  const schemas = response.schema.map((schema) => schema.name);
+  const jsonRows: Array<Record<string, string>> = response.datarows.map((row) => {
+    const jsonRow: Record<string, string> = {};
+    row.forEach((col, i) => {
+      if (!(typeof col === 'object' && !Array.isArray(col) && col !== null)) {
+        jsonRow[schemas[i]] = String(col);
+      } else {
+        TypedObject.entries(flattenObject(col as Record<string, unknown>)).forEach(([key, val]) => {
+          jsonRow[schemas[i] + '.' + key] = val;
+        });
+      }
+    });
+    return jsonRow;
+  });
+  const csv = `Rows: ${response.size}, total: ${response.total}\n\n`;
+  return csv + jsonToCsv(jsonRows);
+};
+
+/**
+ * Unsafe functions that assume object does not contain additional keys and
+ * cast result based on object type.
+ * Taken from https://news.ycombinator.com/item?id=36457557#36459276.
+ */
+const TypedObject = {
+  keys: Object.keys as <T>(obj: T) => Array<keyof T>,
+  entries: Object.entries as <T>(
+    o: T
+  ) => Array<
+    {
+      [K in Exclude<keyof T, undefined>]: [K, T[K]];
+    }[Exclude<keyof T, undefined>]
+  >,
 };
