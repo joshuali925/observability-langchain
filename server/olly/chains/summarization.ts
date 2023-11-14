@@ -25,7 +25,7 @@ PPL (Piped Processing Language) query used: ${context.query}
 
 Give some documents to support your point.
 
-Skip the preamble; go straight into the summarization.`;
+Skip the introduction; go straight into the summarization.`;
   }
 
   const [mappings, sampleDoc] = await Promise.all([
@@ -39,15 +39,15 @@ Considering the following:
 User's question on index '${context.index}': ${context.question}
 ${context.query ? 'PPL (Piped Processing Language) query used: ' + context.query : ''}
 
-Additionally give 2 sample questions that can be asked about index '${
-    context.index
-  }' given the fields below. Only give the questions, do not give descriptions of questions. The format for a field is
+Additionally recommend 2 or 3 possible questions on this index given the fields below. Only give the questions, do not give descriptions of questions. The format for a field is
 \`\`\`
 - field_name: field_type (sample field value)
 \`\`\`
 
 Fields:
-${fields}`;
+${fields}
+
+Skip the introduction; go straight into the summarization.`;
 };
 
 /**
@@ -66,7 +66,6 @@ export const requestSummarizationChain = async (
   // vector search doesn't help much since the response is already retrieved based on user's question
   const docs = [new Document({ pageContent: truncate(context.response) })];
   const question = await createPrompt(context);
-  console.info('❗question:', question);
   const output = await chain.call({ input_documents: docs, question }, { callbacks });
   return output.text;
 };

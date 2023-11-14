@@ -245,6 +245,12 @@ export const requestPPLGeneratorChain = async (
   const chain = new LLMChain({ llm: model, prompt });
   const output = await chain.call({ question }, callbacks);
   const match = output.text.match(/<ppl>((.|[\r\n])+)<\/ppl>/);
-  if (match && match[1]) return { query: match[1].replace(/[\r\n]/g, ' ').trim() };
+  if (match && match[1])
+    return {
+      query: match[1]
+        .replace(/[\r\n]/g, ' ')
+        .replace(/ISNOTNULL/g, 'isnotnull') // TODO remove after https://github.com/opensearch-project/sql/issues/2431
+        .trim(),
+    };
   throw new Error(output.text);
 };
