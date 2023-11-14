@@ -66,7 +66,7 @@ export const flatten = (response: AggregationBucket[]) => {
   return response;
 };
 
-export function flattenObject(object: Record<string, unknown>, prefix = '') {
+function flattenObject(object: AggregationBucket, prefix = '') {
   const result: Record<string, string> = {};
 
   // Recursively flattens object if it's an object or an array
@@ -75,18 +75,18 @@ export function flattenObject(object: Record<string, unknown>, prefix = '') {
       const combinedKey = prefix ? `${prefix}.${key}` : key;
       const value = object[key];
 
-      if (typeof value === 'object' && value != null) {
+      if (typeof value === 'object') {
         if (Array.isArray(value)) {
           for (let i = 0; i < value.length; i++) {
             const nestedObject = flattenObject(value[i], `${combinedKey}.${i}`);
             Object.assign(result, nestedObject);
           }
         } else {
-          const nestedObject = flattenObject(value as Record<string, unknown>, combinedKey);
+          const nestedObject = flattenObject(value, combinedKey);
           Object.assign(result, nestedObject);
         }
       } else {
-        result[combinedKey] = String(value);
+        result[combinedKey] = value.toString();
       }
     }
   }
