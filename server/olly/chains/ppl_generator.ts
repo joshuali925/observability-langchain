@@ -9,8 +9,6 @@ import { LLMChain } from 'langchain/chains';
 import { PromptTemplate } from 'langchain/prompts';
 
 const template = `
-Today's date: {date}
-
 You will be given a question about some metrics from a user.
 Use context provided to write a PPL query that can be used to retrieve the information.
 
@@ -228,7 +226,7 @@ Step 3. Use the choosen fields to write the PPL query. Rules:
 #08 To find 4xx and 5xx errors using status code, if the status code field type is numberic (eg. \`integer\`), then use 'where \`status_code\` >= 400'; if the field is a string (eg. \`text\` or \`keyword\`), then use "where QUERY_STRING(['status_code'], '4* OR 5*')".
 
 ----------------
-Put your PPL query in <ppl> tags. Only give the PPL query that can be used to answer user's question. Do not create new questions.
+Put your PPL query in <ppl> tags.
 ----------------
 
 {question}
@@ -236,7 +234,7 @@ Put your PPL query in <ppl> tags. Only give the PPL query that can be used to an
 
 const prompt = new PromptTemplate({
   template,
-  inputVariables: ['question', 'date'],
+  inputVariables: ['question'],
 });
 
 export const requestPPLGeneratorChain = async (
@@ -249,7 +247,7 @@ export const requestPPLGeneratorChain = async (
   const date = `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${(
     '0' + d.getDate()
   ).slice(-2)}`;
-  const output = await chain.call({ question, date }, callbacks);
+  const output = await chain.call({ question }, callbacks);
   const match = output.text.match(/<ppl>((.|[\r\n])+?)<\/ppl>/);
   if (match && match[1])
     return {
