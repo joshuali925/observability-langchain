@@ -64,7 +64,7 @@ Question: Find the documents in index 'accounts' where firstname is not 'Hattie'
 PPL: source=\`accounts\` | where \`firstname\` != 'Hattie' AND \`lastname\` != 'frank'
 
 Question: Find the emails that contain '.com' in index 'accounts'
-PPL: source=\`accounts\` | where MATCH(\`email\`, '.com') | fields \`email\`
+PPL: source=\`accounts\` | where QUERY_STRING(['email'], '.com') | fields \`email\`
 
 Question: Find the documents in index 'accounts' where there is an email
 PPL: source=\`accounts\` | where ISNOTNULL(\`email\`)
@@ -143,13 +143,13 @@ Fields:
 - user: keyword ("eddie")
 
 Question: What is the average price of products in clothing category ordered in the last 7 days? index is 'ecommerce'
-PPL: source=\`ecommerce\` | where MATCH(\`category\`, 'clothing') AND \`order_date\` > DATE_SUB(NOW(), INTERVAL 7 DAY) | stats AVG(\`taxful_total_price\`) AS \`avg_price\`
+PPL: source=\`ecommerce\` | where QUERY_STRING(['category'], 'clothing') AND \`order_date\` > DATE_SUB(NOW(), INTERVAL 7 DAY) | stats AVG(\`taxful_total_price\`) AS \`avg_price\`
 
 Question: What is the average price of products in each city ordered today by every 2 hours? index is 'ecommerce'
-PPL: source=\`ecommerce\` | where \`order_date\` > DATE_SUB(NOW(), INTERVAL 24 HOUR) | stats AVG(\`taxful_total_price\`) AS \`avg_price\` by SPAN(\`order_date\`, 2h), \`geoip.city_name\`
+PPL: source=\`ecommerce\` | where \`order_date\` > DATE_SUB(NOW(), INTERVAL 24 HOUR) | stats AVG(\`taxful_total_price\`) AS \`avg_price\` by SPAN(\`order_date\`, 2h) AS \`span\`, \`geoip.city_name\`
 
 Question: What is the total revenue of shoes each day in this week? index is 'ecommerce'
-PPL: source=\`ecommerce\` | where MATCH(\`category\`, 'shoes') AND \`order_date\` > DATE_SUB(NOW(), INTERVAL 1 WEEK) | stats SUM(\`taxful_total_price\`) AS \`revenue\` by SPAN(\`order_date\`, 1d)
+PPL: source=\`ecommerce\` | where QUERY_STRING(['category'], 'shoes') AND \`order_date\` > DATE_SUB(NOW(), INTERVAL 1 WEEK) | stats SUM(\`taxful_total_price\`) AS \`revenue\` by SPAN(\`order_date\`, 1d) AS \`span\`
 
 ----------------
 
@@ -182,7 +182,7 @@ Fields:
 - trace_id: text ("102981ABCD2901")
 
 Question: What are recent logs with errors and contains word 'test'? index is 'events'
-PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') AND MATCH(\`body\`, 'test') AND \`observerTime\` > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') AND QUERY_STRING(['body'], 'test') AND \`observerTime\` > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
 
 Question: What is the total number of log with a status code other than 200 in 2023 Feburary? index is 'events'
 PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '!200') AND \`observerTime\` >= '2023-03-01 00:00:00' AND \`observerTime\` < '2023-04-01 00:00:00' | stats COUNT() AS \`count\`
@@ -191,13 +191,13 @@ Question: Count the number of business days that have web category logs last wee
 PPL: source=\`events\` | where \`category\` = 'web' AND \`observerTime\` > DATE_SUB(NOW(), INTERVAL 1 WEEK) AND DAY_OF_WEEK(\`observerTime\`) >= 2 AND DAY_OF_WEEK(\`observerTime\`) <= 6 | stats DISTINCT_COUNT(DATE_FORMAT(\`observerTime\`, 'yyyy-MM-dd')) AS \`distinct_count\`
 
 Question: What are the top traces with largest bytes? index is 'events'
-PPL: source=\`events\` | stats SUM(\`http.response.bytes\`) as \`sum_bytes\` by \`trace_id\` | sort -sum_bytes | head
+PPL: source=\`events\` | stats SUM(\`http.response.bytes\`) AS \`sum_bytes\` by \`trace_id\` | sort -sum_bytes | head
 
 Question: Give me log patterns? index is 'events'
-PPL: source=\`events\` | patterns \`body\` | stats take(\`body\`, 1) as \`sample_pattern\` by \`patterns_field\` | fields \`sample_pattern\`
+PPL: source=\`events\` | patterns \`body\` | stats take(\`body\`, 1) AS \`sample_pattern\` by \`patterns_field\` | fields \`sample_pattern\`
 
 Question: Give me log patterns for logs with errors? index is 'events'
-PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') | patterns \`body\` | stats take(\`body\`, 1) as \`sample_pattern\` by \`patterns_field\` | fields \`sample_pattern\`
+PPL: source=\`events\` | where QUERY_STRING(['http.response.status_code'], '4* OR 5*') | patterns \`body\` | stats take(\`body\`, 1) AS \`sample_pattern\` by \`patterns_field\` | fields \`sample_pattern\`
 
 ----------------
 
@@ -220,9 +220,9 @@ Step 3. Use the choosen fields to write the PPL query. Rules:
 #02 Only use PPL syntax and keywords appeared in the question or in the examples.
 #03 If user asks for current or recent status, filter the time field for last 5 minutes.
 #04 The field used in 'SPAN(\`<field>\`, <interval>)' must have type \`date\`, not \`long\`.
-#05 When aggregating by \`SPAN\` and another field, put \`SPAN\` after \`by\` and before the other field, eg. 'stats COUNT() as \`count\` by SPAN(\`timestamp\`, 1d), \`category\`'.
+#05 When aggregating by \`SPAN\` and another field, put \`SPAN\` after \`by\` and before the other field, eg. 'stats COUNT() AS \`count\` by SPAN(\`timestamp\`, 1d) AS \`span\`, \`category\`'.
 #06 You must put values in quotes when filtering fields with \`text\` or \`keyword\` field type.
-#07 To find documents that contain certain phrases in a string field, use the \`MATCH\` function, eg. "where MATCH(\`field\`, 'phrase')". To do a wildcard search, use \`QUERY_STRING\`, eg. "where QUERY_STRING(['field'], 'prefix*')".
+#07 To find documents that contain certain phrases in string fields, use \`QUERY_STRING\` which supports multiple fields and wildcard, eg. "where QUERY_STRING(['field1', 'field2'], 'prefix*')".
 #08 To find 4xx and 5xx errors using status code, if the status code field type is numberic (eg. \`integer\`), then use 'where \`status_code\` >= 400'; if the field is a string (eg. \`text\` or \`keyword\`), then use "where QUERY_STRING(['status_code'], '4* OR 5*')".
 
 ----------------
