@@ -1,0 +1,261 @@
+{"Input": "How many primary shards does the index film_rank-film_market_estimation have?", "Output": "The index film_rank-film_market_estimation has 1 primary shard.", "validation": null}
+{"Input": "What is the status of the index .plugins-ml-task?", "Output": "The index .plugins-ml-task has a status of green.", "validation": null}
+{"Input": "How many documents are in the index baseball_1-team?", "Output": "The index baseball_1-team contains 2805 documents.", "validation": null}
+{"Input": "What is the size of the store taken by primary shards in the index plaintext-version?", "Output": "The size of the store taken by primary shards in the index plaintext-version is 1gb.", "validation": null}
+{"Input": "How many documents are deleted in the index college_3-student?", "Output": "There are 0 deleted documents in the index college_3-student.", "validation": null}
+{"Input": "What is the status of the index called security-auditlog-2023.10.25?", "Output": "The status of the index security-auditlog-2023.10.25 is yellow open.", "validation": null}
+{"Input": "How many primary shards does the index .plugins-ml-connector have?", "Output": "The index .plugins-ml-connector has 1 primary shard.", "validation": null}
+{"Input": "What is the store size taken by primary shards for the index .plugins-ml-model?", "Output": "The store size taken by primary shards for the index .plugins-ml-model is 2.1gb.", "validation": null}
+{"Input": "What is the number of documents in the index .kibana_1?", "Output": "The number of documents in the index .kibana_1 is 8.", "validation": null}
+{"Input": "How many replica shards does the .plugins-ml-task index have?", "Output": "The .plugins-ml-task index has 0 replica shards.", "validation": null}
+{"Input": "What is the status of the index baseball_1-appearances?", "Output": "The index baseball_1-appearances has a status of yellow.", "validation": null}
+{"Input": "How many primary shards does the index document_management-document_sections have?", "Output": "The index document_management-document_sections has 1 primary shard.", "validation": null}
+{"Input": "What is the store size of the index college_2-student?", "Output": "The index college_2-student has a store size of 206.3kb.", "validation": null}
+{"Input": "How many documents are in the index baseball_1-player?", "Output": "The index baseball_1-player contains 10000 documents.", "validation": null}
+{"Input": "What is the status of the index film_rank-film_market_estimation?", "Output": "The status of the index film_rank-film_market_estimation is yellow open.", "validation": null}
+{"Input": "How many documents are in the index college_2-student?", "Output": "There are 2000 documents in the index college_2-student.", "validation": null}
+{"Input": "What is the pri.store.size of the index baseball_1-batting_postseason?", "Output": "The pri.store.size of the index baseball_1-batting_postseason is 1.1mb.", "validation": null}
+{"Input": "What is the total number of documents across all indices in the cluster?", "Output": "There are 80,959 documents across all indices in the cluster.", "validation": null}
+{"Input": "Which index has the most primary shards?", "Output": "The index with the most primary shards is plaintext-version with 1 primary shard.", "validation": null}
+{"Input": "How many yellow indices are there?", "Output": "There are 13 yellow indices.", "validation": null}
+{"Input": "What is the total disk space used for primary shards across the cluster?", "Output": "The total disk space used for primary shards across the cluster is 2.1 GB.", "validation": null}
+{"Input": "What is the status of the film_rank-film_market_estimation index?", "Output": "The status of the film_rank-film_market_estimation index is open.", "validation": null}
+{"Input": "How many documents does the baseball_1-player index have?", "Output": "The baseball_1-player index has 10000 documents.", "validation": null}
+{"Input": "Which index has the fewest number of documents?", "Output": "The plaintext index has 0 documents, which is the fewest.", "validation": null}
+{"Input": "What is the health status of the .plugins-ml-connector index?", "Output": "The .plugins-ml-connector index has a health status of green.", "validation": null}
+{"Input": "How many yellow status indices are in the cluster?", "Output": "There are 72 yellow status indices in the cluster.", "validation": null}
+{"Input": "What is the status of the index film_rank-film_market_estimation?", "Output": "The index film_rank-film_market_estimation has a status of yellow open.", "validation": null}
+{"Input": "How many primary shards does the index college_2-time_slot have?", "Output": "The index college_2-time_slot has 1 primary shard.", "validation": null}
+{"Input": "What is the health status of the index baseball_1-pitching?", "Output": "The index baseball_1-pitching has a health status of yellow.", "validation": null}
+{"Input": "What is the document count for the index customers_and_addresses-customer_contact_channels?", "Output": "The index customers_and_addresses-customer_contact_channels has a document count of 20.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The index with the most documents is plaintext-version with 80959 documents.", "validation": null}
+{"Input": "What is the total number of indices in green status?", "Output": "There are 9 indices with green status.", "validation": null}
+{"Input": "Which index has the most primary shards?", "Output": "The indices with the most primary shards are baseball_1-batting, baseball_1-batting_postseason, baseball_1-fielding, baseball_1-fielding_outfield, baseball_1-fielding_postseason, baseball_1-pitching, baseball_1-pitching_postseason, baseball_1-postseason, formula_1-constructorresults, and plaintext-version-no-aos, each with 1 primary shard.", "validation": null}
+{"Input": "What is the total store size taken by all indices?", "Output": "The total store size taken by all indices is 11.5gb.", "validation": null}
+{"Input": "How many yellow indices are there?", "Output": "There are 119 yellow indices.", "validation": null}
+{"Input": "What is the status and document count of the index customers_and_addresses-customers?", "Output": "The index customers_and_addresses-customers has a status of yellow and contains 15 documents.", "validation": null}
+{"Input": "How many shards does the index baseball_1-batting have?", "Output": "The index baseball_1-batting has 1 primary shard and 1 replica shard.", "validation": null}
+{"Input": "What is the total size of all indices in the cluster?", "Output": "The total size of all indices in the cluster is 9.8gb.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The index with the most documents is plaintext-version with 80959 documents.", "validation": null}
+{"Input": "What is the health status of the index architecture-bridge?", "Output": "The index architecture-bridge has a health status of yellow.", "validation": null}
+{"Input": "What is the health status of the index called baseball_1-player?", "Output": "The health status of the index baseball_1-player is yellow.", "validation": null}
+{"Input": "How many documents does the index called customers_and_products_contacts-contacts contain?", "Output": "The index customers_and_products_contacts-contacts contains 15 documents.", "validation": null}
+{"Input": "What is the size of the primary shards for the index document_management-document_functional_areas?", "Output": "The size of the primary shards for the index document_management-document_functional_areas is 5.3kb.", "validation": null}
+{"Input": "Which index has the largest store size in my cluster?", "Output": "The .plugins-ml-model index has the largest store size of 2.1gb in your cluster.", "validation": null}
+{"Input": "What is the total number of documents across all non-system indices in my cluster?", "Output": "The total number of documents across all non-system indices is 148,751.", "validation": null}
+{"Input": "How many yellow indices are there in my cluster, excluding any system indices?", "Output": "There are 3 yellow indices in your cluster when excluding system indices.", "validation": null}
+{"Input": "Which index has the highest number of documents in my cluster?", "Output": "The security-auditlog-2023.10.26 index has the highest number of documents at 1,399.", "validation": null}
+{"Input": "What is the total store size for all indices in my cluster including system indices?", "Output": "The total store size for all indices in your cluster including system indices is 4.3gb.", "validation": null}
+{"Input": "What is the status of the index film_rank-film_market_estimation?", "Output": "The index film_rank-film_market_estimation has a status of open.", "validation": null}
+{"Input": "How many primary shards does the index document_management-document_sections have?", "Output": "The index document_management-document_sections has 1 primary shard.", "validation": null}
+{"Input": "What is the store size of the index baseball_1-appearances?", "Output": "The index baseball_1-appearances has a store size of 1.3mb.", "validation": null}
+{"Input": "What is the health status of the index called baseball_1-player?", "Output": "The index baseball_1-player has a health status of yellow.", "validation": null}
+{"Input": "How many replica shards does the index document_management-documents have?", "Output": "The index document_management-documents has 1 replica shard.", "validation": null}
+{"Input": "What is the number of documents in the index called college_2-student?", "Output": "The index college_2-student has 2000 documents.", "validation": null}
+{"Input": "Does the index customers_and_addresses-addresses have the status closed?", "Output": "No, the index customers_and_addresses-addresses has the status yellow and open.", "validation": null}
+{"Input": "What is the status of the index called .plugins-ml-model?", "Output": "The index .plugins-ml-model has a status of green.", "validation": null}
+{"Input": "How many documents are in the index called security-auditlog-2023.10.25?", "Output": "The index security-auditlog-2023.10.25 contains 665 documents.", "validation": null}
+{"Input": "What is the number of primary shards for the index .plugins-ml-task?", "Output": "The index .plugins-ml-task has 1 primary shard.", "validation": null}
+{"Input": "What is the status of the film_rank-film_market_estimation index?", "Output": "The status of the film_rank-film_market_estimation index is yellow.", "validation": null}
+{"Input": "How many documents does the baseball_1-batting index contain?", "Output": "The baseball_1-batting index contains 10000 documents.", "validation": null}
+{"Input": "What is the number of replica shards for the document_management-document_sections index?", "Output": "The document_management-document_sections index has 1 replica shard.", "validation": null}
+{"Input": "Which index has the most documents in the provided cluster state?", "Output": "The plaintext-version index has the most documents at 80959 in the provided cluster state.", "validation": null}
+{"Input": "How many primary shards does the customer_deliveries-customers index have?", "Output": "The customer_deliveries-customers index has 1 primary shard.", "validation": null}
+{"Input": "What is the status of the index called college_2-student?", "Output": "The index college_2-student has a status of yellow.", "validation": null}
+{"Input": "How many replica shards does the index baseball_1-pitching have?", "Output": "The index baseball_1-pitching has 1 replica shard.", "validation": null}
+{"Input": "What is the store size taken by primary shards for the index plaintext-version?", "Output": "The store size taken by primary shards for the index plaintext-version is 1 GB.", "validation": null}
+{"Input": "How many documents are in the index cre_theme_park-theme_parks?", "Output": "The index cre_theme_park-theme_parks has 3 documents.", "validation": null}
+{"Input": "What is the index name that has 80959 documents?", "Output": "The index with 80959 documents is plaintext-version.", "validation": null}
+{"Input": "What is the status of the index called baseball_1-player?", "Output": "The status of the baseball_1-player index is yellow.", "validation": null}
+{"Input": "How many primary shards does the index document_management-document_sections have?", "Output": "The document_management-document_sections index has 1 primary shard.", "validation": null}
+{"Input": "What is the total size of the store for the index called formula_1-constructorresults?", "Output": "The total store size for the formula_1-constructorresults index is 430.3kb.", "validation": null}
+{"Input": "What is the status of the index baseball_1-player?", "Output": "The status of the index baseball_1-player is yellow.", "validation": null}
+{"Input": "How many primary shards does the index baseball_1-batting have?", "Output": "The index baseball_1-batting has 1 primary shards.", "validation": null}
+{"Input": "What is the store size of the index baseball_1-pitching_postseason?", "Output": "The store size of the index baseball_1-pitching_postseason is 954.6kb.", "validation": null}
+{"Input": "What is the status of the security-auditlog-2023.10.26 index?", "Output": "The status of the security-auditlog-2023.10.26 index is yellow.", "validation": null}
+{"Input": "How many documents are in the .plugins-ml-model index?", "Output": "The .plugins-ml-model index has 184 documents.", "validation": null}
+{"Input": "What is the largest index in the cluster based on store size?", "Output": "The largest index in the cluster based on store size is .plugins-ml-model with a size of 2.1 GB.", "validation": null}
+{"Input": "How many primary shards does the security-auditlog-2023.10.25 index have?", "Output": "The security-auditlog-2023.10.25 index has 1 primary shard.", "validation": null}
+{"Input": "Which index has the largest number of documents in the provided cluster state?", "Output": "The plaintext-version index has the largest number of documents at 80959 in the provided cluster state.", "validation": null}
+{"Input": "What is the total number of primary shards across all yellow indices in the provided cluster state?", "Output": "The total number of primary shards across all yellow indices is 358 in the provided cluster state.", "validation": null}
+{"Input": "How many yellow indices have exactly 1 replica shard in the provided cluster state?", "Output": "There are 62 yellow indices that have exactly 1 replica shard in the provided cluster state.", "validation": null}
+{"Input": "Which yellow index has the smallest store size in bytes in the provided cluster state?", "Output": "The smallest yellow index by store size is .chat-assistant-config with 5.5kb in the provided cluster state.", "validation": null}
+{"Input": "What is the total number of documents in the yellow indices?", "Output": "The total number of documents in the yellow indices is 436,669.", "validation": null}
+{"Input": "Which green index has the most documents?", "Output": "The .plugins-ml-model index has the most documents (184) out of the green indices.", "validation": null}
+{"Input": "What is the total disk space used for primary shards across all yellow indices?", "Output": "The total disk space used for primary shards across all yellow indices is 3.8 GB.", "validation": null}
+{"Input": "Which yellow index has the fewest number of documents?", "Output": "The .chat-assistant-config yellow index has the fewest number of documents (1).", "validation": null}
+{"Input": "What is the status of the index security-auditlog-2023.10.25?", "Output": "The status of the index security-auditlog-2023.10.25 is yellow open.", "validation": null}
+{"Input": "How many primary shards does the index .plugins-ml-model have?", "Output": "The index .plugins-ml-model has 1 primary shard.", "validation": null}
+{"Input": "What is the number of documents in the index security-auditlog-2023.10.26?", "Output": "The index security-auditlog-2023.10.26 has 1399 documents.", "validation": null}
+{"Input": "How much storage does the index .plugins-ml-task use for primary shards?", "Output": "The index .plugins-ml-task uses 26.5kb for primary shards.", "validation": null}
+{"Input": "What is the status of the index called .opendistro_security?", "Output": "The index .opendistro_security has a status of green open.", "validation": null}
+{"Input": "How many shards does the index .plugins-ml-task have?", "Output": "The index .plugins-ml-task has 1 primary shard and 0 replica shards.", "validation": null}
+{"Input": "What is the store size of .plugins-ml-model?", "Output": "The index .plugins-ml-model has a store size of 2.1 GB for primary and replica shards.", "validation": null}
+{"Input": "How many primary shards does the index baseball_1-batting have?", "Output": "The index baseball_1-batting has 1 primary shard.", "validation": null}
+{"Input": "What is the health status of the index cre_theme_park-tourist_attraction_features?", "Output": "The health status of the index cre_theme_park-tourist_attraction_features is yellow.", "validation": null}
+{"Input": "What is the total size taken by the primary shards in the index plaintext-version?", "Output": "The total size taken by the primary shards in the index plaintext-version is 1gb.", "validation": null}
+{"Input": "How many documents does the index cre_drama_workshop_groups-bookings have?", "Output": "The index cre_drama_workshop_groups-bookings has 15 documents.", "validation": null}
+{"Input": "What is the status of the index called film_rank-film_market_estimation?", "Output": "The status of the film_rank-film_market_estimation index is yellow open.", "validation": null}
+{"Input": "How many primary shards does the index baseball_1-pitching have?", "Output": "The index baseball_1-pitching has 1 primary shard.", "validation": null}
+{"Input": "What is the total size taken by primary and replica shards for the index document_management-documents?", "Output": "The total size taken by primary and replica shards for the document_management-documents index is 8.6kb.", "validation": null}
+{"Input": "What is the number of documents in the index called plaintext-version?", "Output": "The number of documents in the plaintext-version index is 80959.", "validation": null}
+{"Input": "How many deleted documents are there in the index department_store-staff_department_assignments?", "Output": "There are 0 deleted documents in the department_store-staff_department_assignments index.", "validation": null}
+{"Input": "What is the status of the film_rank-film_market_estimation index?", "Output": "The film_rank-film_market_estimation index has a status of yellow open.", "validation": null}
+{"Input": "How many primary shards does the baseball_1-player index have?", "Output": "The baseball_1-player index has 1 primary shard.", "validation": null}
+{"Input": "What is the total size taken by the cre_theme_park-theme_parks index?", "Output": "The total size taken by the cre_theme_park-theme_parks index is 4.5kb.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The plaintext-version index has the most documents at 80959.", "validation": null}
+{"Input": "What is the health status of the .plugins-ml-model index?", "Output": "The .plugins-ml-model index has a health status of green open.", "validation": null}
+{"Input": "What is the health status of the index .plugins-ml-model-group?", "Output": "The health status of the index .plugins-ml-model-group is green.", "validation": null}
+{"Input": "How many documents are in the index security-auditlog-2023.10.25?", "Output": "The index security-auditlog-2023.10.25 contains 665 documents.", "validation": null}
+{"Input": "What is the store size of the smallest index in the cluster?", "Output": "The smallest index in the cluster is .opensearch-observability with a store size of 208 bytes.", "validation": null}
+{"Input": "How many primary shards does the index .plugins-ml-task have?", "Output": "The index .plugins-ml-task has 1 primary shard.", "validation": null}
+{"Input": "Which index has the largest store size?", "Output": "The plaintext-version index has the largest store size of 1gb.", "validation": null}
+{"Input": "How many documents does the baseball_1-player index contain?", "Output": "The baseball_1-player index contains 10,000 documents.", "validation": null}
+{"Input": "What is the status of the cre_theme_park-theme_parks index?", "Output": "The cre_theme_park-theme_parks index has a status of yellow.", "validation": null}
+{"Input": "Which index has the most primary shards?", "Output": "The plaintext-version-no-aos index has the most primary shards at 1.", "validation": null}
+{"Input": "What is the document count of the .plugins-ml-connector index?", "Output": "The .plugins-ml-connector index has a document count of 11.", "validation": null}
+{"Input": "What is the health status of the index baseball_1-player?", "Output": "The health status of the index baseball_1-player is yellow.", "validation": null}
+{"Input": "How many documents does the index plaintext-version have?", "Output": "The index plaintext-version has 80959 documents.", "validation": null}
+{"Input": "What is the number of replica shards for the index architecture-bridge?", "Output": "The index architecture-bridge has 1 replica shard.", "validation": null}
+{"Input": "What is the total size taken by primary and replica shards for the index formula_1-constructorresults?", "Output": "The total size taken by primary and replica shards for the index formula_1-constructorresults is 430.3kb.", "validation": null}
+{"Input": "How many primary shards does the index cre_theme_park-theme_parks have?", "Output": "The index cre_theme_park-theme_parks has 1 primary shard.", "validation": null}
+{"Input": "What is the status of the .plugins-ml-connector index?", "Output": "The status of the .plugins-ml-connector index is green open.", "validation": null}
+{"Input": "How many documents are in the .plugins-ml-task index?", "Output": "The .plugins-ml-task index has 15 documents.", "validation": null}
+{"Input": "What is the store size of the .opendistro_security index?", "Output": "The store size of the .opendistro_security index is 76.2kb.", "validation": null}
+{"Input": "What is the health status of the security-auditlog-2023.10.25 index?", "Output": "The health status of the security-auditlog-2023.10.25 index is yellow open.", "validation": null}
+{"Input": "How many primary shards does the index cre_drama_workshop_groups-drama_workshop_groups have?", "Output": "The index cre_drama_workshop_groups-drama_workshop_groups has 1 primary shard.", "validation": null}
+{"Input": "What is the total number of documents in the college_2 index?", "Output": "The total number of documents in the college_2 index is 2100.", "validation": null}
+{"Input": "Which index has the most documents deleted?", "Output": "The index with the most deleted documents is plaintext-version with 80959 deleted documents.", "validation": null}
+{"Input": "What is the size of just the primary shards for the index plaintext-version-no-aos?", "Output": "The size of just the primary shards for the plaintext-version-no-aos index is 930.2 MB.", "validation": null}
+{"Input": "How many indices have a health status of green?", "Output": "There are 7 indices with a health status of green.", "validation": null}
+{"Input": "What is the status of the index called baseball_1-player?", "Output": "The index baseball_1-player has a status of yellow open.", "validation": null}
+{"Input": "How many documents does the index called college_2-student contain?", "Output": "The index college_2-student contains 2000 documents.", "validation": null}
+{"Input": "What is the number of primary shards for the index document_management-documents?", "Output": "The index document_management-documents has 1 primary shard.", "validation": null}
+{"Input": "What is the total size taken by the index cre_theme_park-visits?", "Output": "The total size taken by the index cre_theme_park-visits is 8.4kb.", "validation": null}
+{"Input": "How many deleted documents are there in the index called film_rank-film_market_estimation?", "Output": "There are 0 deleted documents in the index film_rank-film_market_estimation.", "validation": null}
+{"Input": "How many security audit logs are in my cluster from October 24th through October 27th?", "Output": "There are 4 security audit log indices ranging from October 24th through October 27th:\n- security-auditlog-2023.10.24 with 1533 documents\n- security-auditlog-2023.10.25 with 665 documents  \n- security-auditlog-2023.10.26 with 1399 documents\n- security-auditlog-2023.10.27 with 163 documents", "validation": null}
+{"Input": "What is the total document count across all security audit log indices in my cluster?", "Output": "The total document count across the 4 security audit log indices is 3760.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The security-auditlog-2023.10.26 index has the most documents at 1399.", "validation": null}
+{"Input": "How large are the ML plugin indices?", "Output": "The ML plugin indices are:\n- .plugins-ml-connector with 11 documents and 183kb \n- .plugins-ml-task with 38 documents and 36.1kb\n- .plugins-ml-model with 460 documents and 5.4gb", "validation": null}
+{"Input": "Which index takes up the most storage space in my cluster?", "Output": "The .plugins-ml-model index takes up the most storage space at 5.4gb.", "validation": null}
+{"Input": "What is the status of the index .plugins-ml-model?", "Output": "The index .plugins-ml-model has a status of green open.", "validation": null}
+{"Input": "How many documents are in the security-auditlog-2023.10.25 index?", "Output": "The security-auditlog-2023.10.25 index has 665 documents.", "validation": null}
+{"Input": "What is the number of primary shards for the .plugins-ml-connector index?", "Output": "The .plugins-ml-connector index has 1 primary shard.", "validation": null}
+{"Input": "How much disk space does the .plugins-ml-model index take for its primary shards?", "Output": "The .plugins-ml-model index takes 2.1gb disk space for its primary shards.", "validation": null}
+{"Input": "How many yellow indices are in the cluster?", "Output": "There are 65 yellow indices in the cluster.", "validation": null}
+{"Input": "What is the total number of documents across all indices?", "Output": "The total number of documents across all indices is 167,784.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The index with the most documents is plaintext-version with 80,959 documents.", "validation": null}
+{"Input": "What is the total disk usage for the cluster?", "Output": "The total disk usage for the cluster is 11.5 GB.", "validation": null}
+{"Input": "Which index takes up the most disk space?", "Output": "The index taking up the most disk space is plaintext-version-no-aos at 930.2 MB.", "validation": null}
+{"Input": "What is the status of the index called college_2-student?", "Output": "The index called college_2-student has a status of yellow.", "validation": null}
+{"Input": "How many documents are in the index baseball_1-team?", "Output": "The index baseball_1-team contains 2805 documents.", "validation": null}
+{"Input": "What is the total size of all the yellow indices?", "Output": "The total size of all yellow indices is 37.8 GB.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The index with the most documents is plaintext-version with 80959 documents.", "validation": null}
+{"Input": "What is the status of the index called baseball_1-pitching?", "Output": "The index baseball_1-pitching has a status of yellow.", "validation": null}
+{"Input": "How many primary shards does the index called college_1-class have?", "Output": "The index college_1-class has 1 primary shard.", "validation": null}
+{"Input": "What is the total size taken by primary and replica shards for the index called film_rank-film_market_estimation?", "Output": "The total size taken by primary and replica shards for the index film_rank-film_market_estimation is 6.9kb.", "validation": null}
+{"Input": "What is the total number of documents across all indices in the cluster?", "Output": "The total number of documents across all indices is 143,751.", "validation": null}
+{"Input": "How many indices have between 10,000 - 100,000 documents?", "Output": "There are 7 indices that have between 10,000 - 100,000 documents.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The plaintext-version index has the most documents at 80,959.", "validation": null}
+{"Input": "What is the total size on disk of all primary shards in the cluster?", "Output": "The total size on disk of all primary shards is 11.5 GB.", "validation": null}
+{"Input": "Which yellow index has the smallest number of documents?", "Output": "The smallest yellow index by document count is architecture-buildings with 0 documents.", "validation": null}
+{"Input": "How many documents does the index baseball_1-player contain?", "Output": "The index baseball_1-player contains 10000 documents.", "validation": null}
+{"Input": "What is the total size taken by the primary shards in the index plaintext-version?", "Output": "The total size taken by the primary shards in the plaintext-version index is 1gb.", "validation": null}
+{"Input": "Which index has the most documents deleted?", "Output": "The index with the most deleted documents is plaintext-version with 80959 deleted documents.", "validation": null}
+{"Input": "What is the total number of documents across all indices in the cluster?", "Output": "The total number of documents across all indices is 148,951.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The index with the most documents is plaintext-version with 80,959 documents.", "validation": null}
+{"Input": "How many indices have a health status of yellow?", "Output": "There are 105 indices with a health status of yellow.", "validation": null}
+{"Input": "What is the total number of documents across all indices in the cluster?", "Output": "There are 121,950 documents across all indices in the cluster.", "validation": null}
+{"Input": "How many indices have 0 documents?", "Output": "There are 4 indices that have 0 documents.", "validation": null}
+{"Input": "What is the total storage used for primary shards across the cluster?", "Output": "The total storage used for primary shards across the cluster is 5.6gb.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The .plugins-ml-model index has the most documents at 460.", "validation": null}
+{"Input": "How many yellow status indices are there?", "Output": "There are 5 indices with yellow status.", "validation": null}
+{"Input": "What is the status of the index called .plugins-ml-model-group?", "Output": "The index .plugins-ml-model-group has a status of green.", "validation": null}
+{"Input": "How many documents are in the index .plugins-ml-task?", "Output": "The index .plugins-ml-task contains 15 documents.", "validation": null}
+{"Input": "What is the total size of all the yellow indices in bytes?", "Output": "The total size of all the yellow indices is 4.3 GB or 4,611,712,896 bytes.", "validation": null}
+{"Input": "Which index has the most primary shards?", "Output": "The index .plugins-ml-model has the most primary shards, with 184.", "validation": null}
+{"Input": "What is the document count for the index security-auditlog-2023.10.27?", "Output": "The index security-auditlog-2023.10.27 has a document count of 163.", "validation": null}
+{"Input": "What is the status of the index cre_theme_park-street_markets?", "Output": "The status of the index cre_theme_park-street_markets is yellow open.", "validation": null}
+{"Input": "How many documents are in the index college_2-student?", "Output": "There are 2000 documents in the index college_2-student.", "validation": null}
+{"Input": "What is the store size of the index cre_theme_park-theme_parks?", "Output": "The store size of the index cre_theme_park-theme_parks is 4.5kb.", "validation": null}
+{"Input": "What is the status of the .plugins-ml-model index?", "Output": "The .plugins-ml-model index has a status of green.", "validation": null}
+{"Input": "How many primary shards does the security-auditlog-2023.10.25 index have?", "Output": "The security-auditlog-2023.10.25 index has 1 primary shard.", "validation": null}
+{"Input": "What is the total size of all non-system indices?", "Output": "The total size of all non-system indices is 4.5gb.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The plaintext-version index has the most documents at 80,959.", "validation": null}
+{"Input": "What is the health status of the index called security-auditlog-2023.10.26?", "Output": "The index security-auditlog-2023.10.26 has a health status of yellow.", "validation": null}
+{"Input": "How many shards does the index .plugins-ml-connector have?", "Output": "The index .plugins-ml-connector has 1 primary shard and 0 replica shards.", "validation": null}
+{"Input": "What is the store size of the index .plugins-ml-model?", "Output": "The index .plugins-ml-model has a store size of 5.4 GB.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The index .plugins-ml-model has the most documents at 322.", "validation": null}
+{"Input": "What is the total number of documents in the security-auditlog-2023.10.26 index?", "Output": "The total number of documents in the security-auditlog-2023.10.26 index is 1399.", "validation": null}
+{"Input": "How large is the .plugins-ml-model index in bytes?", "Output": "The .plugins-ml-model index is 2.1gb in size.", "validation": null}
+{"Input": "What is the number of replica shards for the .kibana_1 index?", "Output": "The .kibana_1 index has 0 replica shards.", "validation": null}
+{"Input": "Which index has the most primary shards in the cluster?", "Output": "The index with the most primary shards in the cluster is .plugins-ml-model with 184 primary shards.", "validation": null}
+{"Input": "Can you provide the total number of documents across all indices in my cluster?", "Output": "Based on the provided cluster state, the total number of documents across all indices is 143,669.", "validation": null}
+{"Input": "What is the total storage used by the 3 largest indices in my cluster?", "Output": "The 3 largest indices by storage used are:\n- .plugins-ml-model: 5.4gb \n- plaintext-version-no-aos: 930.2mb\n- .plugins-ml-model-group: 2.1gb\nThe total storage used by these 3 indices is 7.43gb.", "validation": null}
+{"Input": "Which index has the most documents in my cluster?", "Output": "The index with the most documents is plaintext-version-no-aos with 71,884 documents.", "validation": null}
+{"Input": "What is the status of the index security-auditlog-2023.10.25?", "Output": "The status of the security-auditlog-2023.10.25 index is yellow open.", "validation": null}
+{"Input": "How many primary shards does the index .plugins-ml-connector have?", "Output": "The index .plugins-ml-connector has 1 primary shard.", "validation": null}
+{"Input": "What is the health status of the .opendistro_security index?", "Output": "The .opendistro_security index has a health status of green.", "validation": null}
+{"Input": "How many documents are in the .plugins-ml-model index?", "Output": "The .plugins-ml-model index contains 184 documents.", "validation": null}
+{"Input": "What is the status of the index named college_2-course?", "Output": "The status of the college_2-course index is yellow.", "validation": null}
+{"Input": "How many primary shards does the index film_rank-film_market_estimation have?", "Output": "The film_rank-film_market_estimation index has 1 primary shard.", "validation": null}
+{"Input": "What is the number of documents in the index baseball_1-batting_postseason?", "Output": "The baseball_1-batting_postseason index has 10000 documents.", "validation": null}
+{"Input": "How large is the store size of the index .plugins-ml-model?", "Output": "The store size of the .plugins-ml-model index is 5.4gb.", "validation": null}
+{"Input": "What is the health status of the index .plugins-ml-task?", "Output": "The health status of the .plugins-ml-task index is green.", "validation": null}
+{"Input": "How many primary shards does the index film_rank-film_market_estimation have?", "Output": "The index film_rank-film_market_estimation has 1 primary shard.", "validation": null}
+{"Input": "What is the health status of the index baseball_1-pitching?", "Output": "The health status of the index baseball_1-pitching is yellow.", "validation": null}
+{"Input": "What is the number of documents in the index college_2-student?", "Output": "The index college_2-student has 2000 documents.", "validation": null}
+{"Input": "How large is the index .plugins-ml-model in bytes?", "Output": "The index .plugins-ml-model is 5.4 GB or 5,400,000,000 bytes in size.", "validation": null}
+{"Input": "What is the health status of the index college_1-course?", "Output": "The health status of the index college_1-course is yellow.", "validation": null}
+{"Input": "How many documents are in the index baseball_1-player?", "Output": "The index baseball_1-player has 10000 documents.", "validation": null}
+{"Input": "What is the number of replica shards for the index document_management-document_functional_areas?", "Output": "The index document_management-document_functional_areas has 1 replica shard.", "validation": null}
+{"Input": "How much storage space does the index .plugins-ml-model take up for primary shards?", "Output": "The index .plugins-ml-model takes up 5.4 GB for primary shards.", "validation": null}
+{"Input": "What is the status of the index film_rank-film_market_estimation?", "Output": "The index film_rank-film_market_estimation has a status of open.", "validation": null}
+{"Input": "How many documents does the index baseball_1-player contain?", "Output": "The index baseball_1-player contains 10000 documents.", "validation": null}
+{"Input": "What is the total size taken by the index .plugins-ml-model?", "Output": "The index .plugins-ml-model has a total store size of 5.4gb.", "validation": null}
+{"Input": "What is the status of the index baseball_1-player_college?", "Output": "The status of the index baseball_1-player_college is yellow.", "validation": null}
+{"Input": "What is the number of documents in the index plaintext-version?", "Output": "The number of documents in the index plaintext-version is 80959.", "validation": null}
+{"Input": "How many replica shards does the index cre_theme_park-theme_parks have?", "Output": "The index cre_theme_park-theme_parks has 1 replica shard.", "validation": null}
+{"Input": "What is the store size taken by primary shards for the index plaintext-version-no-aos?", "Output": "The store size taken by primary shards for the index plaintext-version-no-aos is 930.2mb.", "validation": null}
+{"Input": "What is the number of documents deleted in the index baseball_1-pitching?", "Output": "The number of documents deleted in the index baseball_1-pitching is 0.", "validation": null}
+{"Input": "What is the total size of the .plugins-ml-model index?", "Output": "The total size of the .plugins-ml-model index is 2.1gb.", "validation": null}
+{"Input": "Which index has the most documents in my cluster?", "Output": "The index with the most documents is plaintext-version with 80959 documents.", "validation": null}
+{"Input": "How many non-system indices are in the green status?", "Output": "There are 0 non-system indices with green status.", "validation": null}
+{"Input": "What is the document count of the .plugins-ml-task index?", "Output": "The .plugins-ml-task index has 15 documents.", "validation": null}
+{"Input": "Which index has the smallest store size in my cluster?", "Output": "The index with the smallest store size is plaintext with 208 bytes.", "validation": null}
+{"Input": "What is the total number of documents across all indices in the cluster?", "Output": "The total number of documents across all indices is 195,501.", "validation": null}
+{"Input": "Which index has the most documents?", "Output": "The plaintext-version index has the most documents at 80,959.", "validation": null}
+{"Input": "How many indices have a health status of yellow?", "Output": "44 indices have a health status of yellow.", "validation": null}
+{"Input": "What is the total storage used for primary shards across all indices?", "Output": "The total primary shards storage used across all indices is 7.8gb.", "validation": null}
+{"Input": "What is the status of the index baseball_1-pitching?", "Output": "The index baseball_1-pitching has status yellow.", "validation": null}
+{"Input": "How many replica shards does the index browser_web-web_client_accelerator have?", "Output": "The index browser_web-web_client_accelerator has 1 replica shard.", "validation": null}
+{"Input": "What is the pri.store.size of the index formula_1-constructorresults?", "Output": "The pri.store.size of the index formula_1-constructorresults is 430.3kb.", "validation": null}
+{"Input": "How many documents are in the index college_2-student?", "Output": "The index college_2-student has 2000 documents.", "validation": null}
+{"Input": "What is the health status of the .plugins-ml-model index?", "Output": "The index .plugins-ml-model has a health status of green.", "validation": null}
+{"Input": "What is the status of the security-auditlog-2023.10.25 index?", "Output": "The status of the security-auditlog-2023.10.25 index is yellow open.", "validation": null}
+{"Input": "How many documents are in the .plugins-ml-model index?", "Output": "The .plugins-ml-model index has 460 documents.", "validation": null}
+{"Input": "Can you tell me about the index with the largest store size in the cluster?", "Output": "The index with the largest store size is .plugins-ml-model with a store size of 5.4gb.", "validation": null}
+{"Input": "What is the health status of the .kibana_1 index?", "Output": "The health status of the .kibana_1 index is green open.", "validation": null}
+{"Input": "What is the total number of documents across all user indices in my cluster?", "Output": "There are 80959 total documents across all user indices in the cluster.", "validation": null}
+{"Input": "Which user index has the most primary shards in my cluster?", "Output": "The plaintext-version index has the most primary shards of any user index at 1 primary shard.", "validation": null}
+{"Input": "How many system indices are there in my cluster?", "Output": "There are 5 system indices in the cluster: .kibana_1, .opendistro_security, .plugins-ml-connector, .plugins-ml-model-group, and .plugins-ml-task.", "validation": null}
+{"Input": "What is the health status of the index .plugins-ml-connector?", "Output": "The health status of the index .plugins-ml-connector is green.", "validation": null}
+{"Input": "How many primary shards does the index security-auditlog-2023.10.25 have?", "Output": "The index security-auditlog-2023.10.25 has 1 primary shard.", "validation": null}
+{"Input": "What is the index name with the largest store size?", "Output": "The index name with the largest store size is .plugins-ml-model with a store size of 2.1 GB.", "validation": null}
+{"Input": "Does the index .kibana_1 have any replica shards?", "Output": "No, the index .kibana_1 does not have any replica shards.", "validation": null}
+{"Input": "What is the status of the index called baseball_1-player?", "Output": "The status of the baseball_1-player index is yellow open.", "validation": null}
+{"Input": "How many documents are in the index customers_and_invoices-invoices?", "Output": "The customers_and_invoices-invoices index contains 15 documents.", "validation": null}
+{"Input": "What is the store size of the index called company_1-employee?", "Output": "The store size of the company_1-employee index is 10.2kb.", "validation": null}
+{"Input": "What is the status of the index called baseball_1-batting?", "Output": "The index baseball_1-batting has a status of yellow.", "validation": null}
+{"Input": "How many documents does the index called baseball_1-team contain?", "Output": "The index baseball_1-team contains 2805 documents.", "validation": null}
+{"Input": "What is the size of the primary shards for the index called baseball_1-player?", "Output": "The primary shards for the index baseball_1-player take up 4mb.", "validation": null}
+{"Input": "How many documents does the index called customers_and_addresses-customers have?", "Output": "The index customers_and_addresses-customers contains 15 documents.", "validation": null}
+{"Input": "What is the health status of the index called .plugins-ml-model?", "Output": "The index .plugins-ml-model has a health status of green.", "validation": null}
+{"Input": "Which index has the most documents in my cluster?", "Output": "The plaintext-version index has the most documents in your cluster at 80,959.", "validation": null}
+{"Input": "What is the total size taken by primary shards across all indices?", "Output": "The total size taken by primary shards across all indices is 6.8 GB.", "validation": null}
+{"Input": "How many indices have a health status of yellow?", "Output": "There are 43 indices that have a health status of yellow.", "validation": null}
+{"Input": "What is the document count and health status of the .plugins-ml-connector index?", "Output": "The .plugins-ml-connector index has a document count of 11 and a health status of green.", "validation": null}
+{"Input": "Which index has the smallest store size in my cluster?", "Output": "The smallest index by store size is plaintext with 208 bytes.", "validation": null}
+{"Input": "What is the health status of the index baseball_1-appearances?", "Output": "The health status of the index baseball_1-appearances is yellow.", "validation": null}
+{"Input": "How many primary shards does the index customers_and_invoices-orders have?", "Output": "The index customers_and_invoices-orders has 1 primary shard.", "validation": null}
+{"Input": "What is the total size taken by primary and replica shards for the index cre_theme_park-theme_parks?", "Output": "The total size taken by primary and replica shards for the index cre_theme_park-theme_parks is 4.5kb.", "validation": null}
