@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
+import { CoreSetup, CoreStart, Plugin, PluginInitializerContext } from '../../../src/core/public';
 import {
   createOpenSearchDashboardsReactContext,
   toMountPoint,
@@ -24,8 +24,19 @@ import {
 
 export const [getCoreStart, setCoreStart] = createGetterSetter<CoreStart>('CoreStart');
 
+interface PublicConfig {
+  chat: {
+    enabled: boolean;
+  };
+}
+
 export class AssistantPlugin
   implements Plugin<AssistantSetup, AssistantStart, SetupDependencies, AppPluginStartDependencies> {
+  private config: PublicConfig;
+  constructor(initializerContext: PluginInitializerContext) {
+    this.config = initializerContext.config.get<PublicConfig>();
+  }
+
   public setup(
     core: CoreSetup<AppPluginStartDependencies>,
     setupDeps: SetupDependencies
@@ -48,27 +59,29 @@ export class AssistantPlugin
       };
     })();
 
-    core.getStartServices().then(async ([coreStart, startDeps]) => {
-      const CoreContext = createOpenSearchDashboardsReactContext<AssistantServices>({
-        ...coreStart,
-        setupDeps,
-        startDeps,
+    if (this.config.chat.enabled) {
+      core.getStartServices().then(async ([coreStart, startDeps]) => {
+        const CoreContext = createOpenSearchDashboardsReactContext<AssistantServices>({
+          ...coreStart,
+          setupDeps,
+          startDeps,
+        });
+        coreStart.chrome.navControls.registerRight({
+          order: 10000,
+          mount: toMountPoint(
+            <CoreContext.Provider>
+              <HeaderChatButton
+                application={coreStart.application}
+                chatEnabled={await assistantEnabled()}
+                contentRenderers={contentRenderers}
+                actionExecutors={actionExecutors}
+                assistantActions={assistantActions}
+              />
+            </CoreContext.Provider>
+          ),
+        });
       });
-      coreStart.chrome.navControls.registerRight({
-        order: 10000,
-        mount: toMountPoint(
-          <CoreContext.Provider>
-            <HeaderChatButton
-              application={coreStart.application}
-              chatEnabled={await assistantEnabled()}
-              contentRenderers={contentRenderers}
-              actionExecutors={actionExecutors}
-              assistantActions={assistantActions}
-            />
-          </CoreContext.Provider>
-        ),
-      });
-    });
+    }
 
     return {
       registerContentRenderer: (contentType, render) => {
