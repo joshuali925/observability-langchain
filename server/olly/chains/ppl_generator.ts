@@ -63,6 +63,9 @@ PPL: source=\`accounts\` | where \`firstname\` = 'Hattie' OR \`lastname\` = 'fra
 Question: Find the documents in index 'accounts' where firstname is not 'Hattie' and lastname is not 'Frank'
 PPL: source=\`accounts\` | where \`firstname\` != 'Hattie' AND \`lastname\` != 'frank'
 
+Question: Find the emails that contain '.com' in index 'accounts'
+PPL: source=\`accounts\` | where QUERY_STRING(['email'], '.com') | fields \`email\`
+
 Question: Find the documents in index 'accounts' where there is an email
 PPL: source=\`accounts\` | where ISNOTNULL(\`email\`)
 
@@ -86,12 +89,6 @@ PPL: source=\`accounts\` | stats AVG(\`age\`) AS \`avg_age\`, MIN(\`age\`) AS \`
 
 Question: Show all states sorted by average balance. index is 'accounts'
 PPL: source=\`accounts\` | stats AVG(\`balance\`) AS \`avg_balance\` BY \`state\` | sort +avg_balance
-
-Question: Find the fullname of people with address or email containing 'place', and divide their age by 2 rounded up and rounded down. index is 'accounts'
-PPL: source=\`accounts\` | where QUERY_STRING(['address', 'email'], 'place') | eval fullname = CONCAT_WS(' ', firstname, lastname), \`age_round_up\` = CEIL(\`age\` / 2), \`age_round_down\` = FLOOR(\`age\` / 2) | fields \`fullname\`, \`age_round_up\`, \`age_round_down\`
-
-Question: Prepend 'hello ' to first name, append ' world' to last name, and replace '.com' with '.org' in email and make email uppercase. index is 'accounts'
-PPL: source=\`accounts\` | eval \`firstname\` = CONCAT('hello ', \`firstname\`), \`lastname\` = CONCAT(\`lastname\`, ' world'), \`email\` = UPPER(REPLACE(\`email\`, '.com', '.org'))
 
 ----------------
 
@@ -148,11 +145,11 @@ Fields:
 Question: What is the average price of products in clothing category ordered in the last 7 days? index is 'ecommerce'
 PPL: source=\`ecommerce\` | where QUERY_STRING(['category'], 'clothing') AND \`order_date\` > DATE_SUB(NOW(), INTERVAL 7 DAY) | stats AVG(\`taxful_total_price\`) AS \`avg_price\`
 
-Question: What is the average price rounded to two decimal places of products in each city ordered today by every 2 hours? index is 'ecommerce'
-PPL: source=\`ecommerce\` | where \`order_date\` > DATE_SUB(NOW(), INTERVAL 24 HOUR) | stats AVG(\`taxful_total_price\`) AS \`avg_price\` by SPAN(\`order_date\`, 2h) AS \`span\`, \`geoip.city_name\` | eval \`rounded_avg_price\` = ROUND(\`avg_price\`, 2) | fields \`rounded_avg_price\`, \`span\`
+Question: What is the average price of products in each city ordered today by every 2 hours? index is 'ecommerce'
+PPL: source=\`ecommerce\` | where \`order_date\` > DATE_SUB(NOW(), INTERVAL 24 HOUR) | stats AVG(\`taxful_total_price\`) AS \`avg_price\` by SPAN(\`order_date\`, 2h) AS \`span\`, \`geoip.city_name\`
 
-Question: What is the total revenue rounded to the nearest integer of shoes each day in this week? index is 'ecommerce'
-PPL: source=\`ecommerce\` | where QUERY_STRING(['category'], 'shoes') AND \`order_date\` > DATE_SUB(NOW(), INTERVAL 1 WEEK) | stats SUM(\`taxful_total_price\`) AS \`revenue\` by SPAN(\`order_date\`, 1d) AS span | eval \`rounded_revenue\` = ROUND(\`revenue\`, 0) | fields \`rounded_revenue\`, \`span\`
+Question: What is the total revenue of shoes each day in this week? index is 'ecommerce'
+PPL: source=\`ecommerce\` | where QUERY_STRING(['category'], 'shoes') AND \`order_date\` > DATE_SUB(NOW(), INTERVAL 1 WEEK) | stats SUM(\`taxful_total_price\`) AS \`revenue\` by SPAN(\`order_date\`, 1d) AS \`span\`
 
 ----------------
 
@@ -227,8 +224,6 @@ Step 3. Use the choosen fields to write the PPL query. Rules:
 #06 You must put values in quotes when filtering fields with \`text\` or \`keyword\` field type.
 #07 To find documents that contain certain phrases in string fields, use \`QUERY_STRING\` which supports multiple fields and wildcard, eg. "where QUERY_STRING(['field1', 'field2'], 'prefix*')".
 #08 To find 4xx and 5xx errors using status code, if the status code field type is numberic (eg. \`integer\`), then use 'where \`status_code\` >= 400'; if the field is a string (eg. \`text\` or \`keyword\`), then use "where QUERY_STRING(['status_code'], '4* OR 5*')".
-#09 To return specific fields, use the \`fields\` command, eg. 'fields \`field1\`, \`field2\`, \`field3\`'. Note it only accepts exact field names as parameters.
-#10 To run a function on a field, use \`eval\` with \`fields\` command, eg. 'eval \`new_field\` = \`field\` * 2 | fields \`new_field\`'.
 
 ----------------
 Put your PPL query in <ppl> tags.
@@ -248,6 +243,10 @@ export const requestPPLGeneratorChain = async (
   callbacks?: Callbacks
 ): Promise<{ query: string }> => {
   const chain = new LLMChain({ llm: model, prompt });
+  const d = new Date();
+  const date = `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${(
+    '0' + d.getDate()
+  ).slice(-2)}`;
   const output = await chain.call({ question }, callbacks);
   const match = output.text.match(/<ppl>((.|[\r\n])+?)<\/ppl>/);
   if (match && match[1])
