@@ -9,15 +9,15 @@ import { loadQAStuffChain } from 'langchain/chains';
 import { Document } from 'langchain/document';
 import { OpenSearchClient } from '../../../../../src/core/server';
 import { SummarizationRequestSchema } from '../../routes/langchain_routes';
-import { generateFieldContext } from '../utils/ppl_generator';
 import { truncate } from '../utils/utils';
+import { requestQuerySuggestionsChain } from './query_suggestions_generator';
 
 interface SummarizationContext extends SummarizationRequestSchema {
   client: OpenSearchClient;
   model: BaseLanguageModel;
 }
 
-const createPrompt = async (context: SummarizationContext) => {
+const createPrompt = (context: SummarizationContext) => {
   if (!context.isError) {
     return `You will be given a search response, summarize it as a concise paragraph while considering the following:
 User's question on index '${context.index}': ${context.question}
@@ -28,34 +28,13 @@ Give some documents to support your point.
 Skip the introduction; go straight into the summarization.`;
   }
 
-  const [mappings, sampleDoc] = await Promise.all([
-    context.client.indices.getMapping({ index: context.index }),
-    context.client.search({ index: context.index, size: 1 }),
-  ]);
-  const fields = generateFieldContext(mappings, sampleDoc);
-
   return `You will be given an API response with errors, summarize it as a concise paragraph. Do not try to answer the user's question.
-If the error cannot be fixed, eg. no such field or function not supported, then give suggestions to rephrase the question and give 'https://opensearch.org/docs/latest/search-plugins/sql/ppl/index/' as documentations.
+If the error cannot be fixed, eg. no such field or function not supported, then give suggestions to rephrase the question.
 Otherwise give some suggestions on how to fix the error.
 
 Consider the following:
 User's question on index '${context.index}': ${context.question}
 ${context.query ? 'PPL (Piped Processing Language) query used: ' + context.query : ''}
-
-Additionally recommend 2 or 3 possible questions related to user's question on this index given the fields below. Only give the questions, do not give descriptions of questions and do not give PPL queries. Example:
-
-Some questions you can ask:
-- <question1>
-- <question2>
-- <question3>
-
-The format for a field is
-\`\`\`
-- field_name: field_type (sample field value)
-\`\`\`
-
-Fields:
-${fields}
 
 Skip the introduction; go straight into the summarization.`;
 };
@@ -75,7 +54,16 @@ export const requestSummarizationChain = async (
   const chain = loadQAStuffChain(context.model);
   // vector search doesn't help much since the response is already retrieved based on user's question
   const docs = [new Document({ pageContent: truncate(context.response) })];
-  const question = await createPrompt(context);
-  const output = await chain.call({ input_documents: docs, question }, { callbacks });
-  return output.text;
+  const question = createPrompt(context);
+  const [output, suggestions] = await Promise.all([
+    chain.call({ input_documents: docs, question }, { callbacks }),
+    requestQuerySuggestionsChain(
+      context.model,
+      context.client,
+      context.index,
+      context.question,
+      callbacks
+    ),
+  ]);
+  return { summary: output.text, suggestedQuestions: suggestions };
 };

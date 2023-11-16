@@ -79,11 +79,11 @@ export function registerLangchainRoutes(router: IRouter) {
         const opensearchClient = context.core.opensearch.client.asCurrentUser;
         const callbacks = [new OpenSearchTracer(opensearchClient, traceId, runs)];
         const model = LLMModelFactory.createModel({ client: opensearchClient });
-        const summarized = await requestSummarizationChain(
+        const chainResponse = await requestSummarizationChain(
           { client: opensearchClient, model, ...request.body },
           callbacks
         );
-        return response.ok({ body: summarized });
+        return response.ok({ body: chainResponse });
       } catch (error) {
         context.assistant_plugin.logger.warn(error);
         return response.custom({ statusCode: error.statusCode || 500, body: error.message });
