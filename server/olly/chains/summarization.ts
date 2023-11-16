@@ -57,13 +57,7 @@ export const requestSummarizationChain = async (
   const question = createPrompt(context);
   const [output, suggestions] = await Promise.all([
     chain.call({ input_documents: docs, question }, { callbacks }),
-    requestQuerySuggestionsChain(
-      context.model,
-      context.client,
-      context.index,
-      context.question,
-      callbacks
-    ),
+    requestQuerySuggestionsChain(context.model, context.client, context.index, callbacks),
   ]);
   return { summary: output.text, suggestedQuestions: suggestions };
 };

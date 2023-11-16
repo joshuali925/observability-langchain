@@ -14,7 +14,6 @@ export const requestQuerySuggestionsChain = async (
   model: BaseLanguageModel,
   client: OpenSearchClient,
   index: string,
-  question?: string,
   callbacks?: Callbacks
 ) => {
   const [mappings, sampleDoc] = await Promise.all([
@@ -24,11 +23,8 @@ export const requestQuerySuggestionsChain = async (
   const fields = generateFieldContext(mappings, sampleDoc);
   const prompt = new PromptTemplate({
     template: `OpenSearch index: {index}
-${question ? `User's question: ${question}` : ''}
 
-Recommend 2 or 3 possible questions ${
-      question ? "related to user's question " : ''
-    }on this index given the fields below. Only give the questions, do not give descriptions of questions and do not give PPL queries.
+Recommend 2 or 3 possible questions on this index given the fields below. Only give the questions, do not give descriptions of questions and do not give PPL queries.
 
 The format for a field is
 \`\`\`
