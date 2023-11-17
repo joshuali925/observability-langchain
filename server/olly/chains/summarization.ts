@@ -30,7 +30,7 @@ Skip the introduction; go straight into the summarization.`;
 
   return `You will be given an API response with errors, summarize it as a concise paragraph. Do not try to answer the user's question.
 If the error cannot be fixed, eg. no such field or function not supported, then give suggestions to rephrase the question.
-Otherwise give some suggestions on how to fix the error.
+It is imperative that you must not give suggestions on how to fix the error or alternative PPL query.
 
 Consider the following:
 User's question on index '${context.index}': ${context.question}
