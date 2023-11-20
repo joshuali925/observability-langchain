@@ -1,0 +1,2 @@
+Input: When did alert GThUkYsB6jqYe1T0UOF3 complete?
+Output: The alert with ID GThUkYsB6jqYe1T0UOF3 is not completed.

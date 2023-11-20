@@ -1,0 +1,2 @@
+Input: What findings were there for the document-level alert?
+Output: The alert triggered by monitor random_doc_monitor on November 4th had a finding with ID 286e854b-62d4-435b-8ebb-dc705efa219c.

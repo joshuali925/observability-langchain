@@ -1,0 +1,2 @@
+Input: What alerts are still in triggered state?
+Output: There are 3 alerts still in triggered state. An alert triggered by random_query_monitor on November 5th 4:02 PM, an alert triggered by random_doc_monitor on November 4th 3:30 PM, and an alert triggered by random_query_monitor on November 3rd 1:45 PM.

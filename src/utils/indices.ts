@@ -78,6 +78,7 @@ export class OpenSearchTestIndices {
       .split('\n')
       .filter((doc) => doc)
       .flatMap((doc) => [{ index: { _index: name } }, JSON.parse(doc) as object]);
+
     if (bulkBody.length > 0) await openSearchClient.bulk({ refresh: true, body: bulkBody });
     console.info(`created index ${name}`);
   }

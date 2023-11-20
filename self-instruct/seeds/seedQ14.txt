@@ -1,0 +1,2 @@
+Input: Of the 5 most recent alerts, how many were severity 3 or higher?
+Output: Of the 5 most recent alerts, 2 were severity 3 or higher. The alert triggered by monitor random_doc_monitor on November 4th 3:30 PM was severity 1, and the alert triggered by monitor random_comp_monitor on November 4th 3:30 PM was severity 1.

@@ -1,0 +1,2 @@
+Input: Which monitor has triggered the most alerts?
+Output: Recently, random_query_monitor has triggered the most alerts. It has triggered 4 alerts in the past week.

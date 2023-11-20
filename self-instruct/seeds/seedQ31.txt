@@ -1,0 +1,2 @@
+Input: What are all the related documents associated with the most recent alert from a document-level monitor?
+Output: The alert triggered by monitor random_doc_monitor on November 4th had a related document with ID YjhOl4sB6ex1.

@@ -1,0 +1,2 @@
+Input: Of all the alerts since yesterday, how many are low-severity alerts?
+Output: Of the 3 alerts triggered since yesterday, 1 was low-severity. It was triggered by random_query_monitor on November 5th.

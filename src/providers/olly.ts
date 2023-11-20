@@ -29,7 +29,10 @@ export class OllyApiProvider implements ApiProvider {
     context?: { vars: Record<string, string | object> },
   ): Promise<OllyProviderResponse> {
     try {
-      return ollyClient.sendMessage(prompt);
+      const prom = ollyClient.sendMessage(prompt);
+      console.log(`in olly: ${prom}`);
+      prom.then((val) => console.log(`resolved valu: ${val}`));
+      return prom;
     } catch (error) {
       console.error('Failed to request Olly:', error);
       return { error: `API call error: ${String(error)}` };

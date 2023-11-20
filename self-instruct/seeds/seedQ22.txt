@@ -1,0 +1,2 @@
+Input: When was the last notification for monitor random_doc_monitor sent?
+Output: The last notification for the most recent alert triggered on November 4th by monitor random_doc_monitor was sent on November 4th 3:34 PM.

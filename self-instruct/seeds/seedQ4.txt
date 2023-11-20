@@ -1,0 +1,2 @@
+Input: Show me additional information on the most recent alert.
+Output: The most recent alert has ID hDjvlhfB6jqY61T0PLK5. It has severity 4 and triggered on November 5th 4:02 PM. It is still currently active.

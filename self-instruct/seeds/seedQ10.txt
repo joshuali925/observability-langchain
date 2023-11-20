@@ -1,0 +1,2 @@
+Input: Can you list the triggers that have triggered alerts?
+Output: Triggers that have triggered alerts recently include the above200Trigger from monitor random_query_monitor, compositeTrigger from monitor random_comp_monitor, and docLevelTrigger from monitor random_doc_monitor.

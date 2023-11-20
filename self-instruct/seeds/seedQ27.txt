@@ -1,0 +1,2 @@
+Input: What alerts are in an error state?
+Output: There is 1 alert currently in an error state. The alert has ID QziGl4sB6jqYe1T0_fnD and was triggered by monitor random_error_monitor on October 31st.

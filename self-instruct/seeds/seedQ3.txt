@@ -1,0 +1,2 @@
+Input: Have there been any high-severity alerts in the last hour?
+Output: No, there have been no high-severity alerts in the last hour.

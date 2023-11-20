@@ -1,0 +1,2 @@
+Input: How many unacknowledged alerts are there?
+Output: There are 3 unacknowledged alerts. They were triggered by monitors random_query_monitor and random_doc_monitor from November 3rd to November 5th.

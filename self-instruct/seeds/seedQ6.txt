@@ -1,0 +1,2 @@
+Input: Have all alerts from monitor random_query_monitor been acknowledged?
+Output: No. random_query_monitor triggered alerts on November 3rd and November 5th that are still unacknowledged.

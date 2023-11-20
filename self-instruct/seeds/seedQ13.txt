@@ -1,0 +1,2 @@
+Input: Which trigger has triggered the most alerts?
+Output: Recently, the above200Trigger from monitor random_query_monitor has triggered the most alerts. It has triggered 3 alerts in the past week.

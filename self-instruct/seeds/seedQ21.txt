@@ -1,0 +1,2 @@
+Input: Show me the alerts triggered by random_query_monitor.
+Output: Recently, monitor random_query_monitor has triggered 4 alerts. It triggered alert ID dzhPl4sB6jqYe1T0ffaX with severity 2 on October 30th, which is completed, alert ID GThUkYsB6jqYe1T0UOF3 with severity 4 on November 2nd, which has been acknowledged, alert ID ODjvlosB6jqYe1T0MPKU with severity 4 on November 3rd, which is active, and alert ID hDjvlhfB6jqY61T0PLK5 with severity 4 on November 5th, which is active. 

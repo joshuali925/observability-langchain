@@ -1,0 +1,2 @@
+Input: What is the severity level of the most recent alert?
+Output: The severity of the most recent alert triggered by monitor random_query_monitor on November 5th is 4.

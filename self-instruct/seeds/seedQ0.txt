@@ -1,16 +1,2 @@
-Instruction:
-Show the transportation method most people choose to get to tourist attractions.
-Index:
-cre_theme_park-tourist_attractions
-Fields:
-- Location_ID: long (579)
-- How_to_Get_There: text (bus)
-- Attraction_Type_Code: long (2)
-- Name: text (art museum)
-- Tourist_Attraction_ID: long (2113)
-PPL Output:
-source=cre_theme_park-tourist_attractions
- | stats COUNT() AS count BY How_to_Get_There
- | sort -count
- | head 1
- | fields How_to_Get_There
+Input: Can you show me all alerts.
+Output: There are many alerts triggered in the OpenSearch cluster. Some recent active alerts include one from random_query_monitor with severity 4 triggered on November 5th that is still active, and one from random_doc_monitor with severity 1 triggered on November 4th.

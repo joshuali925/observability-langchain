@@ -1,0 +1,2 @@
+Input: What are the associated alerts for the alert with ID dzhPl4sB6jqYe1T0ffaX?
+Output: The alert with ID dzhPl4sB6jqYe1T0ffaX triggered by monitor random_comp_monitor is associated with alert IDs ODjvlosB6jqYe1T0MPKU and c1dc6e4b-1f71-4662-b444-a2b257546e3b.

@@ -1,78 +1,337 @@
-Here are some key points to consider when generating OpenSearch PPL (Piped Processing Language) queries:
-1.Source Selection: Begin by specifying the source of data for your PPL query using the source clause. This can be an index name, a pattern, or a combination of multiple sources.
-e.g.
-source=my_index
-| fields field1, field2
+You are an assistant that helps users understand their alerts in OpenSearch using the Get Alerts API. The Get Alerts API response is in JSON format, and the response object contains a field named "alerts" whose value is a list of alert objects. Here is some more description on the fields contained inside each alert object, which are stored in the following order:
 
-2.Transformations: Use transformation functions to manipulate and transform the data as needed. Functions like where, sort, fields, and stats can be used to filter documents, sort results, select specific fields, and perform aggregations respectively.
-e.g.
-source=my_index
-| Where field1 > 100
-| sort - field2, + fields1
-| fields field1, field2
+1. id: shows the ID of the alert.
 
-3.Filtering: Apply filters to narrow down the data based on specific conditions. Use the where function or specific where clauses to define filtering conditions. For example, you can filter based on field values, date ranges, or nested conditions.
-e.g.
-source=my_index
-| where field1 > 100 AND field2 = "value"
-| fields field1, field2
+2. version: shows the version number of the alert.
 
-4.Aggregations: Utilize aggregations to calculate summaries or statistics over the data. Aggregations like  stats, avg, sum, and more can be used to aggregate and analyze the data based on specific fields or criteria.
-e.g
-source=my_index
-| stats count() as total_count, avg(field1) as average_field1 by field2
+3. monitor_id: shows the ID of the Monitor that triggered the alert.
 
-5.Sorting: Order the results using the sort function. Specify the field(s) and the desired sort order (ascending for "+" or descending for "-") to control the order of the returned documents.
-e.g.
-source=my_index
-| sort - field1
-| fields field1, field2
+4. workflow_id: only applicable to composite monitors. Shows the ID of the composite monitor workflow that triggered the alert.
 
-6.Limiting Results: Control the number of results returned using the head function. This allows you to specify the maximum number of documents to retrieve.
-e.g.
-source=my_index
-| head 10
-| fields field1, field2
+5. workflow_name: only applicable to composite monitors. Shows the name of the composite monitor workflow that triggered the alert.
 
-7.Pagination: Implement pagination using the from and size parameters. from specifies the starting index of the documents, and size determines the number of documents to retrieve.
-e.g.
-source=my_index
-| from 10 size 10
-| fields field1, field2
+6. associated_alert_ids: only applicable to composite monitors. Shows the IDs of all sub-alerts triggered by the composite monitor's sub-monitors that led to triggering the composite monitor's overall alert.
 
-8.Distinct: You can use function 'dedup' to filter different result. The dedup (data deduplication) command removes duplicate documents defined by a field from the search result.
-e.g.
-source=my_index
-| dedup field2
-| fields field3
+7. schema_version: shows the schema version of the relevant internally stored index.
 
-9. Distinct Count: You can use function 'DISTINCT_COUNT' to count unique number of one specific fields.
-e.g.
-source=my_index
-| stats DISTINCT_COUNT(field1) as unique_field1_number
+8. monitor_version: shows the version number of the Monitor that triggered the alert.
 
-10. date: If the type is date, you must use format "yy-mm-dd hh:mm:ss"
-e.g
-source=my_index
-| WHERE date_field > "2020-9-10 23:59:59"
+9. monitor_name: shows the name of the Monitor that triggered the alert.
 
-or use a function to create a date
-e.g.
-source=my_index
-| WHERE date_field < DATE_SUB(NOW(), INTERVAL 7 DAY)
+10. execution_id: shows the ID of the execution that triggered the alert.
 
-You will be given some of my examples, each containing: Instruction, Index, Fields, PPL Output.
-The format for a field is `- field_name: field_type (sample field value)`.
+11. trigger_id: shows the ID of the trigger that triggered the alert.
 
-Please write 3 more examples using the same format using the same format. Please mimic the examples. Please don't repeat my examples.
+12. trigger_name: shows the name of the trigger that triggered the alert.
+
+13. finding_ids: only applicable to document-level monitors. The list of IDs for document findings that satisfied the document-level monitor alert condition.
+
+14. related_doc_ids: only applicable to document-level monitors. The list of IDs for documents that satisfied the document-level monitor alert condition.
+
+15. state: shows the current state of the alarm. Supported values are ACTIVE, ACKNOWLEDGED, COMPLETED, ERROR, DELETED, AUDIT.
+
+16. error_message: shows the error message associated with the alarm.
+
+17. alert_history: a list of objects where each object represents a past trigger of the alert. Each object contains a "timestamp" field, which shows the time that the alert began triggering in millisecond Unix epoch time format, and a "message" field, which shows information about the alert.
+
+18. severity: shows the severity of the alert as a number in the inclusive range of 1 to 5, where 1 is Highest severity, 2 is High severity, 3 is Medium severity, 4 is Low severity, 5 is Lowest severity.
+
+19. action_execution_results: a list of alert notification actions executed for the alert. Each element of the list is an object, with fields action_id, representing the ID of the alert notification action, last_execution_time, the time of the last executed notification action, and throttled_count, the number of times the notification action was throttled.
+
+20. start_time: shows the time that the alert began triggering in millisecond Unix epoch time format.
+
+21. last_notification_time: shows the time that the last notification about the alert was sent in millisecond Unix epoch time format.
+
+22. end_time: shows the time that the alert exited ACTIVE state and transitioned to a resolved state in millisecond Unix epoch time format. If this value is null, it means the alert is still currently active.
+
+23. acknowledge_time: shows the time that the alert was acknowledged and moved to ACKNOWLEDGED state in millisecond Unix epoch time format. If this value is null, it means the alert has not yet been acknowledged.
+
+Now, you should give some questions with input and output. The generated questions should include an input (the question being asked) and an output (the correct response to the question). The context is that the current date and time is November 5th, 2023 5:00PM, and the Get Alerts API response is as below:
+
+{
+  "alerts": [
+    {
+      "id": "0OgfsOs5t6yqi81f3yj18",
+      "version": 1,
+      "monitor_id": "tDgzgosB6jqYe1T04dBk",
+      "workflow_id": "",
+      "workflow_name": "",
+      "associated_alert_ids": [],
+      "schema_version": 5,
+      "monitor_version": 1,
+      "monitor_name": "random_query_monitor",
+      "execution_id": "tDgzgosB6jqYe1T04dBk_2023-10-27T20:09:39.833938_9bddfb4b-8396-4b99-a198-bed9df4cb1c7",
+      "trigger_id": "szgzgosB6jqYe1T04NCN",
+      "trigger_name": "above500Trigger",
+      "finding_ids": [],
+      "related_doc_ids": [],
+      "state": "COMPLETED",
+      "error_message": null,
+      "alert_history": [],
+      "severity": "2",
+      "action_execution_results": [],
+      "start_time": 1698446065000,
+      "last_notification_time": 1698449665000,
+      "end_time": 1698453265000,
+      "acknowledged_time": null
+    },
+    {
+      "id": "k9gf4os5tkqi81f3y988",
+      "version": 1,
+      "monitor_id": "tDgzgosB6jqYe1T04dBk",
+      "workflow_id": "",
+      "workflow_name": "",
+      "associated_alert_ids": [],
+      "schema_version": 5,
+      "monitor_version": 1,
+      "monitor_name": "random_query_monitor",
+      "execution_id": "tDgzgosB6jqYe1T04dBk_2023-10-28T20:09:39.833938_9bddfb4b-8396-4b99-a198-bed9df4cb1c7",
+      "trigger_id": "szgzgosB6jqYe1T04NCN",
+      "trigger_name": "above500Trigger",
+      "finding_ids": [],
+      "related_doc_ids": [],
+      "state": "COMPLETED",
+      "error_message": null,
+      "alert_history": [],
+      "severity": "2",
+      "action_execution_results": [],
+      "start_time": 1698532465000,
+      "last_notification_time": 1698536065000,
+      "end_time": 1698539665000,
+      "acknowledged_time": null
+    },
+    {
+      "id": "Xugf4osB7kqi81T0y9pw",
+      "version": 1,
+      "monitor_id": "tDgzgosB6jqYe1T04dBk",
+      "workflow_id": "",
+      "workflow_name": "",
+      "associated_alert_ids": [],
+      "schema_version": 5,
+      "monitor_version": 1,
+      "monitor_name": "random_query_monitor",
+      "execution_id": "tDgzgosB6jqYe1T04dBk_2023-10-29T20:09:39.833938_9bddfb4b-8396-4b99-a198-bed9df4cb1c7",
+      "trigger_id": "szgzgosB6jqYe1T04NCN",
+      "trigger_name": "above500Trigger",
+      "finding_ids": [],
+      "related_doc_ids": [],
+      "state": "COMPLETED",
+      "error_message": null,
+      "alert_history": [],
+      "severity": "2",
+      "action_execution_results": [],
+      "start_time": 1698618865000,
+      "last_notification_time": 1698622465000,
+      "end_time": 1698626065000,
+      "acknowledged_time": null
+    },
+    {
+      "id": "uzg0gosB6jqYe1T0y9Aa",
+      "version": 1,
+      "monitor_id": "tDgzgosB6jqYe1T04dBk",
+      "workflow_id": "",
+      "workflow_name": "",
+      "associated_alert_ids": [],
+      "schema_version": 5,
+      "monitor_version": 1,
+      "monitor_name": "random_query_monitor",
+      "execution_id": "tDgzgosB6jqYe1T04dBk_2023-10-30T20:09:39.833938_9bddfb4b-8396-4b99-a198-bed9df4cb1c7",
+      "trigger_id": "szgzgosB6jqYe1T04NCN",
+      "trigger_name": "above500Trigger",
+      "finding_ids": [],
+      "related_doc_ids": [],
+      "state": "COMPLETED",
+      "error_message": null,
+      "alert_history": [],
+      "severity": "2",
+      "action_execution_results": [],
+      "start_time": 1698696579862,
+      "last_notification_time": 1698714112502,
+      "end_time": 1698719179926,
+      "acknowledged_time": null
+    },
+    {
+      "id": "QziGl4sB6jqYe1T0_fnD",
+      "version": 1006,
+      "monitor_id": "HziGl4sB6jqYe1T0E_kr",
+      "workflow_id": "",
+      "workflow_name": "",
+      "associated_alert_ids": [],
+      "schema_version": 5,
+      "monitor_version": 2,
+      "monitor_name": "random_error_monitor",
+      "execution_id": "HziGl4sB6jqYe1T0E_kr_2023-10-31T23:31:28.267704_a24fd415-c561-4d0f-915b-61aaff304bcc",
+      "trigger_id": "HjiGl4sB6jqYe1T0E_kn",
+      "trigger_name": "errorTrigger",
+      "finding_ids": [],
+      "related_doc_ids": [],
+      "state": "ERROR",
+      "error_message": """Failed evaluating trigger:
+ctx.results.hits.total.value > 100
+           ^---- HERE""",
+      "alert_history": [
+        {
+          "timestamp": 1698796534000,
+          "message": """Failed evaluating trigger:
+ctx.results.hits.total.value > 100
+           ^---- HERE"""
+        },
+        {
+          "timestamp": 1698795754000,
+          "message": """Failed evaluating trigger:
+ctx.results.hits.total.value > 100
+           ^---- HERE"""
+        }
+      ],
+      "severity": "5",
+      "action_execution_results": [],
+      "start_time": 1698795694000,
+      "last_notification_time": 1698796594000,
+      "end_time": null,
+      "acknowledged_time": null
+    },
+    {
+      "id": "GThUkYsB6jqYe1T0UOF3",
+      "version": 1,
+      "monitor_id": "tDgzgosB6jqYe1T04dBk",
+      "workflow_id": "",
+      "workflow_name": "",
+      "associated_alert_ids": [],
+      "schema_version": 5,
+      "monitor_version": 2,
+      "monitor_name": "random_query_monitor",
+      "execution_id": "tDgzgosB6jqYe1T04dBk_2023-11-02T18:38:23.839741_cee0d211-91b5-4624-b548-b1beae17ddbf",
+      "trigger_id": "szgzgosB6jqYe1T04NCN",
+      "trigger_name": "above200Trigger",
+      "finding_ids": [],
+      "related_doc_ids": [],
+      "state": "ACKNOWLEDGED",
+      "error_message": null,
+      "alert_history": [],
+      "severity": "4",
+      "action_execution_results": [],
+      "start_time": 1698950303862,
+      "last_notification_time": 1698950319839,
+      "end_time": null,
+      "acknowledged_time": 1698950340977
+    },
+    {
+      "id": "ODjvlosB6jqYe1T0MPKU",
+      "version": 1,
+      "monitor_id": "tDgzgosB6jqYe1T04dBk",
+      "workflow_id": "",
+      "workflow_name": "",
+      "associated_alert_ids": [],
+      "schema_version": 5,
+      "monitor_version": 5,
+      "monitor_name": "random_query_monitor",
+      "execution_id": "tDgzgosB6jqYe1T04dBk_2023-11-03T20:45:39.828046_bf3e21e8-34f9-442d-9450-2fac9bf3ae84",
+      "trigger_id": "szgzgosB6jqYe1T04NCN",
+      "trigger_name": "above200Trigger",
+      "finding_ids": [],
+      "related_doc_ids": [],
+      "state": "ACTIVE",
+      "error_message": null,
+      "alert_history": [],
+      "severity": "4",
+      "action_execution_results": [],
+      "start_time": 1699044339860,
+      "last_notification_time": 1699053639840,
+      "end_time": null,
+      "acknowledged_time": null
+    },
+    {
+      "id": "c1dc6e4b-1f71-4662-b444-a2b257546e3b",
+      "version": 1,
+      "monitor_id": "UzhXkosB6jqYe1T0b-Rb",
+      "workflow_id": "",
+      "workflow_name": "",
+      "associated_alert_ids": [],
+      "schema_version": 5,
+      "monitor_version": 12,
+      "monitor_name": "random_doc_monitor",
+      "execution_id": "UzhXkosB6jqYe1T0b-Rb_2023-11-04T22:30:25.590729_f79893f6-754c-402c-b764-9febf486b1dc",
+      "trigger_id": "CTgpl4sB6jqYe1T0SfTO",
+      "trigger_name": "docLevelTrigger",
+      "finding_ids": [
+        "286e854b-62d4-435b-8ebb-dc705efa219c"
+      ],
+      "related_doc_ids": [
+        "YjhOl4sB6ex1"
+      ],
+      "state": "ACTIVE",
+      "error_message": null,
+      "alert_history": [],
+      "severity": "1",
+      "action_execution_results": [],
+      "start_time": 1699137025000,
+      "last_notification_time": 1699137265000,
+      "end_time": null,
+      "acknowledged_time": null
+    },
+    {
+      "id": "dzhPl4sB6jqYe1T0ffaX",
+      "version": 1,
+      "monitor_id": "",
+      "workflow_id": "FTiBkosB6jqYe1T07-VH",
+      "workflow_name": "random_comp_monitor",
+      "associated_alert_ids": [
+        "ODjvlosB6jqYe1T0MPKU",
+        "c1dc6e4b-1f71-4662-b444-a2b257546e3b"
+      ],
+      "schema_version": 5,
+      "monitor_version": -1,
+      "monitor_name": "",
+      "execution_id": "FTiBkosB6jqYe1T07-VH_2023-11-04T22:30:50.816820_f57e4ea1-f57e-4678-98c8-a33912ebbb07",
+      "trigger_id": "EjiBkosB6jqYe1T07-U8",
+      "trigger_name": "compositeTrigger",
+      "finding_ids": [],
+      "related_doc_ids": [],
+      "state": "COMPLETED",
+      "error_message": null,
+      "alert_history": [],
+      "severity": "1",
+      "action_execution_results": [],
+      "start_time": 1699137051000,
+      "last_notification_time": 1699137081000,
+      "end_time": 1699137171000,
+      "acknowledged_time": null
+    },
+    {
+      "id": "hDjvlhfB6jqY61T0PLK5",
+      "version": 1,
+      "monitor_id": "tDgzgosB6jqYe1T04dBk",
+      "workflow_id": "",
+      "workflow_name": "",
+      "associated_alert_ids": [],
+      "schema_version": 5,
+      "monitor_version": 5,
+      "monitor_name": "random_query_monitor",
+      "execution_id": "tDgzgosB6jqYe1T04dBk_2023-11-05T23:02:34.828046_bf3e21e8-34f9-442d-9450-2fac9bf3ae84",
+      "trigger_id": "szgzgosB6jqYe1T04NCN",
+      "trigger_name": "above200Trigger",
+      "finding_ids": [],
+      "related_doc_ids": [],
+      "state": "ACTIVE",
+      "error_message": null,
+      "alert_history": [],
+      "severity": "4",
+      "action_execution_results": [],
+      "start_time": 1699228954000,
+      "last_notification_time": 1699230094000,
+      "end_time": null,
+      "acknowledged_time": null
+    }
+  ],
+  "totalAlerts": 10
+}
 
 Here are the requirements:
-1. Create a variety of indices with more than 10 diverse Fields to be used in examples. Do not copy from my examples.
-2. Try not to repeat the verb and column names for each instruction to maximize diversity.
-3. The instructions should be diverse in terms of OpenSearch PPL question and answers.
-4. The language used for the instruction also should be diverse. For example, you should combine questions with imperative instructions, and each instruction should be 1 to 5 sentences long.
-5. The instructions should be related to OpenSearch and OpenSearch PPL, please note that OpenSearch is same with ElasticSearch.
-6. A claude language model should be able to complete the instruction. For example, do not ask the assistant to create any visual or audio output. For another example, do not ask the assistant to wake you up at 5pm or set a reminder because it cannot perform any action.
 
-My examples:
+1. Do not reuse the same questions.
+2. Keep the questions unique, do not reuse similar questions.
+3. Maintain the same format as the examples, like so:
+Input:
+Output:
 
+Here are some examples:

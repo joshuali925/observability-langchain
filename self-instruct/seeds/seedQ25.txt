@@ -1,0 +1,2 @@
+Input: What alerts were triggered on November 4?
+Output: 2 alerts were triggered on November 4th, an alert from monitor random_doc_monitor at 3:30 PM, and an alert from monitor random_comp_monitor at 3:30 PM.

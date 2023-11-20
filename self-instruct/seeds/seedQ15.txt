@@ -1,0 +1,2 @@
+Input: Have all high severity alerts been acknowledged?
+Output: No, the alert triggered by monitor random_doc_monitor on November 4th has severity 1 and is currently active, but has not been acknowledged.

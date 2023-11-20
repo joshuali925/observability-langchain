@@ -1,0 +1,2 @@
+Input: Show me all the alerts with the highest severity that have not yet been acknowledged.
+Output: There is 1 alert with severity 1 that has not been acknowledged. It was triggered by random_doc_monitor on November 4th.

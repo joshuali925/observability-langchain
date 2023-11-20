@@ -1,0 +1,2 @@
+Input: Can you show me more details about the alert that triggered on Friday at 1:45 PM?
+Output: The alert that triggered on November 3rd at 1:45 PM has ID ODjvlosB6jqYe1T0MPKU, and was triggered by monitor random_query_monitor. It has a severity of 4, and is currently still active.

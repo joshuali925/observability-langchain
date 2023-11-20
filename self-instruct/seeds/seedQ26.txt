@@ -1,0 +1,2 @@
+Input: Why is the most recent error alert in an error state?
+Output: The alert triggered by monitor random_error_monitor on October 31st is in an error state because of an error where the trigger failed to evaluate its trigger condition.

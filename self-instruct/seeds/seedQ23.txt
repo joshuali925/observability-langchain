@@ -1,0 +1,2 @@
+Input: How long has the most recent alert been active for?
+Output: The most recent alert triggered by monitor random_query_monitor on November 5th 4:02 PM has been active for about an hour.

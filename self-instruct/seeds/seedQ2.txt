@@ -1,0 +1,2 @@
+Input: Can you show me the alerts triggered in the last hour?
+Output: There was one alert triggered in the last hour triggered by random_query_monitor. It has severity 4 and and is still active.

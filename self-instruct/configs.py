@@ -16,7 +16,7 @@ intro_file = "./HEAD_EXAMPLE"
 # directory containing seeds, each seed will be a text file named `seedQn.txt`
 seeds_dir = "./seeds"
 # sections in each seed and completion, each seed should have these sections
-seed_sections = ["Instruction", "Index", "Fields", "PPL Output"]
+seed_sections = ["Input", "Output"]
 # directory to store LLM generated examples
 output_dir = "./raw_outputs"
 
@@ -40,3 +40,6 @@ def validate(result: dict):
     except Exception as e:
         error = json.loads(e.args[1])["error"]
         return error["type"]
+
+def validate_alerts(result: dict):
+    return None

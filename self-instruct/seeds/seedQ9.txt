@@ -1,0 +1,2 @@
+Input: Which monitors have triggered alerts?
+Output: Monitors that have triggered alerts recently include random_query_monitor, random_comp_monitor, and random_doc_monitor.

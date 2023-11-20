@@ -1,0 +1,2 @@
+Input: Can you show me all the active high-severity alerts?
+Output: There is 1 alert with severity 1 that is currently active. It was triggered by random_doc_monitor on November 4th.

@@ -1,0 +1,2 @@
+Input: How long has alert dzhPl4sB6jqYe1T0ffaX been active for?
+Output: The alert with ID dzhPl4sB6jqYe1T0ffaX from monitor random_comp_monitor was active for about 2 minutes, from November 4th 3:30 PM to November 4th 3:32 PM.
