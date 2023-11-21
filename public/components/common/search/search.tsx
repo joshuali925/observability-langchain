@@ -47,6 +47,10 @@ import { SQLService } from '../../../services/requests/sql';
 import chatLogo from '../../datasources/icons/query-assistant-logo.svg';
 import { useCatIndices, useGetIndexPatterns } from '../../event_analytics/explorer/llm/input';
 import { SavePanel } from '../../event_analytics/explorer/save_panel';
+import {
+  resetSummary,
+  selectQueryAssistantSummarization,
+} from '../../event_analytics/redux/slices/query_assistant_summarization_slice';
 import { reset } from '../../event_analytics/redux/slices/query_result_slice';
 import {
   changeData,
@@ -54,10 +58,6 @@ import {
   selectQueries,
 } from '../../event_analytics/redux/slices/query_slice';
 import { update as updateSearchMetaData } from '../../event_analytics/redux/slices/search_meta_data_slice';
-import {
-  selectQueryAssistantSummarization,
-  resetSummary,
-} from '../../event_analytics/redux/slices/query_assistant_summarization_slice';
 import { PPLReferenceFlyout } from '../helpers';
 import { LiveTailButton, StopLiveButton } from '../live_tail/live_tail_button';
 import { Autocomplete } from './autocomplete';
@@ -296,17 +296,11 @@ export const Search = (props: any) => {
   const data =
     indexPatterns && indices
       ? [...indexPatterns, ...indices].filter(
-          (v1, index, array) => array.findIndex((v2) => v1.label === v2.label) === index
+          (v1, index, array) =>
+            !v1.label.startsWith('.') && array.findIndex((v2) => v1.label === v2.label) === index
         )
       : undefined;
   const loading = indicesLoading || indexPatternsLoading;
-  // HARDCODED INDEXES BELOW
-  const filteredData = [
-    { label: 'opensearch_dashboards_sample_data_ecommerce' },
-    { label: 'opensearch_dashboards_sample_data_logs' },
-    { label: 'opensearch_dashboards_sample_data_flights' },
-    { label: 'sso_logs-*.*' },
-  ];
 
   return (
     <div className="globalQueryBar">
@@ -385,7 +379,7 @@ export const Search = (props: any) => {
                     prepend={<EuiText>Index</EuiText>}
                     singleSelection={true}
                     isLoading={loading}
-                    options={filteredData}
+                    options={data}
                     selectedOptions={selectedIndex}
                     onChange={(index) => setSelectedIndex(index)}
                   />
