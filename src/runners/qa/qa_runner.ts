@@ -25,7 +25,6 @@ export class QARunner extends TestRunner<QASpec, OllyApiProvider> {
   }
 
   public async compareResults(received: ProviderResponse, spec: QASpec): Promise<TestResult> {
-    console.info("in QA compareResults");
     try {
       console.log(received.output, spec.expectedAnswer);
       return {

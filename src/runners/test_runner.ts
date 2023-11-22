@@ -41,12 +41,14 @@ export abstract class TestRunner<
   }
 
   public runSpecs(specs: T[]) {
-    // TODO:
-    // - prepare alerting config index too, make sure get monitors api matches search alerting-config index, then copypasta monitors into mappings and docs like u did w alerting, replace IDs of alerts with these ones
-    // - dynamically populate timestamps of alerts in test script
+    // index creation needs to happen every time to repopulate
+    // the docs with current timestamps
+    OpenSearchTestIndices.deleteAll();
+    OpenSearchTestIndices.create("alerting");
 
-    // OpenSearchTestIndices.deleteAll();
-    // OpenSearchTestIndices.create("alerting");
+    // TODO: dynamically populate test cases with local
+    // cluster-generated alert IDs
+
     it.each(specs.sort((a, b) => a.clusterStateId.localeCompare(b.clusterStateId)))(
       'Test-id $id',
       async (spec) => {
@@ -54,28 +56,13 @@ export abstract class TestRunner<
         await expect(received).toMatchRunnerExpectations(spec, this);
       },
     );
-    // OpenSearchTestIndices.deleteAll();
   }
 
   public async run(spec: T) {
     const input = this.buildInput(spec);
-    // const received = (await this.apiProvider.callApi(input.prompt, input.context)) as Awaited<
-    //   ReturnType<U['callApi']>
-    // >;
-  
-
-    const promise = this.apiProvider.callApi(input.prompt, input.context);
-    console.log("promise retrieved");
-    const raw = await promise;
-    console.log("raw retrieved");
-    const received = raw as Awaited<ReturnType<U['callApi']>>;
-    console.log("received retrieved");
-
-    // TODO: json syntax error stops code from reaching here
-    // api call to olly is successful, and retrieval of response
-    // is successful too
-    // i think wats happening is that the promise resolves into the value "Not Found", and
-    // the json parser attempts to parse "Not Found" as json but just gets N instead at position 0.
+    const received = (await this.apiProvider.callApi(input.prompt, input.context)) as Awaited<
+      ReturnType<U['callApi']>
+    >;
 
     if (received.error) throw new Error(received.error);
     if (!received.output) throw new Error('result is empty');
