@@ -57,6 +57,11 @@ export class OpenSearchTestIndices {
     console.info('deleted all test indices');
   }
 
+  public static async createAlertingIndices() {
+    // populate timestamps
+    // do createIndex, but specify id too
+  }
+
   private static async createIndex(group: string, name: string) {
     const indexDir = path.join(this.indicesDir, group, name);
     const mappingsPath = path.join(indexDir, 'mappings.json');

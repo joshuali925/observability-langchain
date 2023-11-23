@@ -32,6 +32,7 @@ export abstract class TestRunner<
   public async beforeEach(): Promise<void> {}
   public async afterEach(): Promise<void> {}
 
+  // parses the get alerts test cases (get_alerts_tests.jsonl)
   public parseTestSpecs(filePath: string): T[] {
     const jsonLines = fs.readFileSync(filePath, 'utf8');
     return jsonLines
@@ -41,14 +42,6 @@ export abstract class TestRunner<
   }
 
   public runSpecs(specs: T[]) {
-    // index creation needs to happen every time to repopulate
-    // the docs with current timestamps
-    OpenSearchTestIndices.deleteAll();
-    OpenSearchTestIndices.create("alerting");
-
-    // TODO: dynamically populate test cases with local
-    // cluster-generated alert IDs
-
     it.each(specs.sort((a, b) => a.clusterStateId.localeCompare(b.clusterStateId)))(
       'Test-id $id',
       async (spec) => {
