@@ -57,11 +57,6 @@ export class OpenSearchTestIndices {
     console.info('deleted all test indices');
   }
 
-  public static async createAlertingIndices() {
-    // populate timestamps
-    // do createIndex, but specify id too
-  }
-
   private static async createIndex(group: string, name: string) {
     const indexDir = path.join(this.indicesDir, group, name);
     const mappingsPath = path.join(indexDir, 'mappings.json');
@@ -79,10 +74,17 @@ export class OpenSearchTestIndices {
     await openSearchClient.indices.create({ index: name, body: { mappings } });
 
     const ndjson = await fs.readFile(documentsPath, 'utf-8');
-    const bulkBody = ndjson
+
+    const objList = ndjson
       .split('\n')
       .filter((doc) => doc)
-      .flatMap((doc) => [{ index: { _index: name } }, JSON.parse(doc) as object]);
+
+    var bulkBody;
+    if (group === 'alerting') {
+      bulkBody = objList.flatMap((doc) => [{ index: { _index: name, _id: JSON.parse(doc).id } }, JSON.parse(doc) as object]);
+    } else {
+      bulkBody = objList.flatMap((doc) => [{ index: { _index: name } }, JSON.parse(doc) as object]);
+    }
 
     if (bulkBody.length > 0) await openSearchClient.bulk({ refresh: true, body: bulkBody });
     console.info(`created index ${name}`);
