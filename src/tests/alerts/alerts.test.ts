@@ -45,10 +45,10 @@ const specFiles = [path.join(specDirectory, 'get_alerts_tests.jsonl')].map((path
 // - figure out potential dynamic population of questions with hardcoded dates (or just remove em outright)
 
 populateAlertDocTimestamps();
+populateTestCaseTimes();
 
 OpenSearchTestIndices.deleteAll();
 OpenSearchTestIndices.create("alerting");
-// OpenSearchTestIndices.createAlertingIndices();
 
 describe.each(specFiles)('$path', ({ path }) => {
   beforeAll(() => runner.beforeAll());
