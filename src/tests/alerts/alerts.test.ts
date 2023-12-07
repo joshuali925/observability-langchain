@@ -70,55 +70,56 @@ function populateAlertDocTimestamps() {
   // each alert needs to happen at a very specifically chosen
   // time for the test cases to make sense
   alertObjectsList.forEach(function (alertObj) {
+    const now = Date.now();
     switch(alertObj.id) {
       case "0OgfsOs5t6yqi81f3yj18":
-        alertObj.start_time = Date.now() - 795021000;
+        alertObj.start_time = now - 795021000;
         alertObj.last_notification_time = alertObj.start_time + one_hour;
         alertObj.end_time = alertObj.start_time + three_hours;
         break;
       case "k9gf4os5tkqi81f3y988":
-        alertObj.start_time = Date.now() - 708621000;
+        alertObj.start_time = now - 708621000;
         alertObj.last_notification_time = alertObj.start_time + one_hour;
         alertObj.end_time = alertObj.start_time + three_hours;
         break;
       case "Xugf4osB7kqi81T0y9pw":
-        alertObj.start_time = Date.now() - 622221000;
+        alertObj.start_time = now - 622221000;
         alertObj.last_notification_time = alertObj.start_time + one_hour;
         alertObj.end_time = alertObj.start_time + three_hours;
         break;
       case "uzg0gosB6jqYe1T0y9Aa":
-        alertObj.start_time = Date.now() - 535821000;
+        alertObj.start_time = now - 535821000;
         alertObj.last_notification_time = alertObj.start_time + one_hour;
         alertObj.end_time = alertObj.start_time + three_hours;
         break;
       case "QziGl4sB6jqYe1T0_fnD":
-        alertObj.start_time = Date.now() - 436706000;
+        alertObj.start_time = now - 436706000;
         alertObj.last_notification_time = alertObj.start_time + one_hour;
         alertObj.end_time = null;
         break;
       case "GThUkYsB6jqYe1T0UOF3":
-        alertObj.start_time = Date.now() - 282097000;
+        alertObj.start_time = now - 282097000;
         alertObj.last_notification_time = alertObj.start_time + one_hour;
         alertObj.end_time = null;
         alertObj.acknowledged_time = alertObj.start_time + three_hours;
         break;
       case "ODjvlosB6jqYe1T0MPKU":
-        alertObj.start_time = Date.now() - 188061000;
+        alertObj.start_time = now - 188061000;
         alertObj.last_notification_time = alertObj.start_time + one_hour;
         alertObj.end_time = null;
         break;
       case "c1dc6e4b-1f71-4662-b444-a2b257546e3b":
-        alertObj.start_time = Date.now() - 95375000;
+        alertObj.start_time = now - 95375000;
         alertObj.last_notification_time = alertObj.start_time + one_hour;
         alertObj.end_time = null;
         break;
       case "dzhPl4sB6jqYe1T0ffaX":
-        alertObj.start_time = Date.now() - 95349000;
+        alertObj.start_time = now - 95349000;
         alertObj.last_notification_time = alertObj.start_time + one_hour;
         alertObj.end_time = alertObj.start_time + three_hours;
         break;
       case "hDjvlhfB6jqY61T0PLK5":
-        alertObj.start_time = Date.now() - 3446000;
+        alertObj.start_time = now - 3446000;
         alertObj.last_notification_time = alertObj.start_time + one_hour;
         alertObj.end_time = null;
         break;
