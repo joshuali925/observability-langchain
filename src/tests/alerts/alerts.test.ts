@@ -127,12 +127,9 @@ function populateAlertDocTimestamps() {
     }
   });
 
-  fs.writeFile(
+  fs.writeFileSync(
     path.join(__dirname, '..', '..', '..', 'data', 'indices', 'alerting', '.opendistro-alerting-alerts', 'documents.ndjson'),
-    alertObjectsList.map((line) => JSON.stringify(line)).join('\n'),
-    function(err) {
-      if (err) return console.error(err);
-    }
+    alertObjectsList.map((line) => JSON.stringify(line)).join('\n')
   );
 }
 
@@ -155,49 +152,83 @@ function populateTestCaseTimes() {
     switch(testObj.id) {
       case "ui_PZbaYHYFD_fgoVjkzd":
         var alert = alertObjectsList.find(alert => alert.id === "uzg0gosB6jqYe1T0y9Aa");
-        var date = new Date(alert.start_time).toTimeString().split(",")[0];
-        testObj.question = `How many alerts were triggered on ${date}?`
-        testObj.expectedAnswer = `1 alert was triggered on ${date}. The alert has ID uzg0gosB6jqYe1T0y9Aa and was triggered by monitor random_query_monitor.`
+        var date = trimDay(new Date(alert.start_time).toDateString());
+        testObj.question = `How many alerts were triggered on ${date}?`;
+        testObj.expectedAnswer = `1 alert was triggered on ${date}. The alert has ID uzg0gosB6jqYe1T0y9Aa and was triggered by monitor random_query_monitor.`;
         break;
       case "ejbPZp9WEgYiyUH7VwPwk":
         var alert = alertObjectsList.find(alert => alert.id === "dzhPl4sB6jqYe1T0ffaX");
-        var date = new Date(alert.start_time).toTimeString().split(",")[0];
-        testObj.question = `What are the names of the monitors that triggered alerts on ${date}?`
-        testObj.expectedAnswer = `2 monitors triggered alerts on ${date} - random_doc_monitor and random_comp_monitor.`
+        var date = trimDay(new Date(alert.start_time).toDateString());
+        testObj.expectedAnswer = `2 monitors triggered alerts on ${date} - random_doc_monitor and random_comp_monitor.`;
+        break;
+      case "B_aIDTWPmk0VnO1bfFfNk":
+        var alert = alertObjectsList.find(alert => alert.id === "GThUkYsB6jqYe1T0UOF3");
+        var date = trimDayAndTime(new Date(alert.acknowledged_time).toString());
+        testObj.expectedAnswer = `Yes, 1 alert has been acknowledged in the last 3 days. The alert with ID GThUkYsB6jqYe1T0UOF3 was acknowledged on ${date}.`;
+        break;
       case "E7YDumUyLlZyLmTiZxzCT":
         var alert = alertObjectsList.find(alert => alert.id === "dzhPl4sB6jqYe1T0ffaX");
-        var date = new Date(alert.start_time).toTimeString();
-        testObj.expectedAnswer = `The composite monitor random_comp_monitor last triggered alert dzhPl4sB6jqYe1T0ffaX on ${date}.`
+        var date = trimDayAndTime(new Date(alert.start_time).toString());
+        testObj.expectedAnswer = `The composite monitor random_comp_monitor last triggered alert dzhPl4sB6jqYe1T0ffaX on ${date}.`;
+        break;
       case "u0jg-xCfiW7jOmghnyVMM":
         var alert = alertObjectsList.find(alert => alert.id === "QziGl4sB6jqYe1T0_fnD");
-        var date = new Date(alert.start_time).toTimeString();
-        testObj.expectedAnswer = `The error alert QziGl4sB6jqYe1T0_fnD started on ${date}.`
+        var date = trimDayAndTime(new Date(alert.start_time).toString());
+        testObj.expectedAnswer = `The error alert QziGl4sB6jqYe1T0_fnD started on ${date}.`;
+        break;
+      case "NYliAiH18aVrM-wacy0Vs":
+        var alert = alertObjectsList.find(alert => alert.id === "QziGl4sB6jqYe1T0_fnD");
+        var date = trimDay(new Date(alert.start_time).toDateString());
+        testObj.question = `What are the names of the monitors that triggered alerts on ${date}?`;
+        testObj.expectedAnswer = `The monitor random_query_monitor triggered an alert on ${date}.`;
+        break;
       case "vzdAN1QaoIFCcS8jQmI-R":
         var alert = alertObjectsList.find(alert => alert.id === "Xugf4osB7kqi81T0y9pw");
-        var date = new Date(alert.start_time).toTimeString();
-        testObj.expectedAnswer = `The alert with ID \"Xugf4osB7kqi81T0y9pw\" started triggering on ${date}.`
+        var date = trimDayAndTime(new Date(alert.start_time).toString());
+        testObj.expectedAnswer = `The alert with ID \"Xugf4osB7kqi81T0y9pw\" started triggering on ${date}.`;
+        break;
       case "rTZb6QqiQgNA1lVxysmDX":
         var alert = alertObjectsList.find(alert => alert.id === "QziGl4sB6jqYe1T0_fnD");
-        var date = new Date(alert.start_time).toTimeString();
-        testObj.expectedAnswer = `The most recent error alert with ID QziGl4sB6jqYe1T0_fnD began on ${date}.`
+        var date = trimDayAndTime(new Date(alert.start_time).toString());
+        testObj.expectedAnswer = `The most recent error alert with ID QziGl4sB6jqYe1T0_fnD began on ${date}.`;
+        break;
       case "HvnENM6nO1bTy5CknxEtO":
         var alert = alertObjectsList.find(alert => alert.id === "uzg0gosB6jqYe1T0y9Aa");
-        var date = new Date(alert.last_notification_time).toTimeString();
-        testObj.expectedAnswer = `The last notification time for alert uzg0gosB6jqYe1T0y9Aa was on ${date}.`
+        var date = trimDayAndTime(new Date(alert.last_notification_time).toString());
+        testObj.expectedAnswer = `The last notification time for alert uzg0gosB6jqYe1T0y9Aa was on ${date}.`;
+        break;
       case "MrSeNM6Cq-hva6JhpmlYF":
         var alert = alertObjectsList.find(alert => alert.id === "hDjvlhfB6jqY61T0PLK5");
-        var date = new Date(alert.start_time).toTimeString();
-        testObj.expectedAnswer = `The most recent alert with ID hDjvlhfB6jqY61T0PLK5 was triggered on ${date}.`
+        var date = trimDayAndTime(new Date(alert.start_time).toString());
+        testObj.expectedAnswer = `The most recent alert with ID hDjvlhfB6jqY61T0PLK5 was triggered on ${date}.`;
+        break;
+      case "dxhFcfgh98R8_i0xO80ke":
+        var alert = alertObjectsList.find(alert => alert.id === "GThUkYsB6jqYe1T0UOF3");
+        var date = trimDayAndTime(new Date(alert.acknowledged_time).toString());
+        testObj.expectedAnswer = `The alert with ID GThUkYsB6jqYe1T0UOF3 was acknowledged on ${date}.`;
+        break;
       default:
         break;
     }
   });
 
-  fs.writeFile(
+  fs.writeFileSync(
     path.join(__dirname, '..', 'specs', 'get_alerts_tests.jsonl'),
-    testObjectsList.map((line) => JSON.stringify(line)).join('\n'),
-    function(err) {
-      if (err) return console.error(err);
-    }
+    testObjectsList.map((line) => JSON.stringify(line)).join('\n')
   );
+}
+
+// only for Date.toDateString()s
+// Date.toDateString() comes in format DayOfWeek Month Day Year, this
+// just trims the leading DayOfWeek, leaving only Month Day Year
+function trimDay (date: string) {
+  return date.substring(4);
+}
+
+// only for Date.toString()s
+// Date.toString() comes in format DayOfWeek Month Day Year Time, and then the timezone,
+// this trims the leading DayOfWeek, the time's seconds place, and the trailing timezone information
+function trimDayAndTime (date: string) {
+  const dateAndFullTime = date.split(" ").slice(1, 5).join(" "); // trim day of week and timezone info
+  return dateAndFullTime.substring(0, dateAndFullTime.length - 3); // trim seconds off of time
 }
