@@ -17,9 +17,11 @@ export class OpenSearchTestIndices {
     const indexGroups = groups.length > 0 ? groups : await fs.readdir(this.indicesDir);
     return Promise.all(
       indexGroups.map(async (group) =>
-        (await fs.readdir(path.join(this.indicesDir, group))).map((name) => {
-          return this.promisePool.run(() => this.createIndex(group, name));
-        }),
+        Promise.all(
+          (await fs.readdir(path.join(this.indicesDir, group))).map((name) => {
+            return this.promisePool.run(() => this.createIndex(group, name));
+          }),
+        ),
       ),
     );
   }
