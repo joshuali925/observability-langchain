@@ -1,1 +1,0 @@
-{"id":"-k1AcpmK_1bLI6_UBfLsw","clusterStateId":"custom","question":"how many people are there?","gold_query":"SELECT count(*) FROM accounts","index":"accounts"}
