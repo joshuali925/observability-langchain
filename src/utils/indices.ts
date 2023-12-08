@@ -73,7 +73,11 @@ export class OpenSearchTestIndices {
     }
 
     const mappings = JSON.parse(await fs.readFile(mappingsPath, 'utf-8')) as MappingTypeMapping;
-    await openSearchClient.indices.create({ index: name, body: { mappings } });
+    if (!(await openSearchClient.indices.exists({ index: name }))) {
+      await openSearchClient.indices.create({ index: name, body: { mappings } });
+    } else {
+      console.warn(`Index '${name}' already exists, skipping creation`);
+    }
 
     const ndjson = await fs.readFile(documentsPath, 'utf-8');
 
@@ -89,8 +93,14 @@ export class OpenSearchTestIndices {
       bulkBody = objList.flatMap((doc) => [{ index: { _index: name } }, JSON.parse(doc) as object]);
     }
 
-    if (bulkBody.length > 0) await openSearchClient.bulk({ refresh: true, body: bulkBody });
-    console.info(`created index ${name}`);
+    if (bulkBody.length > 0) {
+      try {
+        await openSearchClient.bulk({ refresh: true, body: bulkBody });
+        console.info(`created index ${name}`);
+      } catch (error) {
+        throw new Error('hi');
+      }
+    }
   }
 
   public static async dumpIndices(group: string, names: string[]) {

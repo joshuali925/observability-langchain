@@ -17,7 +17,16 @@ import { QARunner } from '../../runners/qa/qa_runner';
 import { OpenSearchTestIndices } from '../../utils/indices';
 
 const provider = ApiProviderFactory.create(PROVIDERS.OLLY);
-const runner = new QARunner(provider);
+const runner = new (class extends QARunner {
+  protected async beforeAll(clusterStateId: string): Promise<void> {
+    if (clusterStateId !== 'alerting') {
+      throw new Error('unexpected cluster state id');
+    }
+    await OpenSearchTestIndices.deleteAll();
+    await OpenSearchTestIndices.create('alerting');
+  }
+})(provider);
+
 const specDirectory = path.join(__dirname, 'specs');
 const specFiles = [path.join(specDirectory, 'get_alerts_tests.jsonl')];
 
@@ -51,10 +60,6 @@ const specFiles = [path.join(specDirectory, 'get_alerts_tests.jsonl')];
 
 populateAlertDocTimestamps();
 populateTestCaseTimes();
-
-// TODO use beforeAll hook
-void OpenSearchTestIndices.deleteAll();
-void OpenSearchTestIndices.create('alerting');
 
 runner.run(specFiles);
 
