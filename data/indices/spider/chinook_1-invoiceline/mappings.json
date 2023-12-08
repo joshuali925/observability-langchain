@@ -1,0 +1,1 @@
+{"properties":{"InvoiceId":{"type":"long"},"InvoiceLineId":{"type":"long"},"Quantity":{"type":"long"},"TrackId":{"type":"long"},"UnitPrice":{"type":"float"}}}

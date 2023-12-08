@@ -1,0 +1,1 @@
+{"properties":{"product_category":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"product_id":{"type":"long"},"product_name":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}}}}

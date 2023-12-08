@@ -1,0 +1,1 @@
+{"properties":{"DepartmentID":{"type":"long"},"Head":{"type":"long"},"Name":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}}}}

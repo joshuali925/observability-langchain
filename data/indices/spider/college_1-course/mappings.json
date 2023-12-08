@@ -1,0 +1,1 @@
+{"properties":{"CRS_CODE":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"CRS_CREDIT":{"type":"float"},"CRS_DESCRIPTION":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"DEPT_CODE":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}}}}

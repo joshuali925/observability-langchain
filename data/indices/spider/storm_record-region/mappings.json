@@ -1,0 +1,1 @@
+{"properties":{"Region_code":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"Region_id":{"type":"long"},"Region_name":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}}}}

@@ -1,0 +1,1 @@
+{"properties":{"authID":{"type":"long"},"fname":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"lname":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}}}}

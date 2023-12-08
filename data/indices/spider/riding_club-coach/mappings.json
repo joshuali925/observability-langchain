@@ -1,0 +1,1 @@
+{"properties":{"Club_ID":{"type":"long"},"Coach_ID":{"type":"long"},"Coach_name":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"Gender":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"Rank":{"type":"long"}}}

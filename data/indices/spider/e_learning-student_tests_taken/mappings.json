@@ -1,0 +1,1 @@
+{"properties":{"date_test_taken":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"registration_id":{"type":"long"},"test_result":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}}}}

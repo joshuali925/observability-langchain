@@ -1,0 +1,1 @@
+{"properties":{"Statement_Details":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"Statement_ID":{"type":"long"}}}

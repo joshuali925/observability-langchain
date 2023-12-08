@@ -1,0 +1,1 @@
+{"properties":{"Theme_Park_Details":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"Theme_Park_ID":{"type":"long"}}}

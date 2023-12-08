@@ -1,0 +1,1 @@
+{"properties":{"student_details":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"student_id":{"type":"long"}}}

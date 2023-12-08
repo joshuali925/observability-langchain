@@ -1,0 +1,1 @@
+{"properties":{"Project":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"Scientist":{"type":"long"}}}

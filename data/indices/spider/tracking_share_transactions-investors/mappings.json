@@ -1,0 +1,1 @@
+{"properties":{"Investor_details":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"investor_id":{"type":"long"}}}

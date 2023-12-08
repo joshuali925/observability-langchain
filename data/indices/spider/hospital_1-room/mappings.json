@@ -1,0 +1,1 @@
+{"properties":{"BlockCode":{"type":"long"},"BlockFloor":{"type":"long"},"RoomNumber":{"type":"long"},"RoomType":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"Unavailable":{"type":"long"}}}

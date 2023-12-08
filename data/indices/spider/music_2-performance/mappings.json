@@ -1,0 +1,1 @@
+{"properties":{"Bandmate":{"type":"long"},"SongId":{"type":"long"},"StagePosition":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}}}}

@@ -1,0 +1,1 @@
+{"properties":{"CID":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"Grade":{"type":"text","fields":{"keyword":{"type":"keyword","ignore_above":256}}},"StuID":{"type":"long"}}}
