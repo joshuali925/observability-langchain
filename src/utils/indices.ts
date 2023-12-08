@@ -6,6 +6,7 @@
 import fs from 'node:fs/promises';
 import path from 'path';
 import { MappingTypeMapping, SearchResponse } from '@opensearch-project/opensearch/api/types';
+import { ResponseError } from '@opensearch-project/opensearch/lib/errors';
 import { openSearchClient } from '../providers/clients/opensearch';
 import { createPromisePool } from './promise_pool';
 
@@ -73,10 +74,15 @@ export class OpenSearchTestIndices {
     }
 
     const mappings = JSON.parse(await fs.readFile(mappingsPath, 'utf-8')) as MappingTypeMapping;
-    if (!(await openSearchClient.indices.exists({ index: name }))) {
+    try {
       await openSearchClient.indices.create({ index: name, body: { mappings } });
-    } else {
-      console.warn(`Index '${name}' already exists, skipping creation`);
+    } catch (err) {
+      const error = err as ResponseError<{ error: { type: string } }>;
+      if (error.body.error.type === 'resource_already_exists_exception') {
+        console.warn(`Index '${name}' already exists, skipping creation`);
+      } else {
+        throw error;
+      }
     }
 
     const ndjson = await fs.readFile(documentsPath, 'utf-8');
