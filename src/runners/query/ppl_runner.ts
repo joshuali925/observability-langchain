@@ -78,7 +78,8 @@ export class PPLRunner extends TestRunner<PPLSpec, PPLGeneratorApiProvider> {
       });
       return {
         pass,
-        message: () => `expected ${received.output} to pass PPL Rubric with ${spec.gold_query}.`,
+        message: () =>
+          `expected ${received.output} to have the same response as ${spec.gold_query}.`,
         score,
       };
     } catch (error) {

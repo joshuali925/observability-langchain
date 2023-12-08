@@ -55,9 +55,7 @@ export abstract class TestRunner<
       clusterStateIdToSpec[spec.clusterStateId].push(spec);
     });
     describe.each(Object.keys(clusterStateIdToSpec))('Cluster state %s', (clusterStateId) => {
-      beforeAll(async () => {
-        return this.beforeAll(clusterStateId);
-      });
+      beforeAll(() => this.beforeAll(clusterStateId));
       afterAll(() => this.afterAll(clusterStateId));
       beforeEach(() => this.beforeEach(clusterStateId));
       afterEach(() => this.afterEach(clusterStateId));
