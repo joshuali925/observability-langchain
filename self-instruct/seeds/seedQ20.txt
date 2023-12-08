@@ -1,0 +1,32 @@
+Instruction:
+What are the top traces with largest bytes?
+Index:
+events
+Fields:
+- timestamp: long (1686000665919)
+- attributes.data_stream.dataset: text ("nginx.access")
+- attributes.data_stream.namespace: text ("production")
+- attributes.data_stream.type: text ("logs")
+- body: text ("172.24.0.1 - - [02/Jun/2023:23:09:27 +0000] "GET / HTTP/1.1" 200 4955 "-" "Mozilla/5.0 zgrab/0.x"")
+- communication.source.address: text ("127.0.0.1")
+- communication.source.ip: text ("172.24.0.1")
+- container_id: text (null)
+- container_name: text (null)
+- event.category: text ("web")
+- event.domain: text ("nginx.access")
+- event.kind: text ("event")
+- event.name: text ("access")
+- event.result: text ("success")
+- event.type: text ("access")
+- http.flavor: text ("1.1")
+- http.request.method: text ("GET")
+- http.response.bytes: long (4955)
+- http.response.status_code: keyword ("200")
+- http.url: text ("/")
+- log: text (null)
+- observerTime: date (1686000665919)
+- source: text (null)
+- span_id: text ("abcdef1010")
+- trace_id: text ("102981ABCD2901")
+PPL Output:
+source=\`events\` | stats SUM(\`http.response.bytes\`) as \`sum_bytes\` by \`trace_id\` | sort -sum_bytes | head
