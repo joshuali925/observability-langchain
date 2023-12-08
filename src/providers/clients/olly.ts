@@ -57,7 +57,12 @@ class OllyClient {
         'osd-xsrf': '1',
       },
       body: JSON.stringify({ question, index }),
-    }).then((resp) => resp.text());
+    }).then((response) => {
+      if (response.ok) {
+        return response.text();
+      }
+      return response.text().then((text) => Promise.reject(text));
+    });
   }
 }
 

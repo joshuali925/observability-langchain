@@ -24,7 +24,7 @@ declare global {
 }
 
 export interface Matcher<T = unknown> {
-  calculateScore(received: T, expected: T, threshold: number): Promise<jest.CustomMatcherResult>;
+  calculateScore(received: T, expected: T): number;
 }
 
 const { matchesSimilarity, matchesLlmRubric } = assertions;
