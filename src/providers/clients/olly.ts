@@ -41,10 +41,16 @@ class OllyClient {
       .find((message) => message.type === 'output' && message.contentType === 'markdown') as
       | Extract<IMessage, { type: 'output' }>
       | undefined;
+    const errorMessage = response.messages
+      .reverse()
+      .find((message) => message.type === 'output' && message.contentType === 'error') as
+      | Extract<IMessage, { type: 'output' }>
+      | undefined;
     return {
       ...response,
       output: outputMessage?.content,
       traceId: outputMessage?.traceId,
+      error: errorMessage?.content,
     };
   }
 
