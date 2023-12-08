@@ -14,7 +14,7 @@ interface QASpec extends TestSpec {
 }
 
 export class QARunner extends TestRunner<QASpec, OllyApiProvider> {
-  public buildInput(spec: QASpec): {
+  protected buildInput(spec: QASpec): {
     prompt: string;
     context: { vars: Record<string, string | object> } | undefined;
   } {

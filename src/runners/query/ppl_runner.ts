@@ -35,7 +35,7 @@ export class PPLRunner extends TestRunner<PPLSpec, PPLGeneratorApiProvider> {
     await OpenSearchTestIndices.create(clusterStateId);
   }
 
-  public buildInput(spec: PPLSpec): {
+  protected buildInput(spec: PPLSpec): {
     prompt: string;
     context: { vars: Record<string, string | object> } | undefined;
   } {

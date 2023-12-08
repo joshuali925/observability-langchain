@@ -32,7 +32,7 @@ export abstract class TestRunner<
   protected async beforeEach(clusterStateId: string): Promise<void> {}
   protected async afterEach(clusterStateId: string): Promise<void> {}
 
-  public parseTestSpecs(filePath: string): T[] {
+  protected parseTestSpecs(filePath: string): T[] {
     const jsonLines = fs.readFileSync(filePath, 'utf8');
     return jsonLines
       .split('\n')
@@ -47,7 +47,7 @@ export abstract class TestRunner<
     });
   }
 
-  public runSpecs(specs: T[]) {
+  protected runSpecs(specs: T[]) {
     const clusterStateIdToSpec: Record<string, T[]> = {};
     specs.forEach((spec) => {
       if (clusterStateIdToSpec[spec.clusterStateId] === undefined)
@@ -69,7 +69,7 @@ export abstract class TestRunner<
     });
   }
 
-  public async runSpec(spec: T) {
+  protected async runSpec(spec: T) {
     const input = this.buildInput(spec);
     const received = (await this.apiProvider.callApi(input.prompt, input.context)) as Awaited<
       ReturnType<U['callApi']>
@@ -99,7 +99,7 @@ export abstract class TestRunner<
     );
   }
 
-  public abstract buildInput(spec: T): {
+  protected abstract buildInput(spec: T): {
     prompt: Parameters<ApiProvider['callApi']>[0];
     context: Parameters<ApiProvider['callApi']>[1];
   };

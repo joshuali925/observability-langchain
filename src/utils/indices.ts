@@ -76,10 +76,19 @@ export class OpenSearchTestIndices {
     await openSearchClient.indices.create({ index: name, body: { mappings } });
 
     const ndjson = await fs.readFile(documentsPath, 'utf-8');
-    const bulkBody = ndjson
-      .split('\n')
-      .filter((doc) => doc)
-      .flatMap((doc) => [{ index: { _index: name } }, JSON.parse(doc) as object]);
+
+    const objList = ndjson.split('\n').filter((doc) => doc);
+
+    let bulkBody;
+    if (group === 'alerting') {
+      bulkBody = objList.flatMap((doc) => {
+        const spec = JSON.parse(doc) as { id: string };
+        return [{ index: { _index: name, _id: spec.id } }, spec];
+      });
+    } else {
+      bulkBody = objList.flatMap((doc) => [{ index: { _index: name } }, JSON.parse(doc) as object]);
+    }
+
     if (bulkBody.length > 0) await openSearchClient.bulk({ refresh: true, body: bulkBody });
     console.info(`created index ${name}`);
   }
