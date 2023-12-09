@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import _ from 'lodash';
 import { ProviderResponse } from 'promptfoo';
 import { OllyApiProvider } from '../../providers/olly';
 import { TestResult, TestRunner, TestSpec } from '../test_runner';

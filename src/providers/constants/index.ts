@@ -7,6 +7,7 @@ export const PROVIDERS = {
   OLLY: 'olly_chat',
   PPL_GENERATOR: 'ppl_generator',
   ML_COMMONS: 'ml_commons',
+  AGENT_FRAMEWORK: 'agent_framework',
 } as const;
 
 export const OPENSEARCH_CONFIG = {

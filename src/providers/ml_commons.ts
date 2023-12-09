@@ -29,6 +29,9 @@ interface AssistantConfigDoc {
   embeddings_model_id: string;
 }
 
+/**
+ * Api Provider to request model/_predict in ml-commons directly.
+ */
 export class MlCommonsApiProvider implements ApiProvider {
   constructor(private readonly providerId = PROVIDERS.ML_COMMONS) {}
 

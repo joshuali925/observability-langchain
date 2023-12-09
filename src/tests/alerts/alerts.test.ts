@@ -11,12 +11,11 @@
 
 import fs from 'fs';
 import path from 'path';
-import { PROVIDERS } from '../../providers/constants';
 import { ApiProviderFactory } from '../../providers/factory';
 import { QARunner } from '../../runners/qa/qa_runner';
 import { OpenSearchTestIndices } from '../../utils/indices';
 
-const provider = ApiProviderFactory.create(PROVIDERS.OLLY);
+const provider = ApiProviderFactory.create();
 const runner = new (class extends QARunner {
   protected async beforeAll(clusterStateId: string): Promise<void> {
     if (clusterStateId !== 'alerting') {
