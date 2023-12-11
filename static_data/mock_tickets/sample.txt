@@ -1,0 +1,346 @@
+The following is a ticket for a 404 and 503 errors incident:
+ID: d31911d8-a98c-4fc9-a25c-108ea68d9b66
+Title: Multiple 404 and 503 Errors
+Time: 2023-06-01 10:15 AM
+Username: john.doe
+
+Summary: The system experienced a high number of 404 and 503 errors, affecting multiple microservices.
+
+Root Cause: The issue was caused by a misconfiguration in the Nginx load balancer, leading to improper routing of requests, caused 404 and 503 errors.
+The ops team has deployed a new version of the application servers behind an Nginx load balancer. However, in the Nginx config, they forgot to update the server entries to point to the new application servers. So Nginx is still routing traffic to the old application servers.
+Users start reporting errors and issues with the application. The error logs on the new application servers show no requests coming in. The ops team checks the Nginx load balancer and realizes their mistake - the config still has the old server entries. They quickly update the config to point to the new set of application servers.
+However, some users may have experienced errors and outage during this time. The ops team does a post-mortem and updates their deployment runbooks to include an explicit check to verify server entries are updated on the load balancers during future deployments. They also decide to build more monitoring and alerts to quickly detect such issues - things like:
+- Monitors to check that requests are being received on both old and new servers during a deployment
+- Monitors to check that the Nginx config files have actually been updated
+- Smoke tests that run against the load balancer to verify it is routing to the correct application servers
+- Alerts if there are unexpected spikes of errors in the application
+- Logging Nginx server entries on each config change so it's easy to check if any were missed
+To prevent this from happening again, the team also decides to double check server entries in the Nginx config as part of the change approval process for production deployments going forward.
+
+In this scenario, the misconfiguration was that the Nginx load balancer was not updated with the correct application server entries after a new deployment.
+Specifically:
+1. Nginx was originally configured with server entries pointing to the old application servers (app-server-1, app-server-2, etc.)
+2. The ops team deployed a new version of the application servers (app-server-3, app-server-4, etc.)
+3. However, they forgot to update the Nginx config with the new server entries. So Nginx was still routing all traffic to the old application servers (app-server-1, app-server-2, etc.).
+4. This meant that no requests were reaching the new application servers (app-server-3, app-server-4, etc.). So users experienced errors and outages.
+The correct configuration should have been:
+1. Deploy the new application servers (app-server-3, app-server-4, etc.)
+2. Update the Nginx config to point to the new servers:
+```
+upstream app_servers {
+    server app-server-3:8080;
+    server app-server-4:8080;  # New server entries!
+}
+```
+3. Reload Nginx to load the new config
+4. Verify Nginx is now routing requests to the new backend servers
+So the misconfiguration was simply that step #2 was missed, and Nginx was not updated with the correct server entries pointing to the new app servers. This is a common mistake that can happen during production changes, which is why the ops team added more checks and monitoring in the post-mortem to catch these types of issues quickly in the future.
+
+Resolution Steps: not resolved yet, ongoing issue.
+
+Comment Thread:
+John Doe: "I noticed a high number of errors in the system. Can you investigate?"
+On-Call: "I'm looking into it. I suspect it could be an issue with the load balancer configuration."
+John Doe: "Please let me know if you find anything."
+On-Call: "Found a misconfiguration in the Nginx load balancer. Fixing it now."
+
+---
+The following is a ticket for an incident happened in Project ThunderShift:
+ID: IN-001
+Title: API gateway latency spike
+Time: 3/15/2020 9:15AM
+Username: jsmith
+
+Summary: The API gateway started experiencing latency spikes of over 5 seconds for some requests. This caused timeouts in client applications.
+
+Root cause: A recent deployment introduced a memory leak in the API gateway pods, causing them to OOM after a few hours of running.
+
+Resolution:
+1. Checked API gateway pod metrics and logs, noticed high memory usage and OOM errors
+2. Restarted all API gateway pods to free up memory
+3. Rolled back latest API gateway deployment to previous stable version
+4. Monitored API gateway closely to ensure latency returned to normal levels
+
+Comments:
+Jsmith: API gateway is showing high latency, some requests timing out. Please investigate.
+Oncall: Checking API gateway pods now. Initial investigation shows high memory usage, restarting pods.
+Jsmith: Latency has returned to normal levels, were there any other actions taken?
+Oncall: Yes, rolled back latest deployment to stable version without memory leak. Monitoring closely now.
+
+The following is a ticket for an incident happened in Project ThunderShift:
+ID: IN-003
+Title: Kafka broker down
+Time: 3/16/2020 2:30PM
+Username: jdoe
+
+Summary: One of the Kafka brokers went down, causing some consumers to lose access to topics.
+
+Root cause: The Kafka broker VM ran out of disk space due to a log file that grew very large.
+
+Resolution:
+1. Checked Kafka broker VM and saw it was down, investigated logs
+2. Saw disk was full, cleared enough space for broker to restart
+3. Restarted Kafka broker
+4. Monitored Kafka brokers and logs to ensure stable operation
+
+Comments:
+Jdoe: Getting errors from some services reading from Kafka topics. Broker 2 seems to be down.
+Oncall: Checking Broker 2. Disk is full, clearing space now so it can restart.
+Jdoe: Services are operating normally again. Thank you!
+Oncall: You're welcome! Broker 2 is back up, closely monitoring the brokers now.
+
+The following is a ticket for an incident happened in Project ThunderShift:
+ID: IN-004
+Title: Database connection issues
+Time: 3/18/2020 11:30AM
+Username: jsmith
+
+Summary: Several services were unable to connect to the database, returning connection timeout errors.
+
+Root cause: The database proxy load balancer had a misconfiguration that caused it to route traffic to incorrect backends.
+
+Resolution:
+1. Checked database proxy configs and logs, noticed misconfiguration
+2. Corrected database proxy config and reloaded config
+3. Verified services were able to connect to database successfully
+4. Monitored closely to ensure no further issues
+
+Comments:
+Jsmith: Getting DB connection errors from multiple services. Please check database tier.
+Oncall: Investigating database proxies and backends. Found misconfiguration, correcting now.
+Jsmith: Services connecting to DB normally again. Thank you!
+Oncall: You're welcome! Database proxy config corrected, monitoring database tier.
+
+The following is a ticket for an incident happened in Project ThunderShift:
+ID: IN-005
+Title: CPU spike on worker nodes
+Time: 3/19/2020 9:45PM
+Username: jdoe
+
+Summary: Several worker nodes experienced high CPU usage spikes, impacting pod scheduling.
+
+Root cause: A new deployment of a machine learning service introduced a bug that caused occasional CPU spikes.
+
+Resolution:
+
+Checked worker node metrics and logs, saw CPU spikes correlating with ML service pod activity
+Scaled down ML service deployment to 1 pod
+Patched ML service code to fix CPU spike bug
+Slowly scaled ML service back up while monitoring to verify fix
+Monitored worker nodes to ensure CPU within normal levels
+Comments:
+Jdoe: Noticing some worker nodes with high CPU. This may be impacting pod scheduling.
+Oncall: Investigating worker nodes. Correlating CPU spikes with new ML service deployment. Scaling down ML service to verify.
+Jdoe: Worker node CPU back to normal. Was the issue with the new ML service?
+Oncall: Yes, found and fixed a bug in the new ML service causing CPU spikes. Scaled ML service back up slowly while monitoring, all good now.
+
+The following is a ticket for an incident happened in Project ThunderShift:
+
+ID: IN-007
+Title: Deployment stuck in progress
+Time: 3/22/2020 11:00AM
+Username: jdoe
+
+Summary: A new deployment of the user service was stuck in progress, not completing.
+
+Root cause: The user service deployment pod was in a CrashLoopBackoff state due to a bug in the new code.
+
+Resolution:
+
+Checked deployment status and pod events, saw user service pod crashing
+Viewed user service pod logs, noticed errors due to null pointer exception
+Patched user service code and pushed fix
+Restarted deployment pod to pull new code, deployment completed successfully
+Monitored user service to verify stable operation
+Comments:
+Jdoe: New user service deployment from this morning seems stuck. Can you check on its status?
+Oncall: Deployment pod is crashing, appears to be an issue with the new code. Investigating now.
+Jdoe: Any updates on resolving the user service deployment? Some features depending on it.
+Oncall: Found and fixed bug causing crashes. Restarting deployment pod, deployment should complete shortly. Monitoring the service.
+Jdoe: User service deployment completed, service operating normally. Thank you for the quick fix!
+
+The following is a ticket for an incident happened in Project ThunderShift:
+
+ID: IN-008
+Title: Elevated error rates in logs
+
+Time: 3/23/2020 8:30PM
+Username: jsmith
+
+Summary: Many logs across services were showing higher than normal error rates.
+
+Root cause: A release the previous week introduced a new library with a bug that caused intermittent failures under heavy load. Multiple services were impacted.
+
+Resolution:
+
+Analyzed logs across services, noticed spike in similar error
+Identified common dependency across services with high error rates
+Patched bug in library and released new version
+Restarted pods to pull in new library release, error rates returned to normal
+Monitored logs and error rates to verify resolution
+Comments:
+Jsmith: Noticing elevated error rates in many logs. This may indicate issues across multiple services.
+Oncall: Analyzing logs, found common dependency introduced recently with intermittent failure under load. Patching now.
+Jsmith: Error rates decreasing, did you find and resolve the issue?
+Oncall: Yes, identified and patched bug in new library. Restarting affected pods, errors should continue declining. Monitoring closely.
+
+The following is a ticket for an incident happened in Project ThunderShift:
+
+ID: IN-009
+Title: Build pipeline failures
+Time: 3/25/2020 10:15AM
+Username: jdoe
+
+Summary: The CI/CD build pipeline was failing for several services, blocking new deployments.
+
+Root cause: A security vulnerability was discovered in a library used by many services. The build pipeline scans ensured new builds did not contain this vulnerable library, causing it to fail.
+
+Resolution:
+
+Checked build pipeline logs and error messages, noticed failures due to vulnerable library
+Identified services using outdated vulnerable library
+Upgraded library versions in all affected services
+Pushed updated services to repos which triggered new build pipeline runs
+Verified build pipeline success and monitored to ensure no further issues
+Comments:
+Jdoe: Several service builds seem to be failing in the pipeline. Can you check into this?
+Oncall: Investigating build failures. Appears to be due to a vulnerable library used by multiple services. Upgrading now.
+
+Jdoe: Builds seem to be passing again, was the issue resolved?
+
+Oncall: Yes, identified and upgraded vulnerable library in all affected services. Build pipeline runs have completed successfully. Monitoring build pipeline.
+
+The following is a ticket for an incident happened in Project ThunderShift:
+
+ID: IN-010
+Title: Automated alerts for response latency
+Time: 3/27/2020 2:00AM
+Username: jsmith
+
+Summary: An automated alert fired for high response latency in the payments service.
+
+Root cause: A caching layer misconfiguration caused occasional cache misses, impacting response times.
+
+Resolution:
+
+Checked payments service metrics, logs and configs, noticed high cache miss rates
+Corrected caching layer configs and reloaded
+Response latency returned to normal levels, automated alerts ceased
+Monitored payments service to ensure stable operation
+Comments:
+Oncall: Automated alert received for payments service latency. Investigating.
+
+Oncall: Traced issue to caching layer misconfiguration. Correcting configs, latency decreasing. Alerts should stop firing soon.
+Oncall: Payments service latency back to normal levels, automated alerts quiet. Caching config corrected, monitoring service metrics.
+
+The following is a ticket for an incident happened in Project ThunderShift:
+
+ID: IN-011
+Title: Elevated security logging
+
+Time: 3/29/2020 5:30AM
+Username: jdoe
+
+Summary: The security logging system reported increased unauthorized access attempts and brute force login attacks.
+
+Root cause: A network security misconfiguration allowed access to login endpoints from an IP range used by malicious actors.
+
+Resolution:
+
+Checked security logging alerts and logs, noticed IP range with many failed login attempts
+Identified network security group with misconfigured access rule allowing that IP range
+Removed misconfigured access rule, redeployed network security config
+Brute force attempts and unauthorized access logging decreased to normal
+Monitored security logging to ensure no further issues
+Comments:
+Jdoe: Reviewing security logs this morning, seeing lots of failed logins and brute force attempts from a specific IP range. This may indicate a system access issue.
+
+Oncall: Checking security logs and network security configs. Found misconfigured access rule allowing that IP range, removing now.
+
+Jdoe: Brute force login attempts seem to have decreased, was network access resolved?
+
+Oncall: Yes, identified and corrected network security misconfiguration allowing malicious IP range access. Brute force attempts declined to normal levels, closely monitoring security logs.
+
+The following is a ticket for an incident happened in Project ThunderShift:
+ID: IN-012
+Title: Service communication issues
+
+Time: 3/30/2020 1:00PM
+Username: jsmith
+
+Summary: Some services were unable to communicate with other services, returns errors about invalid node ports.
+
+Root cause: A bug in the network proxy caused it to improperly handle IP address changes after pod rescheduling, blocking some inter-service traffic.
+
+Resolution:
+
+Checked service configs, logs and metrics, noticed pod IP changes occurring before errors
+Identified issue with network proxy not properly updating POD IPs after reschedule
+Patched network proxy, restarted proxy pods to pick up fix
+Recreated impacted service pods to refresh IPs, communication restored
+Monitored services and network proxy to verify stable operation
+Comments:
+Jsmith: Some services are unable to reach other services, seeing errors about invalid node ports. This appears to be a networking issue.
+
+Oncall: Investigating network proxy and services. Traced to proxy bug not properly handling pod IP changes after reschedule. Patching and restarting network proxy now.
+
+Jsmith: Service communication appears restored. Was the issue resolved?
+
+Oncall: Yes, identified and patched bug with network proxy not updating POD IPs. Restarted proxy and recreated impacted service pods. Networking stable, monitoring services and network components.
+
+The following is a ticket for an incident happened in Project ThunderShift:
+
+ID: IN-013
+Title: Storage volume capacity alert
+Time: 4/1/2020 8:00PM
+Username: jdoe
+
+Summary: An automated alert triggered warning that a primary storage volume was nearing maximum capacity.
+
+Root cause: Log retention settings were too long, causing log files to build up and fill the storage volume.
+
+Resolution:
+
+Checked storage volume metrics and logs, confirmed high usage and capacity alert
+Analyzed volume usage by types, noticed large amounts of log data
+Shortened log retention settings to free up storage space
+Ran log cleanup job to remove old logs no longer needed
+Storage volume usage declined and capacity alerts ceased firing
+Monitored storage volume to ensure continued stable operation
+Comments:
+
+Oncall: Automated alert received for high primary storage volume usage. Investigating.
+
+Oncall: Log files consuming significant storage space due to long retention settings. Adjusting settings and running log cleanup to free space.
+
+Oncall: Log cleanup complete and retention adjusted. Storage volume usage has declined and alerts quieted. Continuing to monitor.
+
+The following is a ticket for an incident happened in Project ThunderShift:
+ID: IN-014
+Title: Metrics aggregation and monitoring system issues
+
+Time: 4/3/2020 1:15 PM
+
+Username: jsmith
+
+Summary: The metrics aggregation and monitoring system stopped collecting metrics from several components. Alerting was also delayed or not triggered for some events.
+
+Root cause: The metrics db storage volume ran out of disk space, impacting metrics collection and alerting functions.
+
+Resolution:
+
+Checked monitoring system logs and metrics, noticed metrics db disk full errors
+Cleared enough space on metrics db volume to restore basic functioning
+Set db to read-only while resolving root cause of space issue
+Analyzed metrics db usage and pruning settings, adjusted to limit data retained
+Ran pruning job to remove old metrics data on schedule again
+Set db to read-write, metrics collection and alerting operating normally
+Monitored metrics db to ensure continued stability
+Comments:
+Jsmith: Noticing some delays in metrics collection and alerting. Possible issue with monitoring systems.
+
+Oncall: Metrics db volume low on disk space, impacting some monitoring functions. Freeing up enough space to restore now.
+
+Jsmith: Metrics and alerts seem to be back on schedule. Is everything resolved?
+
+Oncall: Yes, identified root cause as excess metrics retention. Adjusted db pruning settings, ran cleanup. System operating normally again, closely watching metrics db.
