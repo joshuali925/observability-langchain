@@ -55,16 +55,18 @@ const specFiles = [path.join(specDirectory, 'get_alerts_tests.jsonl')];
 // command to run in observability-langchain root to delete DS Stores: find . -name '.DS_Store' -type f -delete
 
 // TODO:
-// - figure out potential dynamic population of questions with hardcoded dates (or just remove em outright)
+// - add "when did alert xyz complete" question where xyz is an alert thats still active, answer should be "alert is not yet complete"
+// - refactor populateAlertDocTimestamps() to read from alertTimeToTimestamp map intead of hard-coding again in the function
 
+const alertTimeToTimestamp = new Map<string, number>();
+
+populateAlertTimeToTimestampMap();
 populateAlertDocTimestamps();
 populateTestCaseTimes();
 
 runner.run(specFiles);
 
 function populateAlertDocTimestamps() {
-  const one_hour = 1 * 60 * 60 * 1000; // 1 hr -> milliseconds
-  const three_hours = 3 * 60 * 60 * 1000; // 3 hrs -> milliseconds
 
   const alertLines = fs.readFileSync(
     path.join(
@@ -159,6 +161,52 @@ function populateAlertDocTimestamps() {
   );
 }
 
+function populateTestCaseTimes() {
+  const templateLines = fs.readFileSync(path.join(__dirname, '..', 'templates', 'get_alerts_test_templates.jsonl'), 'utf8');
+  const templateLinesList = templateLines.split('\n');
+
+  for (let i = 0; i < templateLinesList.length; i++) {
+    templateLinesList[i] = formatString(templateLinesList[i]);
+  }
+
+  fs.writeFileSync(
+    path.join(__dirname, '..', 'specs', 'get_alerts_tests.jsonl'),
+    templateLinesList.join('\n')
+  );
+}
+
+// only for trimming Date.toString()
+// Date.toString() comes in format "DayOfWeek Month Day Year Time Timezone",
+// if trimStyle "date" is passed in, this trims DayOfWeek, Time, and Timezone
+// if trimStyle "dateAndTime" is passed in, this trims DayOfWeek, Timezone, and the seconds portion of the Time
+function trimDate(fullDate: string, trimStyle: string) {
+  if (trimStyle === "date") {
+    return fullDate.split(" ").slice(1, 4).join(" "); // trim day of week and timezone info
+  } else if (trimStyle === "dateAndTime") {
+    const dateAndFullTime = fullDate.split(" ").slice(1, 5).join(" "); // trim day of week and timezone info
+    return dateAndFullTime.substring(0, dateAndFullTime.length - 3); // trim seconds off of time
+  }
+  throw new Error(`passed in trimStyle was neither 'date' nor 'dateAndTime', was ${trimStyle} instead`);
+}
+
+// expected syntax of a string format: <{alert-id}.{start_time|end_time|acknowledged_time|last_notification_time},{date|dateAndTime}>
+// example: <0OgfsOs5t6yqi81f3yj18.start_time,dateAndTime>
+function formatString(template: string) {
+  return template.replace(/<(.*?)>/g, function(match, contents) {
+    const arr = contents.split(",");
+    const key = arr[0];
+    const trimStyle = arr[1];
+    if (alertTimeToTimestamp.has(key)) {
+      const val = alertTimeToTimestamp.get(key);
+      if (typeof val == 'undefined') return match;
+      const result = trimDate(new Date(val).toString(), trimStyle);
+      if (typeof result == 'undefined') return match;
+      return result;
+    }
+    return match;
+  });
+}
+
 // caveat to check for: this populates the test cases with dates and times with respect to the time of test framework execution
 // because of time range shifts depending on when this test framework is executed, questions that concern a specific date might become skewed
 // because the dynamically populated time offsets of the alerts might lead into the day before the day intended for testing.
@@ -167,121 +215,72 @@ function populateAlertDocTimestamps() {
 // That being said, the alerts were generated assuming the current time was 5pm (see HEAD_EXAMPLE), so if the tests are executed at or
 // around 5pm, these frameshifts are unlikely to cause issues, which makes this time a useful reference point/anchor
 // as a last resort, if the frameshifts really end up becoming a problem, one could set the time on their local machine to 5pm.
-function populateTestCaseTimes() {
-  const alertLines = fs.readFileSync(
-    path.join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      'data',
-      'indices',
-      'alerting',
-      '.opendistro-alerting-alerts',
-      'documents.ndjson',
-    ),
-    'utf8',
-  );
-  const alertObjectsList = alertLines.split('\n').map((line) => JSON.parse(line));
+function populateAlertTimeToTimestampMap() {
+  const now = Date.now();
+  const one_hour = 1 * 60 * 60 * 1000; // 1 hr -> milliseconds
+  const three_hours = 3 * 60 * 60 * 1000; // 3 hrs -> milliseconds
 
-  const testLines = fs.readFileSync(
-    path.join(__dirname, 'specs', 'get_alerts_tests.jsonl'),
-    'utf8',
-  );
-  const testObjectsList = testLines.split('\n').map((line) => JSON.parse(line));
+  // each alert needs to happen at a very specifically chosen
+  // time for the cluster alerts context to be most diverse
 
-  testObjectsList.forEach(function (testObj) {
-    switch (testObj.id) {
-      case 'ui_PZbaYHYFD_fgoVjkzd': {
-        const alert = alertObjectsList.find((alert) => alert.id === 'uzg0gosB6jqYe1T0y9Aa');
-        const date = trimDay(new Date(alert.start_time).toDateString());
-        testObj.question = `How many alerts were triggered on ${date}?`;
-        testObj.expectedAnswer = `1 alert was triggered on ${date}. The alert has ID uzg0gosB6jqYe1T0y9Aa and was triggered by monitor random_query_monitor.`;
-        break;
-      }
-      case 'ejbPZp9WEgYiyUH7VwPwk': {
-        const alert = alertObjectsList.find((alert) => alert.id === 'dzhPl4sB6jqYe1T0ffaX');
-        const date = trimDay(new Date(alert.start_time).toDateString());
-        testObj.expectedAnswer = `2 monitors triggered alerts on ${date} - random_doc_monitor and random_comp_monitor.`;
-        break;
-      }
-      case 'B_aIDTWPmk0VnO1bfFfNk': {
-        const alert = alertObjectsList.find((alert) => alert.id === 'GThUkYsB6jqYe1T0UOF3');
-        const date = trimDayAndTime(new Date(alert.acknowledged_time).toString());
-        testObj.expectedAnswer = `Yes, 1 alert has been acknowledged in the last 3 days. The alert with ID GThUkYsB6jqYe1T0UOF3 was acknowledged on ${date}.`;
-        break;
-      }
-      case 'E7YDumUyLlZyLmTiZxzCT': {
-        const alert = alertObjectsList.find((alert) => alert.id === 'dzhPl4sB6jqYe1T0ffaX');
-        const date = trimDayAndTime(new Date(alert.start_time).toString());
-        testObj.expectedAnswer = `The composite monitor random_comp_monitor last triggered alert dzhPl4sB6jqYe1T0ffaX on ${date}.`;
-        break;
-      }
-      case 'u0jg-xCfiW7jOmghnyVMM': {
-        const alert = alertObjectsList.find((alert) => alert.id === 'QziGl4sB6jqYe1T0_fnD');
-        const date = trimDayAndTime(new Date(alert.start_time).toString());
-        testObj.expectedAnswer = `The error alert QziGl4sB6jqYe1T0_fnD started on ${date}.`;
-        break;
-      }
-      case 'NYliAiH18aVrM-wacy0Vs': {
-        const alert = alertObjectsList.find((alert) => alert.id === 'QziGl4sB6jqYe1T0_fnD');
-        const date = trimDay(new Date(alert.start_time).toDateString());
-        testObj.question = `What are the names of the monitors that triggered alerts on ${date}?`;
-        testObj.expectedAnswer = `The monitor random_query_monitor triggered an alert on ${date}.`;
-        break;
-      }
-      case 'vzdAN1QaoIFCcS8jQmI-R': {
-        const alert = alertObjectsList.find((alert) => alert.id === 'Xugf4osB7kqi81T0y9pw');
-        const date = trimDayAndTime(new Date(alert.start_time).toString());
-        testObj.expectedAnswer = `The alert with ID \"Xugf4osB7kqi81T0y9pw\" started triggering on ${date}.`;
-        break;
-      }
-      case 'rTZb6QqiQgNA1lVxysmDX': {
-        const alert = alertObjectsList.find((alert) => alert.id === 'QziGl4sB6jqYe1T0_fnD');
-        const date = trimDayAndTime(new Date(alert.start_time).toString());
-        testObj.expectedAnswer = `The most recent error alert with ID QziGl4sB6jqYe1T0_fnD began on ${date}.`;
-        break;
-      }
-      case 'HvnENM6nO1bTy5CknxEtO': {
-        const alert = alertObjectsList.find((alert) => alert.id === 'uzg0gosB6jqYe1T0y9Aa');
-        const date = trimDayAndTime(new Date(alert.last_notification_time).toString());
-        testObj.expectedAnswer = `The last notification time for alert uzg0gosB6jqYe1T0y9Aa was on ${date}.`;
-        break;
-      }
-      case 'MrSeNM6Cq-hva6JhpmlYF': {
-        const alert = alertObjectsList.find((alert) => alert.id === 'hDjvlhfB6jqY61T0PLK5');
-        const date = trimDayAndTime(new Date(alert.start_time).toString());
-        testObj.expectedAnswer = `The most recent alert with ID hDjvlhfB6jqY61T0PLK5 was triggered on ${date}.`;
-        break;
-      }
-      case 'dxhFcfgh98R8_i0xO80ke': {
-        const alert = alertObjectsList.find((alert) => alert.id === 'GThUkYsB6jqYe1T0UOF3');
-        const date = trimDayAndTime(new Date(alert.acknowledged_time).toString());
-        testObj.expectedAnswer = `The alert with ID GThUkYsB6jqYe1T0UOF3 was acknowledged on ${date}.`;
-        break;
-      }
-      default:
-        break;
-    }
-  });
+  // Alert ID 0OgfsOs5t6yqi81f3yj18
+  var start_time = now - 795021000;
+  alertTimeToTimestamp.set("0OgfsOs5t6yqi81f3yj18.start_time", start_time);
+  alertTimeToTimestamp.set("0OgfsOs5t6yqi81f3yj18.last_notification_time", start_time + one_hour);
+  alertTimeToTimestamp.set("0OgfsOs5t6yqi81f3yj18.end_time", start_time + three_hours);
 
-  fs.writeFileSync(
-    path.join(__dirname, 'specs', 'get_alerts_tests.jsonl'),
-    testObjectsList.map((line) => JSON.stringify(line)).join('\n'),
-  );
-}
+  // Alert ID k9gf4os5tkqi81f3y988
+  var start_time = now - 708621000;
+  alertTimeToTimestamp.set("k9gf4os5tkqi81f3y988.start_time", start_time);
+  alertTimeToTimestamp.set("k9gf4os5tkqi81f3y988.last_notification_time", start_time + one_hour);
+  alertTimeToTimestamp.set("k9gf4os5tkqi81f3y988.end_time", start_time + three_hours);
 
-// only for Date.toDateString()s
-// Date.toDateString() comes in format DayOfWeek Month Day Year, this
-// just trims the leading DayOfWeek, leaving only Month Day Year
-function trimDay(date: string) {
-  return date.substring(4);
-}
+  // Alert ID Xugf4osB7kqi81T0y9pw
+  var start_time = now - 622221000;
+  alertTimeToTimestamp.set("Xugf4osB7kqi81T0y9pw.start_time", start_time);
+  alertTimeToTimestamp.set("Xugf4osB7kqi81T0y9pw.last_notification_time", start_time + one_hour);
+  alertTimeToTimestamp.set("Xugf4osB7kqi81T0y9pw.end_time", start_time + three_hours);
 
-// only for Date.toString()s
-// Date.toString() comes in format DayOfWeek Month Day Year Time, and then the timezone,
-// this trims the leading DayOfWeek, the time's seconds place, and the trailing timezone information
-function trimDayAndTime(date: string) {
-  const dateAndFullTime = date.split(' ').slice(1, 5).join(' '); // trim day of week and timezone info
-  return dateAndFullTime.substring(0, dateAndFullTime.length - 3); // trim seconds off of time
+  // Alert ID uzg0gosB6jqYe1T0y9Aa
+  var start_time = now - 535821000;
+  alertTimeToTimestamp.set("uzg0gosB6jqYe1T0y9Aa.start_time", start_time);
+  alertTimeToTimestamp.set("uzg0gosB6jqYe1T0y9Aa.last_notification_time", start_time + one_hour);
+  alertTimeToTimestamp.set("uzg0gosB6jqYe1T0y9Aa.end_time", start_time + three_hours);
+
+  // Alert ID QziGl4sB6jqYe1T0_fnD
+  var start_time = now - 436706000;
+  alertTimeToTimestamp.set("QziGl4sB6jqYe1T0_fnD.start_time", start_time);
+  alertTimeToTimestamp.set("QziGl4sB6jqYe1T0_fnD.last_notification_time", start_time + one_hour);
+  // this alert is not COMPLETED in the cluster context, so it doesn't get an end time
+
+  // Alert ID GThUkYsB6jqYe1T0UOF3
+  var start_time = now - 282097000;
+  alertTimeToTimestamp.set("GThUkYsB6jqYe1T0UOF3.start_time", start_time);
+  alertTimeToTimestamp.set("GThUkYsB6jqYe1T0UOF3.last_notification_time", start_time + one_hour);
+  alertTimeToTimestamp.set("GThUkYsB6jqYe1T0UOF3.acknowledged_time", start_time + three_hours);
+  // this alert is not COMPLETED in the cluster context, so it doesn't get an end time
+
+  // Alert ID ODjvlosB6jqYe1T0MPKU
+  var start_time = now - 188061000;
+  alertTimeToTimestamp.set("ODjvlosB6jqYe1T0MPKU.start_time", start_time);
+  alertTimeToTimestamp.set("ODjvlosB6jqYe1T0MPKU.last_notification_time", start_time + one_hour);
+  // this alert is not COMPLETED in the cluster context, so it doesn't get an end time
+
+  // Alert ID c1dc6e4b-1f71-4662-b444-a2b257546e3b
+  var start_time = now - 95375000;
+  alertTimeToTimestamp.set("c1dc6e4b-1f71-4662-b444-a2b257546e3b.start_time", start_time);
+  alertTimeToTimestamp.set("c1dc6e4b-1f71-4662-b444-a2b257546e3b.last_notification_time", start_time + one_hour);
+  // this alert is not COMPLETED in the cluster context, so it doesn't get an end time
+
+  // Alert ID dzhPl4sB6jqYe1T0ffaX
+  var start_time = now - 95349000;
+  alertTimeToTimestamp.set("dzhPl4sB6jqYe1T0ffaX.start_time", start_time);
+  alertTimeToTimestamp.set("dzhPl4sB6jqYe1T0ffaX.last_notification_time", start_time + one_hour);
+  alertTimeToTimestamp.set("dzhPl4sB6jqYe1T0ffaX.end_time", start_time + three_hours);
+
+  // Alert ID hDjvlhfB6jqY61T0PLK5
+  var start_time = now - 3446000;
+  alertTimeToTimestamp.set("hDjvlhfB6jqY61T0PLK5.start_time", start_time);
+  alertTimeToTimestamp.set("hDjvlhfB6jqY61T0PLK5.last_notification_time", start_time + one_hour);
+  // this alert is not COMPLETED in the cluster context, so it doesn't get an end time
 }
