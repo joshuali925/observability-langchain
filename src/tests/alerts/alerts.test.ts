@@ -74,14 +74,14 @@ runner.run(specFiles);
 // determine if the answer from Olly is valid or not given the context at the time of execution
 // That being said, the alerts were generated assuming the current time was 5pm (see HEAD_EXAMPLE), so if the tests are executed at or
 // around 5pm, these frameshifts are unlikely to cause issues, which makes this time a useful reference point/anchor
-// as a last resort, if the frameshifts really end up becoming a problem, one could set the time on their local machine to 5pm.
 function populateAlertTimeToTimestampMap() {
   const now = Date.now();
   const one_hour = 1 * 60 * 60 * 1000; // 1 hr -> milliseconds
   const three_hours = 3 * 60 * 60 * 1000; // 3 hrs -> milliseconds
 
-  // each alert needs to happen at a very specifically chosen
-  // time for the cluster alerts context to be most diverse
+  // below is a manually curated set of alert times that best diversifies
+  // the cluster's alert context for testing, each alert needs to happen
+  // at a very specifically chosen time for the cluster alerts context to be most diverse
 
   // Alert ID 0OgfsOs5t6yqi81f3yj18
   let start_time = now - 795021000;
