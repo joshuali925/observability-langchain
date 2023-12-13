@@ -4,9 +4,10 @@
  */
 
 import { ApiResponse } from '@opensearch-project/opensearch';
-import { ApiProvider, ProviderEmbeddingResponse, ProviderResponse } from 'promptfoo';
+import { ApiProvider } from 'promptfoo';
 import { openSearchClient } from './clients/opensearch';
 import { PROVIDERS } from './constants';
+import { OpenSearchProviderResponse } from './types';
 
 interface AgentResponse {
   inference_results: Array<{
@@ -39,7 +40,7 @@ export class AgentFrameworkApiProvider implements ApiProvider {
   async callApi(
     prompt: string,
     context?: { vars: Record<string, string | object> },
-  ): Promise<ProviderResponse> {
+  ): Promise<OpenSearchProviderResponse> {
     try {
       const agentId = this.getAgentId();
       const response = (await openSearchClient.transport.request({

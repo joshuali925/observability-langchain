@@ -5,9 +5,10 @@
 
 import { ApiResponse } from '@opensearch-project/opensearch';
 import { GetResponse } from '@opensearch-project/opensearch/api/types';
-import { ApiProvider, ProviderEmbeddingResponse, ProviderResponse } from 'promptfoo';
+import { ApiProvider, ProviderEmbeddingResponse } from 'promptfoo';
 import { openSearchClient } from './clients/opensearch';
 import { ASSISTANT_CONFIG_DOCUMENT, ASSISTANT_CONFIG_INDEX, PROVIDERS } from './constants';
+import { OpenSearchProviderResponse } from './types';
 
 interface MLCommonsPredictionResponse {
   inference_results: Array<{
@@ -51,7 +52,7 @@ export class MlCommonsApiProvider implements ApiProvider {
   async callApi(
     prompt: string,
     context?: { vars: Record<string, string | object> },
-  ): Promise<ProviderResponse> {
+  ): Promise<OpenSearchProviderResponse> {
     try {
       const modelId = (await this.getModelId()).model_id;
       const response = (await openSearchClient.transport.request({

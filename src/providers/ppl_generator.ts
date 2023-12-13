@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ApiProvider, ProviderResponse } from 'promptfoo';
+import { ApiProvider } from 'promptfoo';
 import { ollyClient } from './clients/olly';
 import { PROVIDERS } from './constants';
+import { OpenSearchProviderResponse } from './types';
 
 export class PPLGeneratorApiProvider implements ApiProvider {
   constructor(private readonly providerId = PROVIDERS.OLLY) {}
@@ -17,7 +18,7 @@ export class PPLGeneratorApiProvider implements ApiProvider {
   async callApi(
     prompt: string,
     context?: { vars: Record<string, string | object> },
-  ): Promise<ProviderResponse> {
+  ): Promise<OpenSearchProviderResponse> {
     if (!context?.vars.index || typeof context.vars.index !== 'string')
       throw new Error('a string value is required for context.vars.index');
 

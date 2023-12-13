@@ -6,10 +6,10 @@
 import { ApiResponse } from '@opensearch-project/opensearch';
 import { ResponseError } from '@opensearch-project/opensearch/lib/errors';
 import _ from 'lodash';
-import { ProviderResponse } from 'promptfoo';
+import { ApiProvider } from 'promptfoo';
 import { LevenshteinMatcher } from '../../matchers/levenshtein';
 import { openSearchClient } from '../../providers/clients/opensearch';
-import { PPLGeneratorApiProvider } from '../../providers/ppl_generator';
+import { OpenSearchProviderResponse } from '../../providers/types';
 import { OpenSearchTestIndices } from '../../utils/indices';
 import { TestResult, TestRunner, TestSpec } from '../test_runner';
 
@@ -26,7 +26,7 @@ interface PPLResponse {
   size: number;
 }
 
-export class PPLRunner extends TestRunner<PPLSpec, PPLGeneratorApiProvider> {
+export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
   levenshtein = new LevenshteinMatcher();
 
   protected async beforeAll(clusterStateId: string): Promise<void> {
@@ -45,7 +45,10 @@ export class PPLRunner extends TestRunner<PPLSpec, PPLGeneratorApiProvider> {
     };
   }
 
-  public async compareResults(received: ProviderResponse, spec: PPLSpec): Promise<TestResult> {
+  public async compareResults(
+    received: OpenSearchProviderResponse,
+    spec: PPLSpec,
+  ): Promise<TestResult> {
     try {
       const actual = (await openSearchClient.transport.request({
         method: 'POST',
