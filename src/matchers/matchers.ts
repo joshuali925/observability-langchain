@@ -9,6 +9,8 @@ import { PROVIDERS } from '../providers/constants';
 import { ApiProviderFactory } from '../providers/factory';
 import { TestResult, TestRunner, TestSpec } from '../runners/test_runner';
 
+const DEFAULT_THRESHOLD = 0.8;
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
@@ -27,7 +29,33 @@ export interface Matcher<T = unknown> {
   calculateScore(received: T, expected: T): number;
 }
 
-const { matchesSimilarity, matchesLlmRubric } = assertions;
+export const matchesSimilarity = (
+  received: string,
+  expected: string,
+  options: { threshold?: number; inverse?: boolean; gradingConfig?: GradingConfig } = {},
+) => {
+  return assertions.matchesSimilarity(
+    received,
+    expected,
+    options.threshold ?? DEFAULT_THRESHOLD,
+    options.inverse,
+    {
+      provider: ApiProviderFactory.create(PROVIDERS.ML_COMMONS),
+      ...options.gradingConfig,
+    },
+  );
+};
+
+export const matchesLlmRubric = (
+  received: string,
+  expected: string,
+  gradingConfig: GradingConfig,
+) => {
+  return assertions.matchesLlmRubric(expected, received, {
+    provider: ApiProviderFactory.create(PROVIDERS.ML_COMMONS),
+    ...gradingConfig,
+  });
+};
 
 export function installJestMatchers() {
   expect.extend({
@@ -36,17 +64,17 @@ export function installJestMatchers() {
       spec: T,
       runner: TestRunner<T, U>,
     ): Promise<TestResult> {
-      return runner.compareResults(received, spec);
+      const results = await runner.compareResults(received, spec);
+      await runner.persistMetadata(spec, received, results);
+      return results;
     },
 
     async toMatchSemanticSimilarity(
       received: string,
       expected: string,
-      threshold: number = 0.8,
+      threshold?: number,
     ): Promise<jest.CustomMatcherResult> {
-      const result = await matchesSimilarity(received, expected, threshold, undefined, {
-        provider: ApiProviderFactory.create(PROVIDERS.ML_COMMONS),
-      });
+      const result = await matchesSimilarity(received, expected, { threshold });
       const pass = received === expected || result.pass;
       if (pass) {
         return {
@@ -67,10 +95,7 @@ export function installJestMatchers() {
       expected: string,
       gradingConfig: GradingConfig,
     ): Promise<jest.CustomMatcherResult> {
-      const gradingResult = await matchesLlmRubric(expected, received, {
-        provider: ApiProviderFactory.create(PROVIDERS.ML_COMMONS),
-        ...gradingConfig,
-      });
+      const gradingResult = await matchesLlmRubric(expected, received, gradingConfig);
       if (gradingResult.pass) {
         return {
           message: () => `expected ${received} not to pass LLM Rubric with ${expected}`,

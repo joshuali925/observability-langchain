@@ -68,19 +68,14 @@ export class PPLRunner extends TestRunner<PPLSpec, PPLGeneratorApiProvider> {
             JSON.stringify(actual.body.datarows),
             JSON.stringify(expected.body.datarows),
           );
-      await this.persistMetadata({
-        id: spec.id,
-        input: spec.question,
-        output: received.output,
-        expected: spec.gold_query,
-        score,
-        exception: null,
-      });
       return {
         pass,
         message: () =>
           `expected ${received.output} to have the same response as ${spec.gold_query}.`,
         score,
+        extras: {
+          exception: null,
+        },
       };
     } catch (error) {
       const respError = (error as ResponseError<string>).body;
@@ -88,18 +83,13 @@ export class PPLRunner extends TestRunner<PPLSpec, PPLGeneratorApiProvider> {
         error: { reason: string; details: string; type: string };
         status: number;
       };
-      await this.persistMetadata({
-        id: spec.id,
-        input: spec.question,
-        output: received.output,
-        expected: spec.gold_query,
-        score: 0,
-        exception: pplError.error.type,
-      });
       return {
         pass: false,
         message: () => `failed to execute query: ${String(error)}`,
         score: 0,
+        extras: {
+          exception: pplError.error.type,
+        },
       };
     }
   }

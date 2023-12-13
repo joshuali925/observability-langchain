@@ -7,7 +7,7 @@ import { ProviderResponse } from 'promptfoo';
 import { OllyApiProvider } from '../../providers/olly';
 import { TestResult, TestRunner, TestSpec } from '../test_runner';
 
-interface QASpec extends TestSpec {
+export interface QASpec extends TestSpec {
   question: string;
   expectedAnswer: string;
 }
@@ -24,8 +24,8 @@ export class QARunner extends TestRunner<QASpec, OllyApiProvider> {
   }
 
   public compareResults(received: ProviderResponse, spec: QASpec): Promise<TestResult> {
+    console.log(`Received: ${String(received.output)}\nExpected: ${String(spec.expectedAnswer)}`);
     try {
-      console.log(received.output, spec.expectedAnswer);
       return Promise.resolve({
         pass: true,
         message: () =>
