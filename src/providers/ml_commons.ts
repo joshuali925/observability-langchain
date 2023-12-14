@@ -51,7 +51,7 @@ export class MlCommonsApiProvider implements ApiProvider {
 
   async callApi(
     prompt: string,
-    context?: { vars: Record<string, string | object> },
+    _context?: { vars: Record<string, string | object> },
   ): Promise<OpenSearchProviderResponse> {
     try {
       const modelId = (await this.getModelId()).model_id;

@@ -34,10 +34,10 @@ export abstract class TestRunner<
     this.apiProvider = apiProvider as U;
   }
 
-  protected async beforeAll(clusterStateId: string): Promise<void> {}
-  protected async afterAll(clusterStateId: string): Promise<void> {}
-  protected async beforeEach(clusterStateId: string): Promise<void> {}
-  protected async afterEach(clusterStateId: string): Promise<void> {}
+  protected async beforeAll(_clusterStateId: string): Promise<void> {}
+  protected async afterAll(_clusterStateId: string): Promise<void> {}
+  protected async beforeEach(_clusterStateId: string): Promise<void> {}
+  protected async afterEach(_clusterStateId: string): Promise<void> {}
 
   /**
    * Build prompt and context to call api provider from each test case.

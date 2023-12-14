@@ -29,7 +29,7 @@ export class OllyApiProvider implements ApiProvider {
 
   async callApi(
     prompt: string,
-    context?: { vars: Record<string, string | object> },
+    _context?: { vars: Record<string, string | object> },
   ): Promise<OllyProviderResponse> {
     try {
       return ollyClient.sendMessage(prompt);

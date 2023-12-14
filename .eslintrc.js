@@ -22,7 +22,14 @@ module.exports = {
   ignorePatterns: ['data/documentations', 'coverage'],
   plugins: ['jest', 'import', 'license-header'],
   rules: {
-    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      },
+    ],
     'import/newline-after-import': ['error', { count: 1 }],
     'import/order': [
       'warn',

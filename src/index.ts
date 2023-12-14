@@ -6,6 +6,7 @@
 import { OpenSearchTestIndices } from './utils/indices';
 
 void (async () => {
+  await OpenSearchTestIndices.init();
   await OpenSearchTestIndices.deleteAll();
   await OpenSearchTestIndices.create();
 })();

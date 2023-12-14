@@ -39,7 +39,7 @@ export class AgentFrameworkApiProvider implements ApiProvider {
 
   async callApi(
     prompt: string,
-    context?: { vars: Record<string, string | object> },
+    _context?: { vars: Record<string, string | object> },
   ): Promise<OpenSearchProviderResponse> {
     try {
       const agentId = this.getAgentId();
