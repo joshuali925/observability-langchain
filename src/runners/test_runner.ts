@@ -36,8 +36,6 @@ export abstract class TestRunner<
 
   protected async beforeAll(_clusterStateId: string): Promise<void> {}
   protected async afterAll(_clusterStateId: string): Promise<void> {}
-  protected async beforeEach(_clusterStateId: string): Promise<void> {}
-  protected async afterEach(_clusterStateId: string): Promise<void> {}
 
   /**
    * Build prompt and context to call api provider from each test case.
@@ -90,19 +88,24 @@ export abstract class TestRunner<
         clusterStateIdToSpec[spec.clusterStateId] = [];
       clusterStateIdToSpec[spec.clusterStateId].push(spec);
     });
+    // workaround for using beforeAll with it.concurrent: https://github.com/jestjs/jest/issues/7997#issuecomment-796965078
+    let beforeAllResolve: (value?: unknown) => void;
+    const beforeAllPromise = new Promise((resolve) => {
+      beforeAllResolve = resolve;
+    });
     describe.each(Object.keys(clusterStateIdToSpec))('Cluster state %s', (clusterStateId) => {
-      beforeAll(() => {
+      beforeAll(async () => {
         this.resetMetadata();
-        return this.beforeAll(clusterStateId);
+        await this.beforeAll(clusterStateId);
+        beforeAllResolve();
       });
       afterAll(() => {
         this.summarize();
         this.resetMetadata();
         return this.afterAll(clusterStateId);
       });
-      beforeEach(() => this.beforeEach(clusterStateId));
-      afterEach(() => this.afterEach(clusterStateId));
-      it.each(clusterStateIdToSpec[clusterStateId])('Test-id $id', async (spec) => {
+      it.concurrent.each(clusterStateIdToSpec[clusterStateId])('Test-id $id', async (spec) => {
+        await beforeAllPromise;
         console.info(`Running test: ${spec.id}`);
         const received = await this.runSpec(spec);
         await expect(received).toMatchRunnerExpectations(spec, this);
@@ -130,10 +133,8 @@ export abstract class TestRunner<
    * @param specFiles an array of test spec files
    */
   public run(specFiles: string[]) {
-    describe.each(specFiles)('%s', (path) => {
-      const specs = this.parseTestSpecs(path);
-      void this.runSpecs(specs);
-    });
+    const specs = specFiles.flatMap((filePath) => this.parseTestSpecs(filePath));
+    void this.runSpecs(specs);
   }
 
   /**

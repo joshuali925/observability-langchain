@@ -14,10 +14,14 @@ export API_PROVIDER=olly_chat
 export AGENT_ID=<agent-id>
 
 npm i
+# run all tests
 npm run test
 
 # run tests for a specific tool
 npm run test src/tests/api/cat.test.ts
+
+# run tests with sequential execution (default concurrency is 5)
+npm run test src/tests/api/cat.test.ts --maxConcurrency=1
 ```
 
 # Adding Alerting Test Cases
