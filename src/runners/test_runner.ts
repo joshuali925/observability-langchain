@@ -179,6 +179,7 @@ export abstract class TestRunner<
       pass: result.pass,
       output: received.output,
       error: received.error,
+      matcher_message: result.message(),
       extras: result.extras,
       executed_at: Date.now(),
       execution_ms: executionMs,

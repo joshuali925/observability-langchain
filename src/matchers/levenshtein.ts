@@ -7,8 +7,10 @@ import { distance as levenshtein } from 'fastest-levenshtein';
 import { Matcher } from './matchers';
 
 export class LevenshteinMatcher implements Matcher<string> {
-  public calculateScore(received: string, expected: string): number {
-    return this.normalize(received, expected, levenshtein(received, expected));
+  public calculateScore(received: string, expected: string) {
+    return Promise.resolve({
+      score: this.normalize(received, expected, levenshtein(received, expected)),
+    });
   }
 
   private normalize(received: string, expected: string, distance: number): number {

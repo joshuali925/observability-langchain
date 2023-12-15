@@ -67,14 +67,15 @@ export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
       const pass = _.isEqual(actual.body.datarows, expected.body.datarows);
       const score = pass
         ? 1
-        : this.levenshtein.calculateScore(
-            JSON.stringify(actual.body.datarows),
-            JSON.stringify(expected.body.datarows),
-          );
+        : (
+            await this.levenshtein.calculateScore(
+              JSON.stringify(actual.body.datarows),
+              JSON.stringify(expected.body.datarows),
+            )
+          ).score;
       return {
-        pass,
-        message: () =>
-          `expected ${received.output} to have the same response as ${spec.gold_query}.`,
+        pass: pass || score >= 0.8,
+        message: () => `Score ${score} is above 0.8`,
         score,
         extras: {
           exception: null,

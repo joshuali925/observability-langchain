@@ -27,7 +27,11 @@ declare global {
 }
 
 export interface Matcher<T = unknown> {
-  calculateScore(received: T, expected: T): number;
+  calculateScore(
+    received: T,
+    expected: T,
+    context?: Record<string, unknown>,
+  ): Promise<{ score: number } & Record<string, unknown>>;
 }
 
 export const matchesSimilarity = (
@@ -66,8 +70,14 @@ export function installJestMatchers() {
       executionMs: number,
       runner: TestRunner<T, U>,
     ): Promise<TestResult> {
-      const result = await runner.compareResults(received, spec);
-      await runner.persistMetadata(spec, received, result, executionMs);
+      const result = await runner.compareResults(received, spec).catch((error) => ({
+        pass: false,
+        message: () => `Result comparison failed to run: ${String(error)}`,
+        score: 0,
+      }));
+      await runner.persistMetadata(spec, received, result, executionMs).catch((error) => {
+        console.error(`Failed to persist metadata: ${String(error)}`);
+      });
       return result;
     },
 
