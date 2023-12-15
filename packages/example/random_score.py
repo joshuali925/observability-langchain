@@ -3,14 +3,15 @@ import sys
 import random
 
 def main():
-    if len(sys.argv) >= 3:
-        output = sys.argv[1]
-        context = json.loads(sys.argv[2])
-    else:
-        raise ValueError("Model output and context are expected.")
+    if len(sys.argv) < 3: raise ValueError("Model output and context are expected.")
+
+    received = sys.argv[1]
+    context = json.loads(sys.argv[2])
+    expected = context["expected"]
+
+    print('received:', received, file=sys.stderr)
+    print('expected:', expected, file=sys.stderr)
     results = {}
-    results["output"] = output
-    results["context"] = context
     results["score"] = random.random()
     return json.dumps(results)
 

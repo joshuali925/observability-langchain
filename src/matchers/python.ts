@@ -68,20 +68,17 @@ export class PythonMatcher implements Matcher<string> {
 
   private findPythonBin(dir: string): string | undefined {
     if (dir === this.packageDir) return;
-
     const pythonPath = PythonMatcher.venvNames
       .map((venv) => {
         const pythonPath = path.join(dir, venv, 'bin', 'python');
         try {
           if (fsSync.statSync(pythonPath).isFile()) return pythonPath;
         } catch (error) {
-          return false;
+          return undefined;
         }
       })
       .find((python) => python);
-
     if (pythonPath) return pythonPath;
-
     return this.findPythonBin(path.dirname(dir));
   }
 
@@ -102,7 +99,9 @@ export class PythonMatcher implements Matcher<string> {
       try {
         const parsed = JSON.parse(result) as object;
         if (!parsed.hasOwnProperty('score')) {
-          throw new Error('Python matcher must return a number or an object with {score: number}');
+          throw new Error(
+            'Python matcher must return a number or JSON string with {score: number}',
+          );
         }
         return parsed as ReturnType<Matcher['calculateScore']>;
       } catch (error) {
@@ -111,9 +110,8 @@ export class PythonMatcher implements Matcher<string> {
     }
 
     const score = parseFloat(result);
-    if (isNaN(score)) {
-      throw new Error('Python matcher must return a number or an object with {score: number}');
-    }
+    if (isNaN(score))
+      throw new Error('Python matcher must return a number or JSON string with {score: number}');
     return { score };
   }
 }
