@@ -5,6 +5,7 @@
 
 /* eslint-disable jest/no-export */
 
+import console from 'console';
 import fs from 'fs';
 import fsPromises from 'node:fs/promises';
 import path from 'path';
@@ -23,12 +24,20 @@ export interface TestResult extends jest.CustomMatcherResult {
   extras?: Record<string, unknown>;
 }
 
+interface TestRunMetadata extends Record<string, unknown> {
+  id: string;
+  score: number;
+  pass: boolean;
+  executed_at: number;
+  execution_ms: number;
+}
+
 export abstract class TestRunner<
   T extends TestSpec = TestSpec,
   U extends ApiProvider = ApiProvider,
 > {
   private resultsFilePath?: string;
-  private persistedMetadata: { score: number; pass: boolean }[] = [];
+  private persistedMetadata: TestRunMetadata[] = [];
 
   constructor(private readonly apiProvider: ApiProvider) {
     this.apiProvider = apiProvider as U;
@@ -94,12 +103,15 @@ export abstract class TestRunner<
       beforeAllResolve = resolve;
     });
     describe.each(Object.keys(clusterStateIdToSpec))('Cluster state %s', (clusterStateId) => {
+      const jestConsoleInfo = console['info'];
       beforeAll(async () => {
+        global.console.info = console['info'];
         this.resetMetadata();
         await this.beforeAll(clusterStateId);
         beforeAllResolve();
       });
       afterAll(() => {
+        global.console.info = jestConsoleInfo;
         this.summarize();
         this.resetMetadata();
         return this.afterAll(clusterStateId);
@@ -107,8 +119,10 @@ export abstract class TestRunner<
       it.concurrent.each(clusterStateIdToSpec[clusterStateId])('Test-id $id', async (spec) => {
         await beforeAllPromise;
         console.info(`Running test: ${spec.id}`);
+        const start = Date.now();
         const received = await this.runSpec(spec);
-        await expect(received).toMatchRunnerExpectations(spec, this);
+        const executionMs = Date.now() - start;
+        await expect(received).toMatchRunnerExpectations(spec, executionMs, this);
       });
     });
   }
@@ -157,7 +171,8 @@ export abstract class TestRunner<
     spec: T,
     received: Awaited<ReturnType<U['callApi']>>,
     result: TestResult,
-  ): (typeof this.persistedMetadata)[number] & Record<string, unknown> {
+    executionMs: number,
+  ): TestRunMetadata {
     return {
       id: spec.id,
       score: result.score,
@@ -166,6 +181,7 @@ export abstract class TestRunner<
       error: received.error,
       extras: result.extras,
       executed_at: Date.now(),
+      execution_ms: executionMs,
     };
   }
 
@@ -203,11 +219,13 @@ export abstract class TestRunner<
     const min = Math.min(...this.persistedMetadata.map((metadata) => metadata.score));
     const max = Math.max(...this.persistedMetadata.map((metadata) => metadata.score));
     const passRate = this.persistedMetadata.filter((metadata) => metadata.pass).length / total;
+    const averageExecutionMs =
+      this.persistedMetadata.reduce((sum, metadata) => sum + metadata.execution_ms, 0) / total;
     const summary = `Summary: ${total} tests, average score: ${average.toFixed(
       2,
     )}, range: ${min.toFixed(2)} - ${max.toFixed(2)}. Pass rate: ${
       Number(passRate.toFixed(4)) * 100
-    }%`;
+    }%, average execution time: ${averageExecutionMs.toFixed(2)} ms`;
     console.info(summary);
     return summary;
   }

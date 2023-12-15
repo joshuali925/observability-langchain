@@ -19,6 +19,7 @@ declare global {
       toPassLLMRubric(expected: string, gradingConfig: GradingConfig): Promise<R>;
       toMatchRunnerExpectations<T extends TestSpec, U extends ApiProvider>(
         spec: T,
+        executionMs: number,
         runner: TestRunner<T, U>,
       ): Promise<R>;
     }
@@ -62,11 +63,12 @@ export function installJestMatchers() {
     async toMatchRunnerExpectations<T extends TestSpec, U extends ApiProvider>(
       received: Awaited<ReturnType<U['callApi']>>,
       spec: T,
+      executionMs: number,
       runner: TestRunner<T, U>,
     ): Promise<TestResult> {
-      const results = await runner.compareResults(received, spec);
-      await runner.persistMetadata(spec, received, results);
-      return results;
+      const result = await runner.compareResults(received, spec);
+      await runner.persistMetadata(spec, received, result, executionMs);
+      return result;
     },
 
     async toMatchSemanticSimilarity(
