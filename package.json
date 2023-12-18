@@ -6,7 +6,8 @@
     "test": "NODE_TLS_REJECT_UNAUTHORIZED=0 jest --config ./configs/jest.config.js --runInBand",
     "prepare": "husky install",
     "lint": "eslint --fix .",
-    "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 ts-node src/index.ts"
+    "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 ts-node src/index.ts",
+    "postinstall": "find ./packages -name requirements.txt -type f -execdir sh -c '[ ! -d venv ] && python3 -m venv venv; source venv/bin/activate; pip install -r {}' \\;"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
