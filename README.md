@@ -1,28 +1,43 @@
 # Assistant Testing Framework
 
+## Run test framework
+
+### 1. Clone repo and install dependencies
+
 ```bash
-# set environment variables, defaults:
-export OPENSEARCH_URL=https://localhost:9200
-export DASHBOARDS_URL=http://localhost:5601
-export OPENSEARCH_USERNAME=admin
-export OPENSEARCH_PASSWORD=admin
-
-# optional variables:
-# set the api provider if not specified in tests, see ./src/providers/constants/index.ts for possible options
-export API_PROVIDER=olly_chat
-# agent id is required if using 'agent_framework' as provider
-export AGENT_ID=<agent-id>
-
+git clone https://github.com/joshuali925/observability-langchain -b assistant-tests
+cd assistant-tests
 npm i
+```
+
+### 2. Set up environment variables
+
+You can set environment variables in a `.env` file, or export them before running the test, or do something like `VAR=VAL npm run test`. Here are a list of variables used:
+
+- `OPENSEARCH_URL`: the opensearch endpoint. defaults to `https://localhost:9200`
+- `DASHBOARDS_URL`: the dashboards endpoint. defaults to `http://localhost:5601`
+- `OPENSEARCH_USERNAME`: username of the user, make sure the user has permission to make ml-commons requests. defaults to `admin`
+- `OPENSEARCH_PASSWORD`: password of the user. defaults to `admin`
+- `API_PROVIDER`: which API provider to use for testing. defaults to `olly_chat`. options: `olly_chat` or `agent_framework`
+- Agent ID variables: required if `API_PROVIDER=agent_framework`
+    - `AGENT_ID`: the agent_id for the root agent in chat related tests
+    - `PPL_AGENT_ID`: the agent_id that uses the PPLTool for PPL related tests
+
+### 3. Run tests
+```bash
 # run all tests
 npm run test
 
 # run tests for a specific tool
-npm run test src/tests/api/cat.test.ts
+npm run test -- src/tests/api/cat.test.ts
 
 # run tests with sequential execution (default concurrency is 5)
 npm run test -- src/tests/api/cat.test.ts --maxConcurrency=1
 ```
+
+### 4. See results
+
+Results are stored in the [results](./results) directory.
 
 # Adding Alerting Test Cases
 If you're adding test cases to test the Alerting tool, please add your test cases to `src/tests/templates/get_alerts_test_templates.jsonl`. The test questions follow a template for questions or answers that concern specific dates (e.g. "How many alerts triggered on December 6?"). Any questions or answers that don't involve specific dates can be added as is, but for those that do involve specific dates, please follow the following syntax:
