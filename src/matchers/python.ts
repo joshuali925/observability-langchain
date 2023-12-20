@@ -12,7 +12,7 @@ const shell = (command: string): Promise<string> => {
   return new Promise((resolve, reject) =>
     exec(command, (error, stdout, stderr) => {
       if (stderr) {
-        console.warn(`stderr: ${stderr.trim()}`);
+        console.warn(`command: ${command}\nstderr: ${stderr.trim()}`);
       }
       if (error) {
         reject(error.message);
@@ -87,12 +87,10 @@ export class PythonMatcher implements Matcher<string> {
     expected: string,
     context?: Record<string, unknown>,
   ) {
-    const escapedOutput = received.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    const escapedContext = JSON.stringify({ ...context, expected })
-      .replace(/"/g, '\\"')
-      .replace(/\n/g, '\\n');
+    const escapedOutput = received.replace(/'/g, `'"'"'`);
+    const escapedContext = JSON.stringify({ expected, ...context }).replace(/'/g, `'"'"'`);
     const result = (
-      await shell(`"${this.executable}" "${this.filePath}" "${escapedOutput}" "${escapedContext}"`)
+      await shell(`"${this.executable}" "${this.filePath}" '${escapedOutput}' '${escapedContext}'`)
     ).trim();
 
     if (result.startsWith('{')) {
@@ -109,7 +107,10 @@ export class PythonMatcher implements Matcher<string> {
       }
     }
 
-    const score = parseFloat(result);
+    let score = 0;
+    if (result.toLowerCase() === 'false') score = 0;
+    else if (result.toLowerCase() === 'true') score = 1;
+    else score = parseFloat(result);
     if (isNaN(score))
       throw new Error('Python matcher must return a number or JSON string with {score: number}');
     return { score };

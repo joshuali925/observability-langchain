@@ -11,6 +11,6 @@ import { PPLRunner } from '../../runners/query/ppl_runner';
 const provider = ApiProviderFactory.create(PROVIDERS.PPL_GENERATOR);
 const runner = new PPLRunner(provider);
 const specDirectory = path.join(__dirname, 'specs');
-const specFiles = [path.join(specDirectory, 'olly_ppl_eval_short.jsonl')];
+const specFiles = [path.join(specDirectory, 'olly_ppl_eval.jsonl')];
 
 runner.run(specFiles);
