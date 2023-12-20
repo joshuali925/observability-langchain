@@ -4,10 +4,10 @@
  */
 
 import { ApiProvider } from 'promptfoo';
-import { IMessage } from '../types';
-import { ollyClient } from './clients/olly';
-import { PROVIDERS } from './constants';
-import { OpenSearchProviderResponse } from './types';
+import { IMessage } from '../../types';
+import { ollyClient } from '../clients/olly';
+import { PROVIDERS } from '../constants';
+import { OpenSearchProviderResponse } from '../types';
 
 type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
 

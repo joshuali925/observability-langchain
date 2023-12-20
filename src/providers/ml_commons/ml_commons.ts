@@ -6,9 +6,9 @@
 import { ApiResponse } from '@opensearch-project/opensearch';
 import { GetResponse } from '@opensearch-project/opensearch/api/types';
 import { ApiProvider, ProviderEmbeddingResponse } from 'promptfoo';
-import { openSearchClient } from './clients/opensearch';
-import { ASSISTANT_CONFIG_DOCUMENT, ASSISTANT_CONFIG_INDEX, PROVIDERS } from './constants';
-import { OpenSearchProviderResponse } from './types';
+import { openSearchClient } from '../clients/opensearch';
+import { ASSISTANT_CONFIG_DOCUMENT, ASSISTANT_CONFIG_INDEX, PROVIDERS } from '../constants';
+import { OpenSearchProviderResponse } from '../types';
 
 interface MLCommonsPredictionResponse {
   inference_results: Array<{

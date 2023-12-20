@@ -4,12 +4,12 @@
  */
 
 import { ApiProvider } from 'promptfoo';
-import { ollyClient } from './clients/olly';
-import { PROVIDERS } from './constants';
-import { OpenSearchProviderResponse } from './types';
+import { ollyClient } from '../clients/olly';
+import { PROVIDERS } from '../constants';
+import { OpenSearchProviderResponse } from '../types';
 
-export class PPLGeneratorApiProvider implements ApiProvider {
-  constructor(private readonly providerId = PROVIDERS.OLLY) {}
+export class OllyPPLGeneratorApiProvider implements ApiProvider {
+  constructor(private readonly providerId = PROVIDERS.PPL_GENERATOR) {}
 
   id() {
     return this.providerId;

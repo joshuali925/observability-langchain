@@ -52,15 +52,30 @@ export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
     };
   }
 
+  private getPPLFromResponse(received: OpenSearchProviderResponse): string {
+    if (!received.output) throw new Error('Received empty response');
+    // https://github.com/opensearch-project/skills/blob/c037b2afeebc746e8bd0fe38c7e8b0f8622030f3/src/main/java/org/opensearch/agent/tools/PPLTool.java#L129
+    if (received.output.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(received.output) as { ppl: string; executionResult: object };
+        return parsed.ppl;
+      } catch (error) {
+        throw new Error(`Cannot find PPL from received response ${received.output}`);
+      }
+    }
+    return received.output;
+  }
+
   public async compareResults(
     received: OpenSearchProviderResponse,
     spec: PPLSpec,
   ): Promise<TestResult> {
     try {
+      const ppl = this.getPPLFromResponse(received);
       const actual = (await openSearchClient.transport.request({
         method: 'POST',
         path: `/_plugins/_ppl`,
-        body: JSON.stringify({ query: received.output }),
+        body: JSON.stringify({ query: ppl }),
       })) as ApiResponse<PPLResponse>;
       const expected = (await openSearchClient.transport.request({
         method: 'POST',
@@ -84,6 +99,9 @@ export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
           JSON.stringify(expected.body.datarows),
         )
       ).score;
+      console.info(`Received PPL: ${ppl}`);
+      console.info(`Expected SQL: ${spec.gold_query}`);
+      console.info(`Score: ${evalResult.score}`);
       return {
         pass: evalResult.score >= 0.8,
         message: () => `Score ${evalResult.score} is above 0.8`,

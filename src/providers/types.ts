@@ -11,4 +11,5 @@ export interface OpenSearchProviderResponse<T extends ProviderResponse['output']
    * output is an optional string unless specified by generics.
    */
   output?: T;
+  extras?: Record<string, unknown>;
 }

@@ -4,19 +4,26 @@
  */
 
 import { ApiProvider } from 'promptfoo';
-import { AgentFrameworkApiProvider } from '../agent_framework';
 import { PROVIDERS } from '../constants';
-import { MlCommonsApiProvider } from '../ml_commons';
-import { OllyApiProvider } from '../olly';
-import { PPLGeneratorApiProvider } from '../ppl_generator';
+import { AgentFrameworkApiProvider, MlCommonsApiProvider } from '../ml_commons';
+import { OllyApiProvider, OllyPPLGeneratorApiProvider } from '../olly';
 
 type Provider = (typeof PROVIDERS)[keyof typeof PROVIDERS];
 
+interface CreateOptions {
+  agentIdKey?: string;
+}
+
 export class ApiProviderFactory {
-  static create(provider: Provider = process.env.API_PROVIDER as Provider): ApiProvider {
+  static create(
+    provider: Provider = process.env.API_PROVIDER as Provider,
+    options: CreateOptions = {},
+  ): ApiProvider {
     switch (provider) {
       case PROVIDERS.PPL_GENERATOR:
-        return new PPLGeneratorApiProvider();
+        if (process.env.API_PROVIDER === PROVIDERS.AGENT_FRAMEWORK)
+          return new AgentFrameworkApiProvider(undefined, options.agentIdKey);
+        return new OllyPPLGeneratorApiProvider();
 
       case PROVIDERS.ML_COMMONS:
         return new MlCommonsApiProvider();

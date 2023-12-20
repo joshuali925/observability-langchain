@@ -5,7 +5,7 @@
 
 import { IMessage } from '../../types';
 import { OPENSEARCH_CONFIG } from '../constants';
-import { OllyProviderResponse } from '../olly';
+import { OllyProviderResponse } from '../olly/olly';
 
 const getAuthHeader = (): { Authorization: string } | undefined => {
   if (!OPENSEARCH_CONFIG.OPENSEARCH_USERNAME || !OPENSEARCH_CONFIG.OPENSEARCH_PASSWORD) {
