@@ -70,11 +70,30 @@ export function installJestMatchers() {
       executionMs: number,
       runner: TestRunner<T, U>,
     ): Promise<TestResult> {
-      const result = await runner.compareResults(received, spec).catch((error) => ({
-        pass: false,
-        message: () => `Result comparison failed to run: ${String(error)}`,
-        score: 0,
-      }));
+      let result: TestResult;
+      if (received.error) {
+        console.error(String(received.error));
+        result = {
+          pass: false,
+          score: 0,
+          message: () => String(received.error),
+          extras: { api_error: true },
+        };
+      } else if (!received.output) {
+        console.error('result is empty');
+        result = {
+          pass: false,
+          score: 0,
+          message: () => 'result is empty',
+          extras: { empty_result: true },
+        };
+      } else {
+        result = await runner.compareResults(received, spec).catch((error) => ({
+          pass: false,
+          message: () => `Result comparison failed to run: ${String(error)}`,
+          score: 0,
+        }));
+      }
       await runner.persistMetadata(spec, received, result, executionMs).catch((error) => {
         console.error(`Failed to persist metadata: ${String(error)}`);
       });

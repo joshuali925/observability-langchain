@@ -80,8 +80,6 @@ export abstract class TestRunner<
     const received = (await this.apiProvider.callApi(input.prompt, input.context)) as Awaited<
       ReturnType<U['callApi']>
     >;
-    if (received.error) throw new Error(received.error);
-    if (!received.output) throw new Error('result is empty');
     return received;
   }
 
