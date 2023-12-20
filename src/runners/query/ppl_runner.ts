@@ -5,7 +5,6 @@
 
 import { ApiResponse } from '@opensearch-project/opensearch';
 import { ResponseError } from '@opensearch-project/opensearch/lib/errors';
-import _ from 'lodash';
 import { ApiProvider } from 'promptfoo';
 import { LevenshteinMatcher } from '../../matchers/levenshtein';
 import { PythonMatcher } from '../../matchers/python';
@@ -27,14 +26,20 @@ interface PPLResponse {
   size: number;
 }
 
+class SqlRunError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'SqlRunError';
+  }
+}
+
 export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
   levenshtein = new LevenshteinMatcher();
   query_eval = new PythonMatcher('os_query_eval/eval.py');
 
   protected async beforeAll(clusterStateId: string): Promise<void> {
     await OpenSearchTestIndices.init();
-    await OpenSearchTestIndices.deleteAll();
-    await OpenSearchTestIndices.create(clusterStateId);
+    await OpenSearchTestIndices.create(clusterStateId, { ignoreExisting: true });
   }
 
   protected buildInput(spec: PPLSpec): {
@@ -55,17 +60,16 @@ export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
       const actual = (await openSearchClient.transport.request({
         method: 'POST',
         path: `/_plugins/_ppl`,
-        body: JSON.stringify({
-          query: received.output,
-        }),
+        body: JSON.stringify({ query: received.output }),
       })) as ApiResponse<PPLResponse>;
       const expected = (await openSearchClient.transport.request({
         method: 'POST',
         path: `/_plugins/_sql`,
-        body: JSON.stringify({
-          query: spec.gold_query,
-        }),
-      })) as ApiResponse<PPLResponse>;
+        body: JSON.stringify({ query: spec.gold_query }),
+      })) as ApiResponse<PPLResponse & { status: number }>;
+      // sql returns 200 for query failures, the error status is inside body
+      if (expected.body.status !== 200) throw new SqlRunError(JSON.stringify(expected.body));
+
       const evalResult = await this.query_eval.calculateScore(
         received.output || '',
         spec.gold_query,
@@ -74,15 +78,12 @@ export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
           expectedResponse: expected.body,
         },
       );
-      const pass = _.isEqual(actual.body.datarows, expected.body.datarows);
-      const editDistance = pass
-        ? 1
-        : (
-            await this.levenshtein.calculateScore(
-              JSON.stringify(actual.body.datarows),
-              JSON.stringify(expected.body.datarows),
-            )
-          ).score;
+      const editDistance = (
+        await this.levenshtein.calculateScore(
+          JSON.stringify(actual.body.datarows),
+          JSON.stringify(expected.body.datarows),
+        )
+      ).score;
       return {
         pass: evalResult.score >= 0.8,
         message: () => `Score ${evalResult.score} is above 0.8`,
@@ -93,6 +94,17 @@ export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
         },
       };
     } catch (error) {
+      if (error instanceof SqlRunError) {
+        console.error(`[${spec.id}] Invalid SQL gold query: ${spec.gold_query}`);
+        return {
+          pass: false,
+          message: () => `failed to execute SQL query: ${String(error)}`,
+          score: 0,
+          extras: {
+            sql_failed: true,
+          },
+        };
+      }
       const respError = (error as ResponseError<string>).body;
       const pplError = JSON.parse(respError) as {
         error: { reason: string; details: string; type: string };

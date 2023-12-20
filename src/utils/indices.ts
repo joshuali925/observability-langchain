@@ -10,18 +10,30 @@ import { ResponseError } from '@opensearch-project/opensearch/lib/errors';
 import { openSearchClient } from '../providers/clients/opensearch';
 import { createPromisePool } from './promise_pool';
 
+interface CreateOptions {
+  ignoreExisting?: boolean;
+}
+
 export class OpenSearchTestIndices {
   static indicesDir = path.join(__dirname, '../../data/indices');
   static promisePool = createPromisePool(10);
 
-  public static async create(...groups: string[]) {
-    const indexGroups = groups.length > 0 ? groups : await fs.readdir(this.indicesDir);
+  public static async create(groups: string[] | string | undefined, options: CreateOptions = {}) {
+    const indexGroups = !groups
+      ? await fs.readdir(this.indicesDir)
+      : typeof groups === 'string'
+      ? [groups]
+      : groups;
+    const ignored: string[] = options.ignoreExisting
+      ? (await openSearchClient.cat.indices<string[]>({ h: 'index' })).body
+      : [];
+
     return Promise.all(
       indexGroups.map(async (group) =>
         Promise.all(
-          (await fs.readdir(path.join(this.indicesDir, group))).map((name) => {
-            return this.promisePool.run(() => this.createIndex(group, name));
-          }),
+          (await fs.readdir(path.join(this.indicesDir, group)))
+            .filter((name) => !ignored.includes(name))
+            .map((name) => this.promisePool.run(() => this.createIndex(group, name))),
         ),
       ),
     );
