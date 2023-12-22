@@ -40,7 +40,18 @@ export class MlCommonsApiProvider implements ApiProvider {
     return this.providerId;
   }
 
-  private async getModelId() {
+  private getLlmId() {
+    if (process.env.ML_COMMONS_LLM_ID) return process.env.ML_COMMONS_LLM_ID;
+    return this.getModelIdFromConfigDoc().then((doc) => doc.model_id);
+  }
+
+  private getEmbeddingsModelId() {
+    if (process.env.ML_COMMONS_EMBEDDINGS_MODEL_ID)
+      return process.env.ML_COMMONS_EMBEDDINGS_MODEL_ID;
+    return this.getModelIdFromConfigDoc().then((doc) => doc.embeddings_model_id);
+  }
+
+  private async getModelIdFromConfigDoc() {
     const getResponse = await openSearchClient.get<GetResponse<AssistantConfigDoc>>({
       id: ASSISTANT_CONFIG_DOCUMENT,
       index: ASSISTANT_CONFIG_INDEX,
@@ -54,7 +65,7 @@ export class MlCommonsApiProvider implements ApiProvider {
     _context?: { vars: Record<string, string | object> },
   ): Promise<OpenSearchProviderResponse> {
     try {
-      const modelId = (await this.getModelId()).model_id;
+      const modelId = await this.getLlmId();
       const response = (await openSearchClient.transport.request({
         method: 'POST',
         path: `/_plugins/_ml/models/${modelId}/_predict`,
@@ -77,7 +88,7 @@ export class MlCommonsApiProvider implements ApiProvider {
 
   async callEmbeddingApi(prompt: string): Promise<ProviderEmbeddingResponse> {
     try {
-      const modelId = (await this.getModelId()).embeddings_model_id;
+      const modelId = await this.getEmbeddingsModelId();
       const response = (await openSearchClient.transport.request({
         method: 'POST',
         path: `/_plugins/_ml/_predict/text_embedding/${modelId}`,

@@ -22,6 +22,9 @@ You can set environment variables in a `.env` file, or export them before runnin
 - Agent ID variables: required if `API_PROVIDER=agent_framework`
     - `AGENT_ID`: the agent_id for the root agent in chat related tests
     - `PPL_AGENT_ID`: the agent_id that uses the PPLTool for PPL related tests
+- ML-Commons model IDs: required if LLM or embeddings based test evaluations are used. fallbacks to reading `.chat-assistant-config` if not provided
+    - `ML_COMMONS_LLM_ID`: ml-commons model id for LLM based requests
+    - `ML_COMMONS_EMBEDDINGS_MODEL_ID`: ml-commons model id for embeddings based requests
 
 ### 3. Run tests
 ```bash
