@@ -37,7 +37,7 @@ const getValue = (obj: AgentResponse, possibleKeys: string[]) => {
 export class AgentFrameworkApiProvider implements ApiProvider {
   constructor(
     private readonly providerId = PROVIDERS.AGENT_FRAMEWORK,
-    private readonly agentIdKey = 'AGENT_ID',
+    private readonly agentIdKey = 'ROOT_AGENT_ID',
   ) {}
 
   id() {
