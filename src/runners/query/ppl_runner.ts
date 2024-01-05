@@ -26,10 +26,14 @@ interface PPLResponse {
   size: number;
 }
 
-class SqlRunError extends Error {
+interface SQLResponse extends PPLResponse {
+  status: number;
+}
+
+class GoldQueryError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'SqlRunError';
+    this.name = 'GoldQueryError';
   }
 }
 
@@ -66,33 +70,43 @@ export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
     return received.output;
   }
 
+  private async runPPL(query: string): Promise<ApiResponse<PPLResponse>> {
+    return (await openSearchClient.transport.request({
+      method: 'POST',
+      path: '/_plugins/_ppl',
+      body: JSON.stringify({ query }),
+    })) as ApiResponse<PPLResponse>;
+  }
+
+  private async runGoldQuery(query: string): Promise<ApiResponse<PPLResponse>> {
+    const response = (await openSearchClient.transport
+      .request({
+        method: 'POST',
+        path: query.toLowerCase().startsWith('select ') ? '/_plugins/_sql' : '/_plugins/_ppl',
+        body: JSON.stringify({ query }),
+      })
+      .catch((error) => {
+        throw new GoldQueryError(String(error));
+      })) as ApiResponse<PPLResponse | SQLResponse>;
+    // sql returns 200 for query failures, the error status is inside body
+    if ('status' in response.body && response.body.status !== 200)
+      throw new GoldQueryError(JSON.stringify(response.body));
+    return response;
+  }
+
   public async compareResults(
     received: OpenSearchProviderResponse,
     spec: PPLSpec,
   ): Promise<TestResult> {
     try {
       const ppl = this.getPPLFromResponse(received);
-      const actual = (await openSearchClient.transport.request({
-        method: 'POST',
-        path: `/_plugins/_ppl`,
-        body: JSON.stringify({ query: ppl }),
-      })) as ApiResponse<PPLResponse>;
-      const expected = (await openSearchClient.transport.request({
-        method: 'POST',
-        path: `/_plugins/_sql`,
-        body: JSON.stringify({ query: spec.gold_query }),
-      })) as ApiResponse<PPLResponse & { status: number }>;
-      // sql returns 200 for query failures, the error status is inside body
-      if (expected.body.status !== 200) throw new SqlRunError(JSON.stringify(expected.body));
+      const actual = await this.runPPL(ppl);
+      const expected = await this.runGoldQuery(spec.gold_query);
 
-      const evalResult = await this.query_eval.calculateScore(
-        received.output || '',
-        spec.gold_query,
-        {
-          receivedResponse: actual.body,
-          expectedResponse: expected.body,
-        },
-      );
+      const evalResult = await this.query_eval.calculateScore(received.output!, spec.gold_query, {
+        receivedResponse: actual.body,
+        expectedResponse: expected.body,
+      });
       const editDistance = (
         await this.levenshtein.calculateScore(
           JSON.stringify(actual.body.datarows),
@@ -112,30 +126,24 @@ export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
         },
       };
     } catch (error) {
-      if (error instanceof SqlRunError) {
-        console.error(`[${spec.id}] Invalid SQL gold query: ${spec.gold_query}`);
-        return {
-          pass: false,
-          message: () => `failed to execute SQL query: ${String(error)}`,
-          score: 0,
-          extras: {
-            sql_failed: true,
-          },
-        };
-      }
-      const respError = (error as ResponseError<string>).body;
-      const pplError = JSON.parse(respError) as {
-        error: { reason: string; details: string; type: string };
-        status: number;
-      };
-      return {
+      const result: TestResult & Required<Pick<TestResult, 'extras'>> = {
         pass: false,
         message: () => `failed to execute query: ${String(error)}`,
         score: 0,
-        extras: {
-          exception: pplError.error.type,
-        },
+        extras: {},
       };
+      if (error instanceof GoldQueryError) {
+        console.error(`[${spec.id}] Invalid gold query: ${spec.gold_query}`);
+        result.extras.exception = 'Gold query error';
+      } else {
+        const respError = (error as ResponseError<string>).body;
+        const pplError = JSON.parse(respError) as {
+          error: { reason: string; details: string; type: string };
+          status: number;
+        };
+        result.extras.exception = pplError.error.type;
+      }
+      return result;
     }
   }
 }

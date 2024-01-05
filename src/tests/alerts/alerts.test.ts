@@ -260,7 +260,7 @@ function populateAlertDocTimestamps() {
 
 function populateTestCaseTimes() {
   const templateLines = fs.readFileSync(
-    path.join(__dirname, '..', 'templates', 'get_alerts_test_templates.jsonl'),
+    path.join(__dirname, 'templates', 'get_alerts_test_templates.jsonl'),
     'utf8',
   );
   const templateLinesList = templateLines.split('\n');

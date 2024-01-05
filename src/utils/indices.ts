@@ -18,7 +18,7 @@ export class OpenSearchTestIndices {
   static indicesDir = path.join(__dirname, '../../data/indices');
   static promisePool = createPromisePool(10);
 
-  public static async create(groups: string[] | string | undefined, options: CreateOptions = {}) {
+  public static async create(groups?: string[] | string, options: CreateOptions = {}) {
     const indexGroups = !groups
       ? await fs.readdir(this.indicesDir)
       : typeof groups === 'string'
@@ -111,14 +111,8 @@ export class OpenSearchTestIndices {
       bulkBody = objList.flatMap((doc) => [{ index: { _index: name } }, JSON.parse(doc) as object]);
     }
 
-    if (bulkBody.length > 0) {
-      try {
-        await openSearchClient.bulk({ refresh: true, body: bulkBody });
-        console.info(`created index ${name}`);
-      } catch (error) {
-        throw new Error('hi');
-      }
-    }
+    if (bulkBody.length > 0) await openSearchClient.bulk({ refresh: true, body: bulkBody });
+    console.info(`created index ${name}`);
   }
 
   public static async dumpIndices(group: string, names: string[]) {
