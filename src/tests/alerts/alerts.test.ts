@@ -21,7 +21,7 @@ const runner = new (class extends QARunner {
     if (clusterStateId !== 'alerting') {
       throw new Error('unexpected cluster state id');
     }
-    await OpenSearchTestIndices.deleteAll();
+    await OpenSearchTestIndices.delete('alerting');
     await OpenSearchTestIndices.create('alerting');
   }
 })(provider);

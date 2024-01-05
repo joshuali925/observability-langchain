@@ -18,12 +18,21 @@ export class OpenSearchTestIndices {
   static indicesDir = path.join(__dirname, '../../data/indices');
   static promisePool = createPromisePool(10);
 
-  public static async create(groups?: string[] | string, options: CreateOptions = {}) {
-    const indexGroups = !groups
+  private static async getIndexGroups(groups?: string[] | string) {
+    return !groups
       ? await fs.readdir(this.indicesDir)
       : typeof groups === 'string'
       ? [groups]
       : groups;
+  }
+
+  /**
+   * @param options - create options
+   * @param groups - string or string array for index groups. undefined implies all groups
+   * @returns promise for creating indices
+   */
+  public static async create(groups?: string[] | string, options: CreateOptions = {}) {
+    const indexGroups = await this.getIndexGroups(groups);
     const ignored: string[] = options.ignoreExisting
       ? (await openSearchClient.cat.indices<string[]>({ h: 'index' })).body
       : [];
@@ -47,13 +56,13 @@ export class OpenSearchTestIndices {
     );
   }
 
-  public static async deleteAll() {
+  public static async delete(groups?: string[] | string) {
     const toChunk = <T>(arr: T[], size: number): T[][] =>
       Array.from({ length: Math.ceil(arr.length / size) }).map((_, i) =>
         arr.slice(size * i, size + size * i),
       );
 
-    const indexGroups = await fs.readdir(this.indicesDir);
+    const indexGroups = await this.getIndexGroups(groups);
     const indices = (
       await Promise.all(indexGroups.map((group) => fs.readdir(path.join(this.indicesDir, group))))
     ).flat();
