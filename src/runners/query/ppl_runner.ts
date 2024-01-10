@@ -135,13 +135,15 @@ export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
       if (error instanceof GoldQueryError) {
         console.error(`[${spec.id}] Invalid gold query: ${spec.gold_query}`);
         result.extras.exception = 'Gold query error';
-      } else {
+      } else if (error instanceof ResponseError) {
         const respError = (error as ResponseError<string>).body;
         const pplError = JSON.parse(respError) as {
           error: { reason: string; details: string; type: string };
           status: number;
         };
         result.extras.exception = pplError.error.type;
+      } else {
+        throw error;
       }
       return result;
     }

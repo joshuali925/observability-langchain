@@ -90,7 +90,13 @@ export function installJestMatchers() {
       } else {
         result = await runner.compareResults(received, spec).catch((error) => ({
           pass: false,
-          message: () => `Result comparison failed to run: ${String(error)}`,
+          message: () =>
+            `Result comparison failed to run: ${
+              String(error).length < 1000
+                ? String(error)
+                : String(error).slice(0, 500) + '...truncated...' + String(error).slice(-500)
+            }`,
+          extras: { matcher_error: true },
           score: 0,
         }));
       }
