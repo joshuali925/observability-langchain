@@ -14,6 +14,11 @@ INDEX_TYPES = {
     "integer": pd.Int32Dtype(),
     "timestamp": str,
     "string": str,
+    "array": str,
+    "date": str,
+    "struct": str,
+    "ip": str,
+    "boolean": bool,
 }
 
 
