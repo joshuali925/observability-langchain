@@ -12,7 +12,7 @@ export interface QASpec extends TestSpec {
 }
 
 export class QARunner extends TestRunner<QASpec, ApiProvider> {
-  public compareResults(received: OpenSearchProviderResponse, spec: QASpec): Promise<TestResult> {
+  public evaluate(received: OpenSearchProviderResponse, spec: QASpec): Promise<TestResult> {
     console.log(`Received: ${String(received.output)}\nExpected: ${String(spec.expectedAnswer)}`);
     try {
       return Promise.resolve({

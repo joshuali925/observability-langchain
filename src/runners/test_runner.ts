@@ -25,7 +25,20 @@ export interface TestResult extends jest.CustomMatcherResult {
   /**
    * any other information that should be persisted.
    */
-  extras?: Record<string, unknown>;
+  extras?: Record<string, unknown> & {
+    /**
+     * true if API call to run tool/agent failed.
+     */
+    api_error?: boolean;
+    /**
+     * true if API call returned an empty result.
+     */
+    empty_output?: boolean;
+    /**
+     * true if call for evaluation failed.
+     */
+    evaluation_error?: boolean;
+  };
 }
 
 interface TestRunMetadata extends Record<string, unknown> {
@@ -73,7 +86,7 @@ export abstract class TestRunner<
    * @param spec test case used
    * @returns comparison result
    */
-  public abstract compareResults(
+  public abstract evaluate(
     received: Awaited<ReturnType<U['callApi']>>,
     spec: T,
   ): Promise<TestResult>;

@@ -93,10 +93,7 @@ export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
     return response;
   }
 
-  public async compareResults(
-    received: OpenSearchProviderResponse,
-    spec: PPLSpec,
-  ): Promise<TestResult> {
+  public async evaluate(received: OpenSearchProviderResponse, spec: PPLSpec): Promise<TestResult> {
     try {
       const ppl = this.getPPLFromResponse(received);
       const actual = await this.runPPL(ppl);

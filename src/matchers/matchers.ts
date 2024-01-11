@@ -88,15 +88,15 @@ export function installJestMatchers() {
           extras: { empty_result: true },
         };
       } else {
-        result = await runner.compareResults(received, spec).catch((error) => ({
+        result = await runner.evaluate(received, spec).catch((error) => ({
           pass: false,
           message: () =>
-            `Result comparison failed to run: ${
+            `Evaluation failed to run: ${
               String(error).length < 1000
                 ? String(error)
                 : String(error).slice(0, 500) + '...truncated...' + String(error).slice(-500)
             }`,
-          extras: { matcher_error: true },
+          extras: { evaluation_error: true },
           score: 0,
         }));
       }
