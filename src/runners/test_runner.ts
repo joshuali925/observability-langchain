@@ -14,12 +14,16 @@ import { ApiProvider } from 'promptfoo';
 export interface TestSpec {
   id: string;
   clusterStateId: string;
+  question: string;
 }
 
 export interface TestResult extends jest.CustomMatcherResult {
+  /**
+   * a number between 0 and 1.
+   */
   score: number;
   /**
-   * any other information that should be persisted
+   * any other information that should be persisted.
    */
   extras?: Record<string, unknown>;
 }
@@ -52,10 +56,15 @@ export abstract class TestRunner<
    * @param spec test case
    * @returns prompt and context
    */
-  protected abstract buildInput(spec: T): {
+  protected buildInput(spec: T): {
     prompt: Parameters<ApiProvider['callApi']>[0];
     context: Parameters<ApiProvider['callApi']>[1];
-  };
+  } {
+    return {
+      prompt: spec.question,
+      context: undefined,
+    };
+  }
 
   /**
    * Compares actual and expected response.

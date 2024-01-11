@@ -14,7 +14,6 @@ import { OpenSearchTestIndices } from '../../utils/indices';
 import { TestResult, TestRunner, TestSpec } from '../test_runner';
 
 interface PPLSpec extends TestSpec {
-  question: string;
   gold_query: string;
   index: string;
 }
