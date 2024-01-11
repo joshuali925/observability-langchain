@@ -15,6 +15,8 @@ def main():
       tokenized_expected = [nltk.word_tokenize(expected)]
    except LookupError:
       nltk.download('punkt')
+      tokenized_received = nltk.word_tokenize(received)
+      tokenized_expected = [nltk.word_tokenize(expected)]
 
    try:
       return meteor_score(tokenized_expected, tokenized_received)
