@@ -73,12 +73,12 @@ export class OpenSearchTestIndices {
         this.promisePool
           .run(() => openSearchClient.indices.delete({ index: indices, ignore_unavailable: true }))
           .catch((error) => {
-            console.info('failed to delete ', String(error));
+            console.info('failed to delete', String(error));
             throw error;
           }),
       ),
     );
-    console.info('deleted all test indices');
+    console.info('deleted index group: ' + indexGroups.join(', '));
   }
 
   private static async createIndex(group: string, name: string) {

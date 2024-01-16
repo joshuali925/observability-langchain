@@ -13,7 +13,7 @@ import { ApiProvider } from 'promptfoo';
 
 export interface TestSpec {
   id: string;
-  clusterStateId: string;
+  clusterStateId?: string;
   question: string;
 }
 
@@ -60,7 +60,13 @@ export abstract class TestRunner<
     this.apiProvider = apiProvider as U;
   }
 
+  /**
+   * @param _clusterStateId - clusterStateId of the test spec, will be 'undefined' if unspecified.
+   */
   protected async beforeAll(_clusterStateId: string): Promise<void> {}
+  /**
+   * @param _clusterStateId - clusterStateId of the test spec, will be 'undefined' if unspecified.
+   */
   protected async afterAll(_clusterStateId: string): Promise<void> {}
 
   /**
@@ -113,9 +119,9 @@ export abstract class TestRunner<
   private runSpecs(specs: T[]) {
     const clusterStateIdToSpec: Record<string, T[]> = {};
     specs.forEach((spec) => {
-      if (clusterStateIdToSpec[spec.clusterStateId] === undefined)
-        clusterStateIdToSpec[spec.clusterStateId] = [];
-      clusterStateIdToSpec[spec.clusterStateId].push(spec);
+      if (clusterStateIdToSpec[String(spec.clusterStateId)] === undefined)
+        clusterStateIdToSpec[String(spec.clusterStateId)] = [];
+      clusterStateIdToSpec[String(spec.clusterStateId)].push(spec);
     });
     // workaround for using beforeAll with it.concurrent: https://github.com/jestjs/jest/issues/7997#issuecomment-796965078
     let beforeAllResolve: (value?: unknown) => void;

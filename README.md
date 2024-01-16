@@ -25,33 +25,33 @@ You can set environment variables using a `.env` file or other standard ways.
 # run all tests
 npm run test
 
-# run tests for a specific tool
+# run a specific test suite
 npm run test -- src/tests/api/cat.test.ts
 
-# run tests with sequential execution (default concurrency is 5)
-npm run test -- src/tests/api/cat.test.ts --maxConcurrency=1
+# run tests with parallel execution (default max concurrency is 1)
+npm run test -- src/tests/api/cat.test.ts --maxConcurrency=5
 ```
 
 ### 4. See results
 
 Results are stored in the `./results/` directory.
 
-## Onboarding a new tool
+## Onboarding a new skill
 
 ### 1. Create test cases
 
-Each test case must contain these fields:
+Each test case should contain these fields:
 
-- `id`: string id used for reproducing results for each test case
-- `clusterStateId`: string id to identify a cluster state. test runner can use this id to setup the data/indices needed before test starts
+- `id`: string id or [name](https://jestjs.io/docs/api#testname-fn-timeout) of the test case. used for reproducing results for each test case
+- `clusterStateId`: optional string id to identify a cluster state. test runner can use this id to setup the data/indices needed before test starts
 - `question`: user's question
 
-Additionally for automatic score evaluation, there should be an expected output defined. For example, for QA related tools (e.g. cat index), each test case should also contain an `expectedAnswer`. For the PPL tool, each test case should contain a `gold_query`. The test cases can contain other arbitrary fields needed such as `index` for each PPL test case.
+Additionally for automatic score evaluation, there should be an expected output defined. For example, for QA related tools (e.g. cat index), each test case should also contain an `expectedAnswer`. For the PPL tool, each test case should contain a `gold_query`. The test cases can contain other arbitrary fields needed, such as `index` for each PPL test case.
 
 ```typescript
 export interface TestSpec {
   id: string;
-  clusterStateId: string;
+  clusterStateId?: string;
   question: string;
 }
 export interface QASpec extends TestSpec {
@@ -63,7 +63,7 @@ interface PPLSpec extends TestSpec {
 }
 ```
 
-The test cases will be stored as `.jsonl` files in the `src/tests/<tool-name>/specs` directory, for example [src/tests/query/specs/olly_ppl_eval.jsonl](./src/tests/query/specs/olly_ppl_eval.jsonl).
+The test cases will be stored as `.jsonl` files in the `src/tests/<skill-name>/specs` directory, for example [src/tests/query/specs/olly_ppl_eval.jsonl](./src/tests/query/specs/olly_ppl_eval.jsonl).
 
 For a tool or a skill, 20 to 50 test cases should be a good start. Here are some notes:
 
@@ -77,7 +77,7 @@ The test runner will be responsible for running and evaluating each test case fo
 
 #### 2.1. Setting up the cluster state
 
-Many tools needs some data in the cluster to work, for example the alerting tool needs some documents in the alerting indices. They should be deterministic so that the outputs are predictable. Test runner can define standard [`jest` hooks](https://jestjs.io/docs/setup-teardown) that receives the `clusterStateId` and do the necessary work to setup the cluster. Since most of the time it would be adding indices to the cluster, there is a helper utility function to create indices by group `OpenSearchTestIndices.create(group)`. Each directory under [data/indices](./data/indices) represents an index group, the structure is:
+Many skills need some data in the cluster to work, for example the alerting tool needs some config documents in the alerting indices. The documents should be deterministic so that the outputs are predictable. Test runner can define standard [`jest` hooks](https://jestjs.io/docs/setup-teardown) that receives the `clusterStateId` and do the necessary work to setup the cluster. Since most of the time it would be adding indices to the cluster, there is a helper utility function to create indices by group `OpenSearchTestIndices.create(group)`. Each directory under [data/indices](./data/indices) represents an index group, the structure is:
 
 ```
 .
@@ -97,6 +97,12 @@ Many tools needs some data in the cluster to work, for example the alerting tool
 The test runner should also define how the score is calculated between the actual and expected output. This can be done by implementing the `evaluate` function.
 
 ```typescript
+public abstract evaluate(received: ProviderResponse, spec: T): Promise<TestResult>;
+```
+
+Types:
+
+```typescript
 export interface ProviderResponse {
   error?: string;
   output?: string | object;
@@ -112,12 +118,13 @@ export interface TestResult extends jest.CustomMatcherResult {
    * any other information that should be persisted.
    */
   extras?: Record<string, unknown> & {
+    // these are automatically set by the framework
     /**
      * true if API call to run tool/agent failed.
      */
     api_error?: boolean;
     /**
-     * true if API call returned an empty result.
+     * true if API call returned an empty output.
      */
     empty_output?: boolean;
     /**
@@ -126,8 +133,6 @@ export interface TestResult extends jest.CustomMatcherResult {
     evaluation_error?: boolean;
   };
 }
-
-public abstract evaluate(received: ProviderResponse, spec: T): Promise<TestResult>;
 ```
 
 Metrics supported by the test framework:
@@ -148,7 +153,7 @@ Python based metrics are stored under [packages](./packages). Each package shoul
 
 #### 2.3. Example
 
-The test runner can be defined in [src/runners](./src/runners) or as anonymous classes. The runner instantiation and call of `runner.run(specFiles)` should be done inside a `*.test.ts` file under `src/tests/<tool-name>`.
+The test runner can be defined in [src/runners](./src/runners) or as anonymous classes. The runner instantiation and call of `runner.run(specFiles)` should be done inside a `.test.ts` file under `src/tests/<skill-name>`.
 
 ```typescript
 // src/tests/api/cat.test.ts
