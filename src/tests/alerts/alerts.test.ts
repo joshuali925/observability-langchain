@@ -16,7 +16,7 @@ import { QARunner } from '../../runners/qa/qa_runner';
 import { OpenSearchTestIndices } from '../../utils/indices';
 
 const provider = ApiProviderFactory.create();
-const runner = new (class extends QARunner {
+const runner = new (class AlertingRunner extends QARunner {
   protected async beforeAll(clusterStateId: string): Promise<void> {
     if (clusterStateId !== 'alerting') {
       throw new Error('unexpected cluster state id');
