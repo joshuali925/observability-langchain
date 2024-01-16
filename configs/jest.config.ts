@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-module.exports = {
+import type { Config } from 'jest';
+
+const config: Config = {
   rootDir: '../',
   setupFiles: ['<rootDir>/configs/setupEnv.ts'],
   setupFilesAfterEnv: ['<rootDir>/configs/setupAfterEnv.ts'],
@@ -25,4 +27,7 @@ module.exports = {
   testEnvironment: 'node',
   testMatch: ['<rootDir>/**/*.test.ts'],
   testTimeout: 600000,
+  maxConcurrency: 1,
 };
+
+export default config;

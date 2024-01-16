@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "Apache-2.0",
   "scripts": {
-    "test": "NODE_TLS_REJECT_UNAUTHORIZED=0 jest --config ./configs/jest.config.js --runInBand",
+    "test": "NODE_TLS_REJECT_UNAUTHORIZED=0 jest --config ./configs/jest.config.ts --runInBand",
     "prepare": "husky install",
     "lint": "eslint --fix .",
     "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 ts-node src/index.ts",
