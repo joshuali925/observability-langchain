@@ -145,3 +145,4 @@ dist
 
 /.env
 /results/
+/jest_html_reporters.html

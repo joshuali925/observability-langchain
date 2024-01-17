@@ -9,6 +9,7 @@ import console from 'console';
 import fs from 'fs';
 import fsPromises from 'node:fs/promises';
 import path from 'path';
+import { addMsg } from 'jest-html-reporters/helper';
 import { ApiProvider } from 'promptfoo';
 
 export interface TestSpec {
@@ -131,7 +132,10 @@ export abstract class TestRunner<
     describe.each(Object.keys(clusterStateIdToSpec))('Cluster state %s', (clusterStateId) => {
       const jestConsoleInfo = console['info'];
       beforeAll(async () => {
-        global.console.info = console['info'];
+        global.console.info = (...args) => {
+          console['info'](...args);
+          void addMsg({ message: args.join(' ').trim() });
+        };
         this.resetMetadata();
         await this.beforeAll(clusterStateId);
         beforeAllResolve();

@@ -15,9 +15,9 @@ export interface QASpec extends TestSpec {
 export class QARunner extends TestRunner<QASpec, ApiProvider> {
   public async evaluate(received: OpenSearchProviderResponse, spec: QASpec): Promise<TestResult> {
     const result = await matchesFactuality(spec.question, received.output!, spec.expectedAnswer);
-    console.info(`Received: ${received.output}`);
-    console.info(`Expected: ${spec.expectedAnswer}`);
-    console.info(`Score: ${result.score}\n`);
+    console.info(
+      `Received: ${received.output}\nExpected: ${spec.expectedAnswer}\nScore: ${result.score}\n`,
+    );
     try {
       return Promise.resolve({
         pass: result.pass,

@@ -28,6 +28,7 @@ const config: Config = {
   testMatch: ['<rootDir>/**/*.test.ts'],
   testTimeout: 600000,
   maxConcurrency: 1,
+  reporters: ['default', ['jest-html-reporters', { inlineSource: true }]],
 };
 
 export default config;

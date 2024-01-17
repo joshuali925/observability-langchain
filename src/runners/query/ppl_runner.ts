@@ -109,9 +109,9 @@ export class PPLRunner extends TestRunner<PPLSpec, ApiProvider> {
           JSON.stringify(expected.body.datarows),
         )
       ).score;
-      console.info(`Received PPL: ${ppl}`);
-      console.info(`Expected SQL: ${spec.gold_query}`);
-      console.info(`Score: ${evalResult.score}`);
+      console.info(
+        `Received PPL: ${ppl}\nExpected query: ${spec.gold_query}\nScore: ${evalResult.score}`,
+      );
       return {
         pass: evalResult.score >= 0.8,
         message: () => `Score ${evalResult.score} is above 0.8`,
