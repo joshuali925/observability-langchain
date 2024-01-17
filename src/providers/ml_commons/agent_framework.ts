@@ -4,11 +4,11 @@
  */
 
 import { ApiResponse } from '@opensearch-project/opensearch';
-import _ from 'lodash';
 import { ApiProvider } from 'promptfoo';
 import { openSearchClient } from '../clients/opensearch';
 import { PROVIDERS } from '../constants';
 import { OpenSearchProviderResponse } from '../types';
+import { getValue } from './utils';
 
 interface AgentResponse {
   inference_results: Array<{
@@ -22,14 +22,6 @@ interface AgentResponse {
     }>;
   }>;
 }
-
-const getValue = (obj: AgentResponse, possibleKeys: string[]) => {
-  for (const key of possibleKeys) {
-    const value = _.get(obj, key) as string;
-    if (value) return value;
-  }
-  return '';
-};
 
 /**
  * Api Provider to request a agent.

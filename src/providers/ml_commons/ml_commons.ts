@@ -9,6 +9,7 @@ import { ApiProvider, ProviderEmbeddingResponse } from 'promptfoo';
 import { openSearchClient } from '../clients/opensearch';
 import { ASSISTANT_CONFIG_DOCUMENT, ASSISTANT_CONFIG_INDEX, PROVIDERS } from '../constants';
 import { OpenSearchProviderResponse } from '../types';
+import { getValue } from './utils';
 
 interface MLCommonsPredictionResponse {
   inference_results: Array<{
@@ -42,13 +43,17 @@ export class MlCommonsApiProvider implements ApiProvider {
 
   private getLlmId() {
     if (process.env.ML_COMMONS_LLM_ID) return process.env.ML_COMMONS_LLM_ID;
-    return this.getModelIdFromConfigDoc().then((doc) => doc.model_id);
+    return this.getModelIdFromConfigDoc()
+      .then((doc) => doc.model_id)
+      .catch(() => Promise.reject('ML_COMMONS_LLM_ID is missing.'));
   }
 
   private getEmbeddingsModelId() {
     if (process.env.ML_COMMONS_EMBEDDINGS_MODEL_ID)
       return process.env.ML_COMMONS_EMBEDDINGS_MODEL_ID;
-    return this.getModelIdFromConfigDoc().then((doc) => doc.embeddings_model_id);
+    return this.getModelIdFromConfigDoc()
+      .then((doc) => doc.embeddings_model_id)
+      .catch(() => Promise.reject('ML_COMMONS_EMBEDDINGS_MODEL_ID is missing.'));
   }
 
   private async getModelIdFromConfigDoc() {
@@ -77,9 +82,17 @@ export class MlCommonsApiProvider implements ApiProvider {
           },
         }),
       })) as ApiResponse<MLCommonsPredictionResponse, unknown>;
-      const respData = response.body.inference_results[0].output[0].dataAsMap;
-      if (!respData.completion) throw new Error(respData.message || 'Failed to request model');
-      return { output: respData.completion };
+      const output = getValue(response.body, [
+        'inference_results[0].output[0].dataAsMap.response',
+        'inference_results[0].output[0].dataAsMap.completion',
+        'inference_results[0].output[0].result',
+      ]);
+      if (!output)
+        throw new Error(
+          getValue(response.body, ['inference_results[0].output[0].dataAsMap.message']) ||
+            'Failed to find model output',
+        );
+      return { output, extras: { rawResponse: response.body } };
     } catch (error) {
       console.error('Failed to request ml-commons model:', error);
       return { error: `API call error: ${String(error)}` };

@@ -4,7 +4,7 @@
  */
 
 import { ApiProvider } from 'promptfoo';
-import { LevenshteinMatcher } from '../../matchers/levenshtein';
+import { matchesFactuality } from '../../matchers/matchers';
 import { OpenSearchProviderResponse } from '../../providers/types';
 import { TestResult, TestRunner, TestSpec } from '../test_runner';
 
@@ -13,21 +13,16 @@ export interface QASpec extends TestSpec {
 }
 
 export class QARunner extends TestRunner<QASpec, ApiProvider> {
-  levenshtein = new LevenshteinMatcher();
-
   public async evaluate(received: OpenSearchProviderResponse, spec: QASpec): Promise<TestResult> {
-    const score = (
-      await this.levenshtein.calculateScore(received.output || '', spec.expectedAnswer)
-    ).score;
+    const result = await matchesFactuality(spec.question, received.output!, spec.expectedAnswer);
     console.info(`Received: ${received.output}`);
     console.info(`Expected: ${spec.expectedAnswer}`);
-    console.info(`Edit distance: ${score}\n`);
+    console.info(`Score: ${result.score}\n`);
     try {
       return Promise.resolve({
-        pass: true,
-        message: () =>
-          `Received: ${String(received.output)}, Expected: ${String(spec.expectedAnswer)}`,
-        score: score,
+        pass: result.pass,
+        message: () => result.reason,
+        score: result.score,
       });
     } catch (error) {
       return Promise.resolve({

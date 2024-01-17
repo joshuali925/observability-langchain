@@ -51,6 +51,48 @@ export const matchesSimilarity = (
   );
 };
 
+export const matchesFactuality = (
+  question: string,
+  received: string,
+  expected: string,
+  gradingConfig?: GradingConfig,
+) => {
+  return assertions.matchesFactuality(question, expected, received, {
+    provider: ApiProviderFactory.create(PROVIDERS.ML_COMMONS),
+    factuality: {
+      subset: 0,
+      superset: 1,
+      agree: 1,
+      disagree: 0,
+      differButFactual: 0,
+    },
+    // modified https://github.com/promptfoo/promptfoo/blob/f1220f125c627137ed05cd593f41cc13d467d12c/src/prompts.ts#L270 to use with claude
+    rubricPrompt: `\n\nHuman: You are comparing a submitted answer to an expert answer on a given question. Here is the data:
+[BEGIN DATA]
+************
+[Question]: {{input}}
+************
+[Expert]: {{ideal}}
+************
+[Submission]: {{completion}}
+************
+[END DATA]
+
+Compare the factual content of the submitted answer with the expert answer. Ignore any differences in style, grammar, or punctuation.
+The submitted answer may either be a subset or superset of the expert answer, or it may conflict with it. Determine which case applies. Answer the question by selecting one of the following options:
+(A) The submitted answer is a subset of the expert answer and is fully consistent with it.
+(B) The submitted answer is a superset of the expert answer and is fully consistent with it.
+(C) The submitted answer contains all the same details as the expert answer.
+(D) There is a disagreement between the submitted answer and the expert answer.
+(E) The answers differ, but these differences don't matter from the perspective of factuality.
+
+Please output one of \`(A)\`, \`(B)\`, \`(C)\`, \`(D)\`, or \`(E)\` with the parenthese.
+
+Assistant:`,
+    ...gradingConfig,
+  });
+};
+
 export const matchesLlmRubric = (
   received: string,
   expected: string,
