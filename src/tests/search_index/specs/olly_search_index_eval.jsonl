@@ -1,0 +1,1 @@
+{"id":"M1SYajgDiYrqvAVMuVMIY","clusterStateId":"custom","question":"{\"index\": \"opensearch_dashboards_sample_data_ecommerce\", \"query\": {\"size\": 20,  \"_source\": \"email\"}}","gold_query":"{\"size\": 20, \"_source\": \"email\"}","index":"opensearch_dashboards_sample_data_ecommerce"}
