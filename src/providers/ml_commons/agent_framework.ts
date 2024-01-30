@@ -51,7 +51,7 @@ export class AgentFrameworkApiProvider implements ApiProvider {
       const response = (await openSearchClient.transport.request({
         method: 'POST',
         path: `/_plugins/_ml/agents/${agentId}/_execute`,
-        body: JSON.stringify({ parameters: { question: prompt, ...context?.vars } }),
+        body: JSON.stringify({ parameters: { input: prompt, ...context?.vars } }),
       })) as ApiResponse<AgentResponse, unknown>;
 
       const output = getValue(response.body, [
