@@ -1,0 +1,7 @@
+{
+  "prefix": "osisIntegration",
+  "paths": {
+    "osisIntegration": "."
+  },
+  "translations": ["translations/ja-JP.json"]
+}
