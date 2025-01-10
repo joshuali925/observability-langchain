@@ -20,7 +20,6 @@ import { usePipeline, usePipelines } from '../hooks/use_pipelines';
 import { PipelineConfig, SourceIndex } from '../utils/pipeline_config';
 import { AggregateConfig } from './aggregate_config';
 import { Configuration } from './configuration';
-import { useOsisContext } from './osis_icon';
 import { PipelineSelector } from './pipelines';
 import { SourceIndexSelector } from './source_index';
 
@@ -31,10 +30,10 @@ interface OsisModalProps {
 export const OsisModal: React.FC<OsisModalProps> = (props) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [selectedPipeline, setSelectedPipeline] = useState<
-    EuiComboBoxOptionOption<PipelineSummary>[]
+    Array<EuiComboBoxOptionOption<PipelineSummary>>
   >([]);
   const [selectedSourceIndex, setSelectedSourceIndex] = useState<
-    EuiComboBoxOptionOption<SourceIndex>[]
+    Array<EuiComboBoxOptionOption<SourceIndex>>
   >([]);
 
   const pipelines = usePipelines();

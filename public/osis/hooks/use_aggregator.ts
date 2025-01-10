@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
-type AggregationType =
+export type AggregationType =
   | 'remove_duplicates'
   | 'put_all'
   | 'count'
@@ -65,9 +65,10 @@ type AggregatorConfig =
   | PercentSamplerConfig;
 
 export function useAggregator() {
-  const [config, setConfig] = useState<AggregatorConfig>();
+  const [config, setConfig] = useState<Partial<AggregatorConfig>>({
+    action: undefined,
+    identificationKeys: [],
+  });
 
-  return {
-    config,
-  };
+  return [config, setConfig] as const;
 }

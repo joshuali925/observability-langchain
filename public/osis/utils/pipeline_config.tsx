@@ -20,7 +20,8 @@ interface PipelineConfigSchema {
 
 export interface SourceIndex {
   name: string;
-  path: string;
+  pipelineName: string;
+  sinkIndex: number;
 }
 
 export class PipelineConfig {
@@ -48,8 +49,8 @@ export class PipelineConfig {
         if (pipelineConfig.sink && Array.isArray(pipelineConfig.sink)) {
           pipelineConfig.sink.forEach((sink, sinkIndex) => {
             if (sink.opensearch?.index) {
-              const path = `${pipelineName}.sink.${sinkIndex}.opensearch.index`;
-              this.sinkIndexes!.push({ name: sink.opensearch.index, path });
+              // path = ${pipelineName}.sink.${sinkIndex}.opensearch.index
+              this.sinkIndexes!.push({ name: sink.opensearch.index, pipelineName, sinkIndex });
             }
           });
         }

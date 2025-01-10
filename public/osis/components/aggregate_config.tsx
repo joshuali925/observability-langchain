@@ -3,11 +3,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { EuiComboBox, EuiComboBoxOptionOption, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import React from 'react';
+import {
+  EuiComboBox,
+  EuiComboBoxOptionOption,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiForm,
+  EuiFormRow,
+} from '@elastic/eui';
+import React, { useState } from 'react';
+import { IFieldType } from '../../../../../src/plugins/data/common';
+import { AggregationType, useAggregator } from '../hooks/use_aggregator';
 import { useIndexFields } from '../hooks/use_index_fields';
 
-const aggregateActionOptions: Array<EuiComboBoxOptionOption<string>> = [
+const aggregateActionOptions: Array<EuiComboBoxOptionOption<AggregationType>> = [
   { label: 'Count', value: 'count' },
   { label: 'Remove duplicates', value: 'remove_duplicates' },
   { label: 'Put all', value: 'put_all' },
@@ -23,32 +32,44 @@ interface AggregateConfigProps {
 
 export const AggregateConfig: React.FC<AggregateConfigProps> = (props) => {
   const indexFields = useIndexFields(props.sourceIndex);
+  const [selectedIdentificationKeys, setSelectedIdentificationKeys] = useState<
+    Array<EuiComboBoxOptionOption<IFieldType>>
+  >([]);
+  const [config, setConfig] = useAggregator();
+
   return (
-    <EuiFlexGroup>
-      <EuiFlexItem>
-        <EuiComboBox
-          placeholder="Select identification keys"
-          singleSelection={{ asPlainText: true }}
-          fullWidth
-          isClearable={false}
-          isLoading={props.loading}
-          options={[]}
-          // selectedOptions={props.selected}
-          // onChange={(newOption) => props.setSelected(newOption)}
-        />
-      </EuiFlexItem>
-      <EuiFlexItem>
-        <EuiComboBox
-          placeholder="Select aggregate action"
-          singleSelection={{ asPlainText: true }}
-          fullWidth
-          isClearable={false}
-          isLoading={props.loading}
-          options={aggregateActionOptions}
-          // selectedOptions={props.selected}
-          // onChange={(newOption) => props.setSelected(newOption)}
-        />
-      </EuiFlexItem>
-    </EuiFlexGroup>
+    <EuiForm component="form">
+      <EuiFlexGroup>
+        <EuiFlexItem>
+          <EuiFormRow label="Aggregate action">
+            <EuiComboBox
+              placeholder="Select aggregate action"
+              singleSelection={{ asPlainText: true }}
+              fullWidth
+              isClearable={false}
+              isLoading={props.loading}
+              options={aggregateActionOptions}
+              selectedOptions={aggregateActionOptions.filter(
+                (option) => option.value === config.action
+              )}
+              onChange={(option) => setConfig({ action: option[0].value })}
+            />
+          </EuiFormRow>
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <EuiFormRow label="Identification keys">
+            <EuiComboBox
+              placeholder="Select identification keys"
+              fullWidth
+              isClearable={false}
+              isLoading={props.loading}
+              options={indexFields.data?.map((field) => ({ label: field.name, value: field }))}
+              selectedOptions={selectedIdentificationKeys}
+              onChange={(newOption) => setSelectedIdentificationKeys(newOption)}
+            />
+          </EuiFormRow>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </EuiForm>
   );
 };

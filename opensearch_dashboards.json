@@ -4,13 +4,6 @@
   "opensearchDashboardsVersion": "opensearchDashboards",
   "server": true,
   "ui": true,
-  "requiredPlugins": [
-    "dataSource",
-    "dataSourceManagement",
-    "data",
-    "queryEnhancements",
-    "opensearchDashboardsUtils",
-    "opensearchDashboardsReact"
-  ],
+  "requiredPlugins": ["data", "opensearchDashboardsUtils", "opensearchDashboardsReact"],
   "optionalPlugins": []
 }
