@@ -7,6 +7,7 @@ import { PipelineSummary } from '@aws-sdk/client-osis';
 import {
   EuiButton,
   EuiButtonEmpty,
+  EuiCodeBlock,
   EuiComboBoxOptionOption,
   EuiModal,
   EuiModalBody,
@@ -15,11 +16,10 @@ import {
   EuiModalHeaderTitle,
   EuiSteps,
 } from '@elastic/eui';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { usePipeline, usePipelines } from '../hooks/use_pipelines';
 import { PipelineConfig, SourceIndex } from '../utils/pipeline_config';
 import { AggregateConfig } from './aggregate_config';
-import { Configuration } from './configuration';
 import { PipelineSelector } from './pipelines';
 import { SourceIndexSelector } from './source_index';
 
@@ -28,7 +28,7 @@ interface OsisModalProps {
 }
 
 export const OsisModal: React.FC<OsisModalProps> = (props) => {
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [yamlConfig, setYamlConfig] = useState('');
   const [selectedPipeline, setSelectedPipeline] = useState<
     Array<EuiComboBoxOptionOption<PipelineSummary>>
   >([]);
@@ -38,10 +38,14 @@ export const OsisModal: React.FC<OsisModalProps> = (props) => {
 
   const pipelines = usePipelines();
   const pipeline = usePipeline(selectedPipeline[0]?.value?.PipelineName);
-  const config = useMemo(
+  const pipelineConfig = useMemo(
     () => new PipelineConfig(pipeline.data?.Pipeline?.PipelineConfigurationBody),
     [pipeline.data]
   );
+
+  useEffect(() => {
+    setYamlConfig(pipelineConfig.getYamlConfig());
+  }, [pipelineConfig]);
 
   const submit = async () => {};
 
@@ -73,7 +77,7 @@ export const OsisModal: React.FC<OsisModalProps> = (props) => {
               status: selectedSourceIndex.length ? 'complete' : undefined,
               children: (
                 <SourceIndexSelector
-                  sourceIndexes={config.findSourceIndexes()}
+                  sourceIndexes={pipelineConfig.findSourceIndexes()}
                   loading={pipeline.loading}
                   selected={selectedSourceIndex}
                   setSelected={setSelectedSourceIndex}
@@ -85,13 +89,19 @@ export const OsisModal: React.FC<OsisModalProps> = (props) => {
               children: (
                 <AggregateConfig
                   loading={pipeline.loading}
-                  sourceIndex={selectedSourceIndex[0]?.value?.name}
+                  sourceIndex={selectedSourceIndex[0]?.value}
+                  pipelineConfig={pipelineConfig}
+                  setYamlConfig={setYamlConfig}
                 />
               ),
             },
             {
-              title: 'Configuration',
-              children: <Configuration textAreaRef={textAreaRef} config={config.getJsonConfig()} />,
+              title: 'Preview',
+              children: (
+                <EuiCodeBlock language="yaml" paddingSize="s" isCopyable>
+                  {yamlConfig}
+                </EuiCodeBlock>
+              ),
             },
           ]}
         />

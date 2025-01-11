@@ -56,7 +56,7 @@ interface PercentSamplerConfig extends BaseConfig {
   percent: number;
 }
 
-type AggregatorConfig =
+export type AggregatorConfig =
   | RemoveDuplicatesConfig
   | PutAllConfig
   | CountConfig

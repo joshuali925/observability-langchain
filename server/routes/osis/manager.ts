@@ -3,7 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { GetPipelineCommand, ListPipelinesCommand, OSISClient } from '@aws-sdk/client-osis';
+import {
+  GetPipelineCommand,
+  GetPipelineCommandInput,
+  ListPipelinesCommand,
+  ListTagsForResourceCommand,
+  OSISClient,
+  UpdatePipelineCommand,
+  UpdatePipelineCommandInput,
+} from '@aws-sdk/client-osis';
 import { AssumeRoleCommand, STSClient } from '@aws-sdk/client-sts';
 
 export class OsisManager {
@@ -44,9 +52,15 @@ export class OsisManager {
     return client.send(command);
   }
 
-  async getPipeline(name: string) {
+  async getPipeline(params: GetPipelineCommandInput) {
     const client = await this.getClient();
-    const command = new GetPipelineCommand({ PipelineName: name });
+    const command = new GetPipelineCommand(params);
+    return client.send(command);
+  }
+
+  async updatePipeline(params: UpdatePipelineCommandInput) {
+    const client = await this.getClient();
+    const command = new UpdatePipelineCommand(params);
     return client.send(command);
   }
 }
