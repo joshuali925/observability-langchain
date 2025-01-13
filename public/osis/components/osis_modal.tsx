@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { PipelineSummary } from '@aws-sdk/client-osis';
+import { UpdatePipelineCommandOutput } from '@aws-sdk/client-osis';
 import {
   EuiButton,
   EuiButtonEmpty,
   EuiCodeBlock,
-  EuiComboBoxOptionOption,
   EuiModal,
   EuiModalBody,
   EuiModalFooter,
@@ -17,9 +16,12 @@ import {
   EuiSteps,
 } from '@elastic/eui';
 import React, { useEffect, useMemo, useState } from 'react';
+import { API } from '../../../common/utils/constants';
 import { usePipeline, usePipelines } from '../hooks/use_pipelines';
-import { PipelineConfig, SourceIndex } from '../utils/pipeline_config';
+import { usePipelineState } from '../hooks/use_pipeline_state';
+import { PipelineConfig } from '../utils/pipeline_config';
 import { AggregateConfig } from './aggregate_config';
+import { useOsisContext } from './osis_icon';
 import { PipelineSelector } from './pipelines';
 import { SourceIndexSelector } from './source_index';
 
@@ -28,29 +30,57 @@ interface OsisModalProps {
 }
 
 export const OsisModal: React.FC<OsisModalProps> = (props) => {
+  const context = useOsisContext();
+  const { state } = usePipelineState();
+
   const [yamlConfig, setYamlConfig] = useState('');
-  const [selectedPipeline, setSelectedPipeline] = useState<
-    Array<EuiComboBoxOptionOption<PipelineSummary>>
-  >([]);
-  const [selectedSourceIndex, setSelectedSourceIndex] = useState<
-    Array<EuiComboBoxOptionOption<SourceIndex>>
-  >([]);
 
   const pipelines = usePipelines();
-  const pipeline = usePipeline(selectedPipeline[0]?.value?.PipelineName);
+  const pipeline = usePipeline(state.pipeline?.PipelineName);
   const pipelineConfig = useMemo(
     () => new PipelineConfig(pipeline.data?.Pipeline?.PipelineConfigurationBody),
     [pipeline.data]
   );
 
   useEffect(() => {
-    setYamlConfig(pipelineConfig.getYamlConfig());
-  }, [pipelineConfig]);
+    if (pipelines.error)
+      context.notifications.toasts.addError(pipelines.error, { title: 'Failed to list pipelines' });
+  }, [pipelines.error]);
 
-  const submit = async () => {};
+  useEffect(() => {
+    if (pipeline.error)
+      context.notifications.toasts.addError(pipeline.error, { title: 'Failed to get pipeline' });
+  }, [pipeline.error]);
+
+  useEffect(() => {
+    if (state.sourceIndex && state.destIndex && state.newPipelineName) {
+      const newConfig = pipelineConfig.createNewPipeline(
+        state.sourceIndex,
+        state.aggregatorConfig,
+        state.destIndex,
+        state.newPipelineName
+      );
+      if (newConfig) setYamlConfig(newConfig.getYamlConfig());
+      return;
+    }
+    setYamlConfig(pipelineConfig.getYamlConfig());
+  }, [pipelineConfig, state]);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const submit = async () => {
+    setIsSubmitting(true);
+    await context.http
+      .put<UpdatePipelineCommandOutput>(`${API.PIPELINE}/${state.pipeline?.PipelineName}`, {
+        body: JSON.stringify({ config: yamlConfig }),
+      })
+      .then(props.close)
+      .catch((error) => context.notifications.toasts.addError(error, { title: 'Failed to submit' }))
+      .finally(() => setIsSubmitting(false));
+  };
 
   return (
-    <EuiModal style={{ minWidth: 1200, minHeight: 600 }} onClose={props.close}>
+    <EuiModal style={{ minWidth: 1024 }} onClose={props.close}>
       <EuiModalHeader>
         <EuiModalHeaderTitle>
           <h1>Update pipeline</h1>
@@ -62,25 +92,16 @@ export const OsisModal: React.FC<OsisModalProps> = (props) => {
           steps={[
             {
               title: 'Pipeline',
-              status: selectedPipeline.length ? 'complete' : undefined,
-              children: (
-                <PipelineSelector
-                  pipelines={pipelines.data}
-                  loading={pipelines.loading}
-                  selected={selectedPipeline}
-                  setSelected={setSelectedPipeline}
-                />
-              ),
+              status: state.pipeline ? 'complete' : undefined,
+              children: <PipelineSelector pipelines={pipelines.data} loading={pipelines.loading} />,
             },
             {
               title: 'Source index',
-              status: selectedSourceIndex.length ? 'complete' : undefined,
+              status: state.sourceIndex ? 'complete' : undefined,
               children: (
                 <SourceIndexSelector
                   sourceIndexes={pipelineConfig.findSourceIndexes()}
                   loading={pipeline.loading}
-                  selected={selectedSourceIndex}
-                  setSelected={setSelectedSourceIndex}
                 />
               ),
             },
@@ -89,7 +110,6 @@ export const OsisModal: React.FC<OsisModalProps> = (props) => {
               children: (
                 <AggregateConfig
                   loading={pipeline.loading}
-                  sourceIndex={selectedSourceIndex[0]?.value}
                   pipelineConfig={pipelineConfig}
                   setYamlConfig={setYamlConfig}
                 />
@@ -109,7 +129,7 @@ export const OsisModal: React.FC<OsisModalProps> = (props) => {
 
       <EuiModalFooter>
         <EuiButtonEmpty onClick={props.close}>Cancel</EuiButtonEmpty>
-        <EuiButton fill onClick={submit}>
+        <EuiButton fill onClick={submit} isLoading={isSubmitting}>
           Submit
         </EuiButton>
       </EuiModalFooter>

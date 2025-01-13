@@ -7,65 +7,47 @@ import {
   EuiComboBox,
   EuiComboBoxOptionOption,
   EuiFieldText,
-  EuiFlexGroup,
-  EuiFlexItem,
   EuiForm,
   EuiFormRow,
 } from '@elastic/eui';
-import { dump } from 'js-yaml';
-import React, { useEffect, useRef, useState } from 'react';
-import { AggregationType, useAggregator } from '../hooks/use_aggregator';
+import React from 'react';
 import { useIndexFields } from '../hooks/use_index_fields';
-import { PipelineConfig, SourceIndex } from '../utils/pipeline_config';
+import { AggregationType, usePipelineState } from '../hooks/use_pipeline_state';
+import { PipelineConfig } from '../utils/pipeline_config';
 
 const aggregateActionOptions: Array<EuiComboBoxOptionOption<AggregationType>> = [
   { label: 'Count', value: 'count' },
-  { label: 'Remove duplicates', value: 'remove_duplicates' },
-  { label: 'Put all', value: 'put_all' },
   { label: 'Histogram', value: 'histogram' },
-  { label: 'Rate limiter', value: 'rate_limiter' },
-  { label: 'Percent sampler', value: 'percent_sampler' },
 ];
 
 interface AggregateConfigProps {
   loading: boolean;
-  sourceIndex: SourceIndex | undefined;
   setYamlConfig: React.Dispatch<React.SetStateAction<string>>;
   pipelineConfig: PipelineConfig;
 }
 
 export const AggregateConfig: React.FC<AggregateConfigProps> = (props) => {
-  const indexFields = useIndexFields(props.sourceIndex?.name);
-  const [aggConfig, setAggConfig] = useAggregator();
-  const [destIndex, setDestIndex] = useState<string>();
-  const [newPipelineName, setNewPipelineName] = useState<string>();
-
-  useEffect(() => {
-    if (destIndex && newPipelineName) {
-      const newConfig = props.pipelineConfig.createNewPipeline(
-        props.sourceIndex,
-        aggConfig,
-        destIndex,
-        newPipelineName
-      );
-      if (newConfig) props.setYamlConfig(newConfig.getYamlConfig());
-    }
-  }, [aggConfig, destIndex, newPipelineName]);
+  const { state, dispatch } = usePipelineState();
+  const indexFields = useIndexFields(state.sourceIndex?.name);
 
   return (
     <EuiForm component="form">
       <EuiFormRow label="Destination index">
         <EuiFieldText
           placeholder="metrics"
-          value={destIndex}
-          onChange={(e) => setDestIndex(e.target.value)}
+          value={state.destIndex}
+          onChange={(e) =>
+            dispatch({ type: 'setState', payload: { destIndex: e.target.value } })
+          }
         />
       </EuiFormRow>
       <EuiFormRow label="New pipeline name">
         <EuiFieldText
           placeholder="my-new-pipeline"
-          value={newPipelineName}
-          onChange={(e) => setNewPipelineName(e.target.value)}
+          value={state.newPipelineName}
+          onChange={(e) =>
+            dispatch({ type: 'setState', payload: { newPipelineName: e.target.value } })
+          }
         />
       </EuiFormRow>
       <EuiFormRow label="Identification keys">
@@ -74,12 +56,14 @@ export const AggregateConfig: React.FC<AggregateConfigProps> = (props) => {
           isClearable={false}
           isLoading={props.loading}
           options={indexFields.data?.map((field) => ({ label: field.name }))}
-          selectedOptions={aggConfig.identificationKeys?.map((key) => ({ label: key }))}
+          selectedOptions={state.aggregatorConfig.identificationKeys?.map((key) => ({
+            label: key,
+          }))}
           onChange={(option) =>
-            setAggConfig((prev) => ({
-              ...prev,
-              identificationKeys: option.map((key) => key.label),
-            }))
+            dispatch({
+              type: 'setAggregatorProperty',
+              payload: { identificationKeys: option.map((key) => key.label) },
+            })
           }
         />
       </EuiFormRow>
@@ -91,13 +75,28 @@ export const AggregateConfig: React.FC<AggregateConfigProps> = (props) => {
           isLoading={props.loading}
           options={aggregateActionOptions}
           selectedOptions={aggregateActionOptions.filter(
-            (option) => option.value === aggConfig.action
+            (option) => option.value === state.aggregatorConfig.action
           )}
           onChange={(option) =>
-            setAggConfig((prev) => ({
-              action: option[0].value,
-              identificationKeys: prev.identificationKeys,
-            }))
+            dispatch({
+              type: 'setAggregatorAction',
+              payload: option[0].value,
+            })
+          }
+        />
+      </EuiFormRow>
+      <EuiFormRow
+        label="Group duration"
+        helpText="The amount of time that a group should exist before it is concluded automatically. Default is 180s."
+      >
+        <EuiFieldText
+          placeholder="30s"
+          value={state.aggregatorConfig.groupDuration}
+          onChange={(e) =>
+            dispatch({
+              type: 'setAggregatorProperty',
+              payload: { groupDuration: e.target.value },
+            })
           }
         />
       </EuiFormRow>

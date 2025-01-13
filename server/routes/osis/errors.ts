@@ -15,7 +15,11 @@ export class OsisError extends Error {
       this.statusCode =
         error.$metadata.httpStatusCode === 500 ? 503 : error.$metadata.httpStatusCode ?? 503;
       try {
-        this.message = JSON.stringify({ ...error, statusCode: this.statusCode });
+        this.message = JSON.stringify({
+          ...error,
+          message: error.message,
+          statusCode: this.statusCode,
+        });
       } catch (_stringifyError) {
         this.message = JSON.stringify({
           message: error.message,

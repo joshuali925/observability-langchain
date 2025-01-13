@@ -16,6 +16,7 @@ type Action<T> =
   | { type: 'success'; payload: State<T>['data'] }
   | { type: 'failure'; error: NonNullable<State<T>['error']> };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type GenericReducer<T = any> = Reducer<State<T>, Action<T>>;
 const genericReducer: GenericReducer = (state, action) => {
   switch (action.type) {
@@ -45,7 +46,10 @@ export const useRequest = <T, U extends unknown[]>(
 
     request(abortControllerRef.current)
       .then((payload) => dispatch({ type: 'success', payload }))
-      .catch((error) => dispatch({ type: 'failure', error }));
+      .catch((error) => {
+        if (error.body?.message) error.stack += '\n\n' + error.body.message;
+        dispatch({ type: 'failure', error });
+      });
 
     return () => abortControllerRef.current?.abort();
   }, [refresh, ...deps]);

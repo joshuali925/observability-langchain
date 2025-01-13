@@ -5,17 +5,19 @@
 
 import { EuiButtonIcon } from '@elastic/eui';
 import React, { useContext, useMemo } from 'react';
-import { HttpSetup } from '../../../../../src/core/public';
+import { HttpSetup, NotificationsStart } from '../../../../../src/core/public';
 import {
   IDataPluginServices,
   QueryEditorExtensionDependencies,
 } from '../../../../../src/plugins/data/public';
 import { useOpenSearchDashboards } from '../../../../../src/plugins/opensearch_dashboards_react/public';
+import { PipelineStateProvider } from '../hooks/use_pipeline_state';
 import { OsisModal } from './osis_modal';
 
 interface IOsisContext {
   dependencies: QueryEditorExtensionDependencies;
   http: HttpSetup;
+  notifications: NotificationsStart;
 }
 export const OsisContext = React.createContext<IOsisContext | null>(null);
 
@@ -35,6 +37,7 @@ export const OsisIcon: React.FC<OsisIconProps> = (props) => {
     () => ({
       dependencies: props.dependencies,
       http: opensearchDashboards.services.http,
+      notifications: opensearchDashboards.services.notifications,
     }),
     [props.dependencies]
   );
@@ -45,7 +48,9 @@ export const OsisIcon: React.FC<OsisIconProps> = (props) => {
       onClick={() => {
         const ref = opensearchDashboards.overlays.openModal(
           <OsisContext.Provider value={osisValue}>
-            <OsisModal close={() => ref.close()} />
+            <PipelineStateProvider>
+              <OsisModal close={() => ref.close()} />
+            </PipelineStateProvider>
           </OsisContext.Provider>
         );
       }}

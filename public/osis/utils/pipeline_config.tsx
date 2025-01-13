@@ -5,7 +5,7 @@
 
 import { dump, load } from 'js-yaml';
 import _ from 'lodash';
-import { AggregatorConfig } from '../hooks/use_aggregator';
+import { AggregatorConfig } from '../hooks/use_pipeline_state';
 
 interface PipelineConfigSchema {
   [key: string]: {
@@ -66,12 +66,12 @@ export class PipelineConfig {
   }
 
   createNewPipeline(
-    sourceIndex: SourceIndex | undefined,
+    sourceIndex: SourceIndex,
     aggConfig: Partial<AggregatorConfig>,
     destIndex: string,
     pipelineName: string
   ): PipelineConfig | undefined {
-    if (!this.config || !sourceIndex) return undefined;
+    if (!this.config) return undefined;
 
     const newConfig = new PipelineConfig(undefined);
     newConfig.config = _.cloneDeep(this.config);

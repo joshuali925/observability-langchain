@@ -7,7 +7,6 @@ import {
   GetPipelineCommand,
   GetPipelineCommandInput,
   ListPipelinesCommand,
-  ListTagsForResourceCommand,
   OSISClient,
   UpdatePipelineCommand,
   UpdatePipelineCommandInput,

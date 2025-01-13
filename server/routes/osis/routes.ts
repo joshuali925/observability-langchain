@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { STSServiceException } from '@aws-sdk/client-sts';
 import { schema } from '@osd/config-schema';
-
 import { IRouter } from 'opensearch-dashboards/server';
 import { API } from '../../../common/utils/constants';
 import { OsisError } from './errors';
@@ -24,7 +22,7 @@ export function registerOsisRoutes(router: IRouter) {
         const resp = await osisManager.getPipelines();
         return response.ok({ body: resp });
       } catch (error) {
-        const osisError = new OsisError(error)
+        const osisError = new OsisError(error);
         return osisError.createErrorResponse();
       }
     }
@@ -44,7 +42,7 @@ export function registerOsisRoutes(router: IRouter) {
         const resp = await osisManager.getPipeline({ PipelineName: request.params.name });
         return response.ok({ body: resp });
       } catch (error) {
-        const osisError = new OsisError(error)
+        const osisError = new OsisError(error);
         return osisError.createErrorResponse();
       }
     }
@@ -70,7 +68,7 @@ export function registerOsisRoutes(router: IRouter) {
         });
         return response.ok({ body: resp });
       } catch (error) {
-        const osisError = new OsisError(error)
+        const osisError = new OsisError(error);
         return osisError.createErrorResponse();
       }
     }
