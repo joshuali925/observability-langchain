@@ -1,0 +1,57 @@
+figure {
+  max-width: 16px !important;
+  margin-right: 12px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.dscSidebarItem {
+  border-top: 1px solid transparent;
+  // position: relative;
+  // display: flex;
+  // align-items: center;
+  // justify-content: space-between;
+  padding: 0 2px;
+  cursor: pointer;
+  border-top: solid 1px transparent;
+  border-bottom: solid 1px transparent;
+  line-height: normal;
+
+  &:hover,
+  &:focus {
+    .dscSidebarItem__action {
+      opacity: 1;
+    }
+  }
+}
+
+.dscSidebarItem__action {
+  opacity: 0; /* 1 */
+  &:hover {
+    opacity: 1; /* 2 */
+  }
+  float: right;
+  font-size: 12px;
+  padding: 2px 6px !important;
+  height: 22px !important;
+  min-width: auto !important;
+  .euiButton__content {
+    padding: 0 4px;
+  }
+}
+
+.dscIndexPattern__triggerButton {
+  @include euiTitle('xs');
+  line-height: $euiSizeXXL;
+}
+
+.dscFieldSearch__toggleButton {
+  width: calc(100% - #{$euiSizeS});
+  color: $euiColorPrimary;
+  padding-left: $euiSizeXS;
+  margin-left: $euiSizeXS;
+}
+
+.kbnDocViewerTable {
+  margin-top: $euiSizeS;
+}

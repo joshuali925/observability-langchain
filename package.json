@@ -1,0 +1,32 @@
+{
+  "name": "insights_discover",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Joshua Li <lijshu@amazon.com>",
+  "license": "Apache-2.0",
+  "kibana": {
+    "version": "7.7.0"
+  },
+  "scripts": {
+    "preinstall": "node ../../preinstall_check",
+    "kbn": "node ../../scripts/kbn",
+    "es": "node ../../scripts/es",
+    "test": "grunt test",
+    "test:karma": "grunt test:karma",
+    "test:karma:debug": "grunt test:karmaDebug",
+    "test:jest": "node ../../scripts/jest",
+    "lint": "yarn run lint:es && yarn run lint:sass"
+  },
+  "engines": {
+    "node": "10.19.0",
+    "yarn": "^1.21.1"
+  },
+  "dependencies": {
+    "@elastic/datemath": "link:../../packages/elastic-datemath",
+    "@elastic/eui": "^24.0.0",
+    "moment": "^2.26.0",
+    "plotly.js": "^1.54.1",
+    "react-graph-vis": "^1.0.5",
+    "react-plotly.js": "^2.4.0"
+  }
+}

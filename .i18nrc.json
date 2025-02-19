@@ -1,0 +1,10 @@
+{
+    "prefix": "insightsDiscover",
+    "paths": {
+      "insightsDiscover": "."
+    },
+    "translations": [
+      "translations/ja-JP.json"
+    ]
+  }
+  
