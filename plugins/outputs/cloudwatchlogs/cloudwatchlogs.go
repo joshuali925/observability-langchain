@@ -26,6 +26,7 @@ import (
 	"github.com/aws/amazon-cloudwatch-agent/internal"
 	"github.com/aws/amazon-cloudwatch-agent/internal/retryer"
 	"github.com/aws/amazon-cloudwatch-agent/logs"
+	"github.com/aws/amazon-cloudwatch-agent/plugins/outputs/cloudwatchlogs/internal/osis"
 	"github.com/aws/amazon-cloudwatch-agent/plugins/outputs/cloudwatchlogs/internal/pusher"
 	"github.com/aws/amazon-cloudwatch-agent/sdk/service/cloudwatchlogs"
 	"github.com/aws/amazon-cloudwatch-agent/tool/util"
@@ -69,6 +70,11 @@ type CloudWatchLogs struct {
 	// Retention for log group
 	RetentionInDays int `toml:"retention_in_days"`
 	Concurrency     int `toml:"concurrency"`
+
+	// OTLP/OpenSearch Ingestion configuration
+	UseOTLP      bool              `toml:"use_otlp"`
+	OTLPEndpoint string            `toml:"otlp_endpoint"`
+	OTLPTimeout  internal.Duration `toml:"otlp_timeout"`
 
 	ForceFlushInterval internal.Duration `toml:"force_flush_interval"` // unit is second
 
@@ -147,7 +153,31 @@ func (c *CloudWatchLogs) getDest(t pusher.Target, logSrc logs.LogSrc) *cwDest {
 		c.targetManager = pusher.NewTargetManager(c.Log, client)
 	})
 	p := pusher.NewPusher(c.Log, t, client, c.targetManager, logSrc, c.workerPool, c.ForceFlushInterval.Duration, maxRetryTimeout, c.pusherStopChan, &c.pusherWaitGroup)
-	cwd := &cwDest{pusher: p, retryer: logThrottleRetryer}
+
+	cwd := &cwDest{
+		pusher:  p,
+		retryer: logThrottleRetryer,
+	}
+
+	// Initialize OpenSearch Ingestion client if OTLP is enabled
+	if c.UseOTLP && c.OTLPEndpoint != "" {
+		c.Log.Infof("Initializing OpenSearch Ingestion client with endpoint: %s", c.OTLPEndpoint)
+		timeout := 10 * time.Second
+		if c.OTLPTimeout.Duration > 0 {
+			timeout = c.OTLPTimeout.Duration
+		}
+
+		// Create the OSIS client
+		cwd.osisClient = osis.NewClient(c.OTLPEndpoint)
+		cwd.osisClient.SetLogger(c.Log)
+		cwd.osisClient.SetTimeout(timeout)
+		cwd.osisClient.SetRegion(c.Region)
+		cwd.osisEnabled = true
+
+		c.Log.Infof("OpenSearch Ingestion client initialized successfully with timeout: %v and region: %s",
+			timeout, c.Region)
+	}
+
 	c.cwDests[t] = cwd
 	return cwd
 }
@@ -315,12 +345,24 @@ func (e *structuredLogEvent) Done() {}
 type cwDest struct {
 	pusher *pusher.Pusher
 	sync.Mutex
-	isEMF   bool
-	stopped bool
-	retryer *retryer.LogThrottleRetryer
+	isEMF       bool
+	stopped     bool
+	retryer     *retryer.LogThrottleRetryer
+	osisClient  *osis.Client
+	osisEnabled bool
 }
 
 func (cd *cwDest) Publish(events []logs.LogEvent) error {
+	// If OpenSearch Ingestion is enabled, send events directly to OSIS
+	if cd.osisEnabled {
+		if cd.stopped {
+			return logs.ErrOutputStopped
+		}
+
+		err := cd.osisClient.PublishEvents(events)
+		return err
+	}
+
 	for _, e := range events {
 		if !cd.isEMF {
 			msg := e.Message()
@@ -388,6 +430,12 @@ var sampleConfig = `
 
   # The log stream name.
   log_stream_name = "<log_stream_name>"
+
+  # OpenSearch Ingestion configuration (optional)
+  # If enabled, logs will be sent to the OTLP endpoint instead of CloudWatch Logs
+  #use_otlp = true
+  #otlp_endpoint = "https://pipeline.us-west-2.osis.amazonaws.com/pipeline-name/logs"
+  #otlp_timeout = "10s"
 `
 
 // SampleConfig returns the default configuration of the Output
@@ -399,6 +447,7 @@ func init() {
 	outputs.Add("cloudwatchlogs", func() telegraf.Output {
 		return &CloudWatchLogs{
 			ForceFlushInterval: internal.Duration{Duration: defaultFlushTimeout},
+			OTLPTimeout:        internal.Duration{Duration: 10 * time.Second},
 			pusherStopChan:     make(chan struct{}),
 			cwDests:            make(map[pusher.Target]*cwDest),
 			middleware: agenthealth.NewAgentHealth(
