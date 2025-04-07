@@ -903,9 +903,23 @@
           "description": "The number of concurrent workers available for cloudwatch logs export",
           "type": "integer",
           "minimum": 1
+        },
+        "use_otlp": {
+          "description": "Enable OpenSearch Ingestion (OTLP) for log event publishing",
+          "type": "boolean"
+        },
+        "otlp_endpoint": {
+          "description": "The OTLP endpoint for OpenSearch Ingestion pipeline",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "otlp_timeout": {
+          "description": "Timeout for OTLP requests to OpenSearch Ingestion",
+          "$ref": "#/definitions/timeIntervalDefinition"
         }
       },
-      "additionalProperties": false,
+      "additionalProperties": true,
       "anyOf": [
         {
           "required": [

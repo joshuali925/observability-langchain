@@ -11,7 +11,7 @@ When concurrency is enabled, the pusher uses a shared worker pool to allow multi
            │    ┌────────Event Queue────────┐      ┌─────────Batch─────────┐  │           │    │ ┌────────┐ │    │
            │    │                           │      │ ┌───────────────────┐ │  │    ┌──────┼───►│ │ Sender │ │    │
            │    │ ┌───┐     ┌───┐┌───┐┌───┐ │      │ │                   │ │  │    │      │    │ └────────┘ │    │
-AddEvent───│───►│ │ n │ ... │ 3 ││ 2 ││ 1 │ ├─────►│ │ PutLogEventsInput │ ├──┼────┤      │    └────────────┘    │
+AddEvent───┼───►│ │ n │ ... │ 3 ││ 2 ││ 1 │ ├─────►│ │ PutLogEventsInput │ ├──┼────┤      │    └────────────┘    │
            │    │ └───┘     └───┘└───┘└───┘ │      │ │                   │ │  │    │      │                      │
            │    │                           │      │ └───────────────────┘ │  │    │      │    ┌──Worker 2──┐    │
            │    └───────────────────────────┘      └───────────────────────┘  │    │      │    │ ┌────────┐ │    │
@@ -25,10 +25,32 @@ AddEvent───│───►│ │ n │ ... │ 3 ││ 2 ││ 1 │ �
            │    ┌────────Event Queue────────┐      ┌─────────Batch─────────┐  │    │      │                      │
            │    │                           │      │ ┌───────────────────┐ │  │    │      │                      │
            │    │ ┌───┐     ┌───┐┌───┐┌───┐ │      │ │                   │ │  │    │      │    ┌──Worker n──┐    │
-AddEvent───│───►│ │ n │ ... │ 3 ││ 2 ││ 1 │ ├─────►│ │ PutLogEventsInput │ ├──┼────┤      │    │ ┌────────┐ │    │
+AddEvent───┼───►│ │ n │ ... │ 3 ││ 2 ││ 1 │ ├─────►│ │ PutLogEventsInput │ ├──┼────┤      │    │ ┌────────┐ │    │
            │    │ └───┘     └───┘└───┘└───┘ │      │ │                   │ │  │    └──────┼───►│ │ Sender │ │    │
            │    │                           │      │ └───────────────────┘ │  │           │    │ └────────┘ │    │
            │    └───────────────────────────┘      └───────────────────────┘  │           │    └────────────┘    │
            │                                                                  │           │                      │
            └──────────────────────────────────────────────────────────────────┘           └──────────────────────┘
 ```
+
+## OpenSearch Ingestion Support
+
+This plugin now supports sending log events to OpenSearch through Amazon OpenSearch Ingestion. When enabled, log events will be sent to the specified OpenSearch Ingestion pipeline instead of CloudWatch Logs.
+
+To enable OpenSearch Ingestion, configure the following parameters in the JSON configuration:
+
+```json
+"logs": {
+  "use_otlp": true,
+  "otlp_endpoint": "https://pipeline.us-west-2.osis.amazonaws.com/pipeline-name/logs",
+  "otlp_timeout": 10
+}
+```
+
+### OTLP Configuration Options
+
+| Parameter | Type | Description | Default |
+| --------- | ---- | ----------- | ------- |
+| `use_otlp` | boolean | Enables OpenSearch Ingestion for log publishing | `false` |
+| `otlp_endpoint` | string | The OpenSearch Ingestion pipeline endpoint URL | - |
+| `otlp_timeout` | integer | Timeout for OTLP requests in seconds | 10 |

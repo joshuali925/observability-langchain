@@ -52,31 +52,31 @@ var (
 )
 
 type CloudWatchLogs struct {
-	Region           string `toml:"region"`
-	RegionType       string `toml:"region_type"`
-	Mode             string `toml:"mode"`
-	EndpointOverride string `toml:"endpoint_override"`
-	AccessKey        string `toml:"access_key"`
-	SecretKey        string `toml:"secret_key"`
-	RoleARN          string `toml:"role_arn"`
-	Profile          string `toml:"profile"`
-	Filename         string `toml:"shared_credential_file"`
-	Token            string `toml:"token"`
+	Region           string `toml:"region" json:"region,omitempty"`
+	RegionType       string `toml:"region_type" json:"region_type,omitempty"`
+	Mode             string `toml:"mode" json:"mode,omitempty"`
+	EndpointOverride string `toml:"endpoint_override" json:"endpoint_override,omitempty"`
+	AccessKey        string `toml:"access_key" json:"access_key,omitempty"`
+	SecretKey        string `toml:"secret_key" json:"secret_key,omitempty"`
+	RoleARN          string `toml:"role_arn" json:"role_arn,omitempty"`
+	Profile          string `toml:"profile" json:"profile,omitempty"`
+	Filename         string `toml:"shared_credential_file" json:"shared_credential_file,omitempty"`
+	Token            string `toml:"token" json:"token,omitempty"`
 
 	//log group and stream names
-	LogStreamName string `toml:"log_stream_name"`
-	LogGroupName  string `toml:"log_group_name"`
+	LogStreamName string `toml:"log_stream_name" json:"log_stream_name,omitempty"`
+	LogGroupName  string `toml:"log_group_name" json:"log_group_name,omitempty"`
 
 	// Retention for log group
-	RetentionInDays int `toml:"retention_in_days"`
-	Concurrency     int `toml:"concurrency"`
+	RetentionInDays int `toml:"retention_in_days" json:"retention_in_days,omitempty"`
+	Concurrency     int `toml:"concurrency" json:"concurrency,omitempty"`
 
 	// OTLP/OpenSearch Ingestion configuration
-	UseOTLP      bool              `toml:"use_otlp"`
-	OTLPEndpoint string            `toml:"otlp_endpoint"`
-	OTLPTimeout  internal.Duration `toml:"otlp_timeout"`
+	UseOTLP      bool              `toml:"use_otlp" json:"use_otlp,omitempty"`
+	OTLPEndpoint string            `toml:"otlp_endpoint" json:"otlp_endpoint,omitempty"`
+	OTLPTimeout  internal.Duration `toml:"otlp_timeout" json:"otlp_timeout,omitempty"`
 
-	ForceFlushInterval internal.Duration `toml:"force_flush_interval"` // unit is second
+	ForceFlushInterval internal.Duration `toml:"force_flush_interval" json:"force_flush_interval,omitempty"` // unit is second
 
 	Log telegraf.Logger `toml:"-"`
 

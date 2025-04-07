@@ -20,6 +20,25 @@ func (f *BasicLogConfig) ApplyRule(input interface{}) (returnKey string, returnV
 	cloudwatchlogsConfig[agent.RegionType] = agent.Global_Config.RegionType
 	cloudwatchlogsConfig[agent.Mode] = context.CurrentContext().ShortMode()
 
+	// Handle the OpenSearch Ingestion (OTLP) configuration
+	im, ok := input.(map[string]interface{})
+	if ok {
+		// Check and add use_otlp if present
+		if useOTLP, ok := im["use_otlp"]; ok {
+			cloudwatchlogsConfig["use_otlp"] = useOTLP
+		}
+		
+		// Check and add otlp_endpoint if present
+		if otlpEndpoint, ok := im["otlp_endpoint"]; ok {
+			cloudwatchlogsConfig["otlp_endpoint"] = otlpEndpoint
+		}
+		
+		// Check and add otlp_timeout if present
+		if otlpTimeout, ok := im["otlp_timeout"]; ok {
+			cloudwatchlogsConfig["otlp_timeout"] = otlpTimeout
+		}
+	}
+
 	returnKey = Output_Cloudwatch_Logs
 	returnVal = cloudwatchlogsConfig
 	return
